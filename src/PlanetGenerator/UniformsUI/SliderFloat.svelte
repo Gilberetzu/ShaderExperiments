@@ -78,12 +78,29 @@ input[type="range"]::-ms-fill-upper {
     cursor: pointer;
     background-color: var(--c3);
 }
+input[type="number"]{
+        min-width: 0px;
+        border: none;
+        background-color: rgb(240, 230, 230);
+        padding: 0em 0.2em;
+        border-radius: 0px 0.2em 0.2em 0em;
+    }
+    input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 </style>
 
 <div class="container">
     <div>{label}</div>
     <input type="range" min={min} max={max} step={step} bind:value/>
-    <div>{value}</div>
+    <input type="number" bind:value>
 
     <div class="resetButton" on:click={()=>{
         value = defaultValue;
