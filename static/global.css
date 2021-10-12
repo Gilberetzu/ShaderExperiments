@@ -1,0 +1,18 @@
+:root {
+	--c1:      #F5EDED;
+    --c1Text:  #D0CDCD;
+    --c1Block: #E0DDDD;
+	--c2: #00345A;
+	--c3: #ED1C24;
+	--c4: #00172D;
+	--codeHighlight: #f92672;
+    --navLayoutMaxWidth: 1500px;
+}
+
+body {
+	margin: 0;
+	font-family: 'Lato', sans-serif;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #333;
+}
