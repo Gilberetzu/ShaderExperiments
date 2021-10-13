@@ -25,6 +25,18 @@
     {
       name: 'WhiteGreen',
       url: '/Examples/WhiteAndGreen.txt'
+    },{
+        name: 'Earthy',
+        url: '/Examples/Earthy.txt'
+    },{
+        name: 'Spiky',
+        url: '/Examples/Spiky.txt'
+    },{
+        name: 'Purple',
+        url: '/Examples/Purple.txt'
+    },{
+        name: 'RedAndBlue',
+        url: '/Examples/RedAndBlue.txt'
     }
   ];
 
@@ -151,7 +163,7 @@
         let data = jsonData.find(
           (element) => element.uniformName == controlElement.params.uniformName
         );
-        controlElement.params.defaultValue = data.value;
+        controlElement.params.defaultValue = (data != undefined && data != null) ? data.value : controlElement.params.defaultValue;
         newControls.push(controlElement);
       } else {
         newControls.push(controlElement);
@@ -172,7 +184,12 @@
         return response.json();
       })
       .then((json) => {
-          setJSONDataToControls(json);
+          console.log(json);
+          try{
+            setJSONDataToControls(json);
+          }catch (e){
+              console.log(e);
+          }
           exampleWindowOpen = false;
       })
       .catch(function () {
@@ -722,6 +739,29 @@
         }
       },
       {
+        type: ControlTypes.CONTROL,
+        component: Boolean,
+        dataType: 'bool',
+        params: {
+          label: 'Cloud Posterize',
+          uniformName: '_CloudsPosterize',
+          defaultValue: planetGenerator.uniforms['_CloudsPosterize'].value
+        }
+      },
+      {
+        type: ControlTypes.CONTROL,
+        component: SliderFloat,
+        dataType: 'float',
+        params: {
+          min: 1.0,
+          max: 10.0,
+          step: 1.0,
+          label: 'Posterize Count',
+          uniformName: '_CloudsPosterizeCount',
+          defaultValue: planetGenerator.uniforms['_CloudsPosterizeCount'].value
+        }
+      },
+      {
         type: ControlTypes.HEADER,
         label: 'Ambien Parameters'
       },
@@ -854,6 +894,10 @@
         />
       {/if}
     {/each}
+
+    <div class="specialThanks">
+        Special thanks to <a href="https://twitter.com/iquilezles">Iñigo Quilez</a> and <a href="https://twitter.com/SebastianLague">Sebastian Lague</a> for their awesome articles and videos on Raymarching.
+    </div>
   </div>
 </div>
 
@@ -881,6 +925,16 @@
 {/if}
 
 <style>
+    .specialThanks{
+        font-size: 1.3em;
+        margin-top: 2em;
+        margin-bottom: 1em;
+        color: var(--c1);
+        font-weight: 300;
+    }
+    .specialThanks a{
+        color: var(--c1);
+    }
   .exampleWindow {
     position: fixed;
     top: 0px;
@@ -893,7 +947,7 @@
   .exampleEntry {
     cursor: pointer;
     font-weight: 300;
-    padding: 0.5em;
+    padding: 0.5em 2em;
     font-size: 1.2em;
     background-color: var(--c4);
     color: var(--c1);

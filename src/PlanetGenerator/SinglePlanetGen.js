@@ -87,6 +87,8 @@ export default class SinglePlanetGen{
             _CloudMoveSpeed: {value: 0.1},
             _CloudsStepSize: {value: 0.01},
             _CloudsMaxStepCount: {value: 100},
+            _CloudsPosterize: {value: true},
+            _CloudsPosterizeCount: {value: 4},
             //Ambient
             _AmbientColor: {value: new THREE.Color(0.1,0.1,0.3)},
             _AmbientPower: {value: 4.0},

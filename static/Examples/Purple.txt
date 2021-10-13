@@ -1,0 +1,262 @@
+[
+  {
+    "type": "CONTROL",
+    "dataType": "vec3",
+    "uniformName": "_PSNoiseOffset",
+    "value": {
+      "x": 10.62,
+      "y": 1,
+      "z": 1
+    }
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_PSNoiseGlobalScale",
+    "value": 2.37
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_PSWaterHeight",
+    "value": 0.38
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_PSWaterDepthOffset",
+    "value": 0.43
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_PSMaxHeightOffset",
+    "value": 0.28
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec2",
+    "uniformName": "_PSNoiseScales",
+    "value": {
+      "x": 1,
+      "y": 3
+    }
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_SecondaryNoiseStrengthGround",
+    "value": 0.35
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_MaxScrewTerrain",
+    "value": -0.26
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_PSDensityOffset",
+    "value": 0.41
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_SurfaceMinLight",
+    "value": 0.2
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "bool",
+    "uniformName": "_EnableVoxelizer",
+    "value": false
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_GridHalfSize",
+    "value": 25
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_VoxelNormalInterp",
+    "value": 1
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_PlanetColor1",
+    "value": "000000"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_PlanetColor2",
+    "value": "e733ff"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_WaterColorDepth",
+    "value": "000000"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_WaterColor",
+    "value": "99ccff"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec2",
+    "uniformName": "_WaterMaterialSmoothStep",
+    "value": {
+      "x": 4.92,
+      "y": 1
+    }
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_WaterNormalScale",
+    "value": 12.46
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_WaterSurfaceMinLight",
+    "value": 0.44
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_WaterNormalStrength",
+    "value": 0.5
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec2",
+    "uniformName": "_SpecularParams",
+    "value": {
+      "x": 3.4,
+      "y": 0.33
+    }
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_WaterMoveSpeed",
+    "value": 0.2
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudTransparency",
+    "value": 1
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_CloudColor1",
+    "value": "5e0c5f"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_CloudColor2",
+    "value": "01d4f9"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_MaxScrewCloud",
+    "value": 0.22
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudMidDistance",
+    "value": 0.5
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudHalfHeight",
+    "value": 0.2
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec2",
+    "uniformName": "_CloudNoiseScales",
+    "value": {
+      "x": 3,
+      "y": 15
+    }
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3",
+    "uniformName": "_CloudNoiseOffset",
+    "value": {
+      "x": 1,
+      "y": 1,
+      "z": 1
+    }
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudNoiseGlobalScale",
+    "value": 1.07
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_SecondaryNoiseStrength",
+    "value": 0.23
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudDensityMultiplier",
+    "value": 0.79
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudDensityOffset",
+    "value": 0.1
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudMoveSpeed",
+    "value": 0.33
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "bool",
+    "uniformName": "_CloudsPosterize",
+    "value": false
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_CloudsPosterizeCount",
+    "value": 4
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "vec3Color",
+    "uniformName": "_AmbientColor",
+    "value": "00047a"
+  },
+  {
+    "type": "CONTROL",
+    "dataType": "float",
+    "uniformName": "_AmbientPower",
+    "value": 3.46
+  }
+]

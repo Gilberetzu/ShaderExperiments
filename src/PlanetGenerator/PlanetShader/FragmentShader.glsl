@@ -55,6 +55,9 @@ uniform float _CloudMoveSpeed;
 uniform float _CloudsStepSize;
 uniform float _CloudsMaxStepCount;
 
+uniform bool _CloudsPosterize;
+uniform float _CloudsPosterizeCount;
+
 //Ambient Parameters
 uniform vec3 _AmbientColor;
 uniform float _AmbientPower;
@@ -538,7 +541,7 @@ void main() {
     cloudRender(viewVecNorm, vPosition, cloudInterp, cloudHitPos);
     bool cloudHit = cloudInterp < 0.0 ? false : true;
 
-    float posterizedCloudInterp = floor(cloudInterp * 4.0) /4.0;
+    float posterizedCloudInterp = _CloudsPosterize && _CloudsPosterizeCount >=2.0 ? floor(cloudInterp * _CloudsPosterizeCount) /(_CloudsPosterizeCount - 1.0) : cloudInterp;
     float cloudPlanetOclussion = 1.0;
     
     if(cloudHit){
