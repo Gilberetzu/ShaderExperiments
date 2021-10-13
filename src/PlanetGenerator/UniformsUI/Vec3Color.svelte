@@ -10,7 +10,7 @@
     let value;
 
     let updateControlValue = ()=>{
-        value = "#" + defaultValue.getHexString(); 
+        value = "#" + defaultValue; 
     }
     updateControlValue();
     

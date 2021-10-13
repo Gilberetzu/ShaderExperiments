@@ -8,6 +8,9 @@
   import Vec2 from '../PlanetGenerator/UniformsUI/Vec2.svelte';
   import Vec3Color from '../PlanetGenerator/UniformsUI/Vec3Color.svelte';
   import Vec3 from '../PlanetGenerator/UniformsUI/Vec3.svelte';
+  import ByMeIcon from '../CommonComponents/ByMeIcon.svelte';
+  import ControlHeader from '../PlanetGenerator/UniformsUI/ControlHeader.svelte';
+  import Boolean from '../PlanetGenerator/UniformsUI/Boolean.svelte';
 
   let canvasElement;
   let planetGenerator;
@@ -17,6 +20,15 @@
     height: 1
   };
   let renderScale = 1;
+
+  let exampleList = [
+    {
+      name: 'WhiteGreen',
+      url: '/Examples/WhiteAndGreen.txt'
+    }
+  ];
+
+  let renderResolution = { x: 800, y: 450 };
 
   let updateShaderUniform = () => {};
 
@@ -31,11 +43,15 @@
   };
 
   let downloadAElement;
+  let uploadJsonElement;
 
   let saveImage = () => {
-    planetGenerator.renderForFile();
+    planetGenerator.renderForFile(renderResolution);
     canvasElement.toBlob((blob) => {
-      saveRenderToImage(blob, `PlanetRender.png`);
+      saveRenderToImage(
+        blob,
+        `PlanetRender_${renderResolution.x}_${renderResolution.y}.png`
+      );
     });
   };
 
@@ -55,6 +71,23 @@
     planetGenerator.resizeRenderer(planetGenerator.desiredWidth);
   };
 
+  const RaymarchSettingType = {
+    NORMAL: 'NORMAL',
+    LOW: 'LOW',
+    HIGH: 'HIGH'
+  };
+  let currentRaymarchRuntimeSetting = RaymarchSettingType.NORMAL;
+
+  let convertJSONtoControls = () => {
+    uploadJsonElement.click();
+  };
+
+  let exampleWindowOpen = false;
+
+  let loadExamples = () => {
+    exampleWindowOpen = true;
+  };
+
   let convertControlsToJSON = () => {
     let controlsJSON = [];
     for (let i = 0; i < controls.length; i++) {
@@ -62,17 +95,29 @@
 
       if (control.type == ControlTypes.CONTROL) {
         let val = null;
-        if(planetGenerator.uniforms[control.params.uniformName].value.getHexString){
-            val = planetGenerator.uniforms[control.params.uniformName].value.getHexString();
+        let uniformVal =
+          planetGenerator.uniforms[control.params.uniformName].value;
+        if (control.dataType == 'vec3Color') {
+          val = uniformVal.getHexString();
+        } else if (control.dataType == 'float') {
+          val = uniformVal;
+        } else if (control.dataType == 'vec2') {
+          val = { x: uniformVal.x, y: uniformVal.y };
+        } else if (control.dataType == 'vec3') {
+          val = { x: uniformVal.x, y: uniformVal.y, z: uniformVal.z };
+        } else if (control.dataType == 'bool') {
+          val = uniformVal;
+        } else {
+          val = JSON.stringify(
+            planetGenerator.uniforms[control.params.uniformName].value
+          );
         }
         controlsJSON.push({
           type: ControlTypes.CONTROL,
+          dataType: control.dataType,
           uniformName: control.params.uniformName,
-
-          value: val==null ? JSON.stringify(
-            planetGenerator.uniforms[control.params.uniformName].value
-          ) : val
-        });//getHexString
+          value: val
+        });
       }
     }
 
@@ -87,12 +132,57 @@
   };
 
   let fileChanged = (event) => {
-    console.log(event.target.files);
+    if (event.target.files.length == 0) return;
+    let eTarget = event.target;
     let reader = new FileReader();
     reader.onload = (event) => {
       let jsonData = JSON.parse(event.target.result);
+      setJSONDataToControls(jsonData);
+      eTarget.value = '';
     };
     reader.readAsText(event.target.files[0]);
+  };
+
+  let setJSONDataToControls = (jsonData) => {
+    let newControls = [];
+    for (let i = 0; i < controls.length; i++) {
+      const controlElement = controls[i];
+      if (controlElement.type == ControlTypes.CONTROL) {
+        let data = jsonData.find(
+          (element) => element.uniformName == controlElement.params.uniformName
+        );
+        controlElement.params.defaultValue = data.value;
+        newControls.push(controlElement);
+      } else {
+        newControls.push(controlElement);
+      }
+    }
+    controls = [];
+    requestAnimationFrame(() => {
+      controls = newControls;
+    });
+  };
+
+  let readJson = (exampleURL) => {
+    fetch(exampleURL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('HTTP error ' + response.status);
+        }
+        return response.json();
+      })
+      .then((json) => {
+          setJSONDataToControls(json);
+          exampleWindowOpen = false;
+      })
+      .catch(function () {
+        this.dataError = true;
+      });
+  };
+
+  let setRenderResolution = (name, value) => {
+    renderResolution.x = value.x;
+    renderResolution.y = value.y;
   };
 
   onMount(() => {
@@ -177,6 +267,7 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec3,
+        dataType: 'vec3',
         params: {
           label: 'Noise Offset',
           uniformName: '_PSNoiseOffset',
@@ -186,6 +277,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.01,
           max: 20.0,
@@ -198,6 +290,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.01,
           max: 1.0,
@@ -210,6 +303,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.01,
           max: 1.0,
@@ -222,6 +316,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.01,
           max: 1.0,
@@ -234,6 +329,7 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec2,
+        dataType: 'vec2',
         params: {
           label: 'Noise Scales',
           uniformName: '_PSNoiseScales',
@@ -243,6 +339,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: -1.0,
           max: 1.0,
@@ -256,6 +353,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: -10.0,
           max: 10.0,
@@ -268,6 +366,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: -1.0,
           max: 1.0,
@@ -280,6 +379,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 1.0,
@@ -294,20 +394,64 @@
       },
       {
         type: ControlTypes.CONTROL,
+        component: Boolean,
+        dataType: 'bool',
+        params: {
+          label: 'Enable Voxel',
+          uniformName: '_EnableVoxelizer',
+          defaultValue: planetGenerator.uniforms['_EnableVoxelizer'].value
+        }
+      },
+      {
+        type: ControlTypes.CONTROL,
+        component: SliderFloat,
+        dataType: 'float',
+        params: {
+          min: 1.0,
+          max: 100.0,
+          step: 1,
+          label: 'Grid Half Size',
+          uniformName: '_GridHalfSize',
+          defaultValue: planetGenerator.uniforms['_GridHalfSize'].value
+        }
+      },
+      {
+        type: ControlTypes.CONTROL,
+        component: SliderFloat,
+        dataType: 'float',
+        params: {
+          min: 0.0,
+          max: 1.0,
+          step: 0.01,
+          label: 'Voxel Normal Interp',
+          uniformName: '_VoxelNormalInterp',
+          defaultValue: planetGenerator.uniforms['_VoxelNormalInterp'].value
+        }
+      },
+
+      {
+        type: ControlTypes.DIVISOR
+      },
+      {
+        type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: '_Planet Color 1',
           uniformName: '_PlanetColor1',
-          defaultValue: planetGenerator.uniforms['_PlanetColor1'].value
+          defaultValue:
+            planetGenerator.uniforms['_PlanetColor1'].value.getHexString()
         }
       },
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: '_Planet Color 2',
           uniformName: '_PlanetColor2',
-          defaultValue: planetGenerator.uniforms['_PlanetColor2'].value
+          defaultValue:
+            planetGenerator.uniforms['_PlanetColor2'].value.getHexString()
         }
       },
       {
@@ -317,19 +461,23 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: 'Water Color Depth',
           uniformName: '_WaterColorDepth',
-          defaultValue: planetGenerator.uniforms['_WaterColorDepth'].value
+          defaultValue:
+            planetGenerator.uniforms['_WaterColorDepth'].value.getHexString()
         }
       },
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: 'Water Color Surface',
           uniformName: '_WaterColor',
-          defaultValue: planetGenerator.uniforms['_WaterColor'].value
+          defaultValue:
+            planetGenerator.uniforms['_WaterColor'].value.getHexString()
         }
       },
       {
@@ -338,6 +486,7 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec2,
+        dataType: 'vec2',
         params: {
           label: 'Water Depth Smooth Step',
           uniformName: '_WaterMaterialSmoothStep',
@@ -348,6 +497,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 20.0,
@@ -360,6 +510,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 1.0,
@@ -372,6 +523,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 1.0,
@@ -384,6 +536,7 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec2,
+        dataType: 'vec2',
         params: {
           label: 'Specular Params',
           uniformName: '_SpecularParams',
@@ -393,6 +546,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 1.0,
@@ -409,6 +563,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 1,
@@ -421,24 +576,29 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: 'Cloud Color 1',
           uniformName: '_CloudColor1',
-          defaultValue: planetGenerator.uniforms['_CloudColor1'].value
+          defaultValue:
+            planetGenerator.uniforms['_CloudColor1'].value.getHexString()
         }
       },
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: 'Cloud Color 2',
           uniformName: '_CloudColor2',
-          defaultValue: planetGenerator.uniforms['_CloudColor2'].value
+          defaultValue:
+            planetGenerator.uniforms['_CloudColor2'].value.getHexString()
         }
       },
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: -10.0,
           max: 10.0,
@@ -451,6 +611,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 1.0,
@@ -463,6 +624,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 0.5,
@@ -475,6 +637,7 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec2,
+        dataType: 'vec2',
         params: {
           label: 'Cloud Noise Scales',
           uniformName: '_CloudNoiseScales',
@@ -484,6 +647,7 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec3,
+        dataType: 'vec3',
         params: {
           label: 'Cloud Noise Offset',
           uniformName: '_CloudNoiseOffset',
@@ -493,6 +657,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 20,
@@ -505,9 +670,10 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
-          min: 0.0,
-          max: 20,
+          min: -1.0,
+          max: 1.0,
           step: 0.01,
           label: 'Cloud Secondary Noise Strength',
           uniformName: '_SecondaryNoiseStrength',
@@ -518,6 +684,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.0,
           max: 20,
@@ -531,6 +698,7 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: -10.0,
           max: 10.0,
@@ -543,9 +711,10 @@
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
-          min: -10.0,
-          max: 10.0,
+          min: -2.0,
+          max: 2.0,
           step: 0.01,
           label: 'Cloud Move Speeed',
           uniformName: '_CloudMoveSpeed',
@@ -559,15 +728,18 @@
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
+        dataType: 'vec3Color',
         params: {
           label: 'Ambient Color',
           uniformName: '_AmbientColor',
-          defaultValue: planetGenerator.uniforms['_AmbientColor'].value
+          defaultValue:
+            planetGenerator.uniforms['_AmbientColor'].value.getHexString()
         }
       },
       {
         type: ControlTypes.CONTROL,
         component: SliderFloat,
+        dataType: 'float',
         params: {
           min: 0.5,
           max: 10.0,
@@ -593,30 +765,72 @@
     <canvas class="canvasRender" bind:this={canvasElement} />
   </div>
   <div class="sideControls">
-    <div>
-      <div class="Render" on:click={convertControlsToJSON}>JSON</div>
-      <input type="file" on:change={fileChanged} bind:value={fileInput} />
+    <h1>Raymarching Planet Generator</h1>
+    <div class="iconHolder">
+      <ByMeIcon />
     </div>
-    <div class="SettingsButtons">
-      <div class="Render" on:click={saveImage}>Render HD</div>
-      <div class="Render" on:click={saveImageCurrent}>Render Current</div>
+
+    <div class="DoubleButtons">
+      <div class="RButton" on:click={convertControlsToJSON}>Save to JSON</div>
+      <div class="RButton" on:click={convertJSONtoControls}>Load from JSON</div>
     </div>
-    <div class="SettingsButtons">
+    <input
+      style="display: none;"
+      bind:this={uploadJsonElement}
+      type="file"
+      on:change={fileChanged}
+      bind:value={fileInput}
+    />
+
+    <div class="RButton" on:click={loadExamples}>Load Example</div>
+
+    <ControlHeader HeaderLabel={'Render Settings'} />
+    <Vec2
+      label={'Render Resolution'}
+      uniformName={''}
+      defaultValue={{ x: 800, y: 450 }}
+      updateShaderUniform={setRenderResolution}
+    />
+    <div class="DoubleButtons">
+      <div class="RButton" on:click={saveImage}>Render</div>
+      <div class="RButton" on:click={saveImageCurrent}>Render Current</div>
+    </div>
+    <ControlHeader HeaderLabel={'Raymarching Settings'} />
+    <div class="TripleButtons">
       <div
-        class="Render"
+        class:RButton={currentRaymarchRuntimeSetting != RaymarchSettingType.LOW}
+        class:RButtonSelected={currentRaymarchRuntimeSetting ==
+          RaymarchSettingType.LOW}
         on:click={() => {
+          currentRaymarchRuntimeSetting = RaymarchSettingType.LOW;
           planetGenerator.setRaymarchLowSettings();
         }}
       >
-        Low Settings
+        Low
       </div>
       <div
-        class="Render"
+        class:RButton={currentRaymarchRuntimeSetting !=
+          RaymarchSettingType.NORMAL}
+        class:RButtonSelected={currentRaymarchRuntimeSetting ==
+          RaymarchSettingType.NORMAL}
         on:click={() => {
+          currentRaymarchRuntimeSetting = RaymarchSettingType.NORMAL;
           planetGenerator.setRaymarchNormalSettings();
         }}
       >
-        Normal Settings
+        Normal
+      </div>
+      <div
+        class:RButton={currentRaymarchRuntimeSetting !=
+          RaymarchSettingType.HIGH}
+        class:RButtonSelected={currentRaymarchRuntimeSetting ==
+          RaymarchSettingType.HIGH}
+        on:click={() => {
+          currentRaymarchRuntimeSetting = RaymarchSettingType.HIGH;
+          planetGenerator.setRaymarchHighSettings();
+        }}
+      >
+        High
       </div>
     </div>
     {#each controls as control}
@@ -627,11 +841,7 @@
           {...control.params}
         />
       {:else if control.type == ControlTypes.HEADER}
-        <div class="header">
-          <div class="headerLine" />
-          <div>{control.label}</div>
-          <div class="headerLine" />
-        </div>
+        <ControlHeader HeaderLabel={control.label} />
       {:else if control.type == ControlTypes.DIVISOR}
         <div class="Divisor" />
       {:else if control.type == ControlTypes.SYSTEM}
@@ -647,7 +857,84 @@
   </div>
 </div>
 
+{#if exampleWindowOpen}
+  <div class="exampleWindow">
+    <div class="windowInner">
+      <div class="windowTitle">Examples</div>
+      <div>
+        {#each exampleList as example}
+          <div class="exampleEntry" on:click={()=>{
+              readJson(example.url);
+          }}>
+            {example.name}
+          </div>
+        {/each}
+      </div>
+    </div>
+    <div
+      class="windowBackground"
+      on:click={() => {
+        exampleWindowOpen = false;
+      }}
+    />
+  </div>
+{/if}
+
 <style>
+  .exampleWindow {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    display: grid;
+    place-content: center;
+  }
+  .exampleEntry {
+    cursor: pointer;
+    font-weight: 300;
+    padding: 0.5em;
+    font-size: 1.2em;
+    background-color: var(--c4);
+    color: var(--c1);
+  }
+  .exampleEntry:hover {
+    background-color: var(--c2);
+    color: var(--c1);
+  }
+  .windowInner {
+    width: 30vw;
+    height: 50vh;
+    background-color: var(--c4);
+    overflow: auto;
+    color: var(--c1);
+    z-index: 100;
+  }
+  .windowTitle {
+    background-color: var(--c1);
+    color: var(--c4);
+    font-weight: 300;
+    font-size: 2em;
+    padding: 0em 1em;
+  }
+  .windowBackground {
+    opacity: 0.5;
+    background-color: var(--c4);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  h1 {
+    font-weight: 300;
+    margin-bottom: 0.5em;
+    text-align: center;
+  }
+  .iconHolder {
+    display: grid;
+    place-content: center;
+    grid-template-columns: 50%;
+  }
   :global(body) {
     padding: 0px;
     margin: 0px;
@@ -683,20 +970,6 @@
     color: var(--c1);
     overflow-y: auto;
   }
-  .header {
-    font-size: 1.5em;
-    font-weight: 300;
-    margin-top: 1em;
-    display: grid;
-    place-items: center;
-    gap: 1em;
-    grid-template-columns: 1fr auto 1fr;
-  }
-  .headerLine {
-    height: 2px;
-    width: 100%;
-    background-color: var(--c1);
-  }
   .Divisor {
     width: 100%;
     height: 1em;
@@ -712,7 +985,18 @@
     border-radius: 1em;
     background-color: var(--c2);
   }
-  .Render {
+  .RButtonSelected {
+    background-color: var(--c2);
+    color: var(--c1);
+    transform: scale(0.9);
+    font-weight: 700;
+    font-size: 1.2em;
+    text-align: center;
+    padding: 0.5em 0px;
+    margin-top: 1em;
+    pointer-events: none;
+  }
+  .RButton {
     background-color: var(--c1);
     color: var(--c4);
     font-weight: 700;
@@ -722,12 +1006,18 @@
     margin-top: 1em;
     cursor: pointer;
   }
-  .Render:hover {
+  .RButton:hover {
     background-color: var(--c3);
+    color: var(--c1);
   }
-  .SettingsButtons {
+  .DoubleButtons {
     display: grid;
     gap: 1em;
     grid-template-columns: 1fr 1fr;
+  }
+  .TripleButtons {
+    display: grid;
+    gap: 1em;
+    grid-template-columns: 1fr 1fr 1fr;
   }
 </style>

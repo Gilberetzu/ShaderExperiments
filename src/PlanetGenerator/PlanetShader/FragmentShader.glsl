@@ -19,6 +19,10 @@ uniform float _MaxScrewTerrain;
 uniform float _PSDensityOffset;
 uniform float _SurfaceMinLight;
 
+uniform float _GridHalfSize;
+uniform float _VoxelNormalInterp;
+uniform bool _EnableVoxelizer;
+
 uniform float _PlanetSurfaceWaterStepSize;
 uniform float _PlanetSurfaceWaterMaxStepCount;
 
@@ -245,7 +249,7 @@ void cloudRender(vec3 viewVector, vec3 positionOS, out float value, out vec3 hit
         if(cDist < _CloudMidDistance - _CloudHalfHeight){
 
             vec2 sInter = sphIntersect(currentPosition, viewVector, vec3(0.0,0.0,0.0), _CloudMidDistance - _CloudHalfHeight);
-            currentPosition = currentPosition + viewVector * max(sInter.x, sInter.y);
+            currentPosition = currentPosition + viewVector * max(sInter.x, sInter.y) * (1.0 + mix(0.0, stepSize, noiseValue));
         }
         if(cDist < _PSWaterHeight) break; //Hit surface
 
@@ -320,25 +324,139 @@ float specular(vec3 lightDirection, vec3 normal, vec3 viewVector){
     return SpecularFactor;
 }
 
-void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor, out vec3 planetHitPos){
-    float stepSize = _PlanetSurfaceWaterStepSize;
-    float totalDensity = 0.0;
+float planetLightOcclusion(vec3 planetSurfacePos){
+    float lightOcclusion = 1.0;
+    if(length(planetSurfacePos) < _CloudMidDistance){
+        SampleCloudShadowPlanet(planetSurfacePos, lDirection, lightOcclusion);
+        lightOcclusion = mix(1.0, lightOcclusion,_CloudTransparency);
+    }
+    return lightOcclusion;
+}
 
+vec3 getWaterNormal(vec3 rayoriginOS, vec3 viewVector, vec3 surfacePos, out vec3 waterHitPosNearOut, out float waterMaterialOut){
+    float waterMaterial = 0.0;
+    vec2 waterIntersections = sphIntersect(rayoriginOS, viewVector, vec3(0,0,0), _PSWaterHeight);
+    vec3 waterHitPosNear = rayoriginOS + viewVector * min(waterIntersections.x, waterIntersections.y);
+    waterHitPosNearOut = waterHitPosNear;
+    vec3 waterHitPosFar = rayoriginOS + viewVector * max(waterIntersections.x, waterIntersections.y); 
+
+    if(surfacePos.x >= 0.0){
+        waterMaterial = length(surfacePos*100.0 - waterHitPosNear*100.0);
+    }else{
+        waterMaterial = length(waterHitPosNear*100.0 - waterHitPosFar*100.0);
+    }
+    waterMaterialOut = waterMaterial;
+
+    vec3 n1 = noised(normalize(waterHitPosNear) * _WaterNormalScale).yzw;
+    vec3 rotatedHitPos = vec3(0.0);
+    Unity_RotateAboutAxis_Radians_float(waterHitPosNear, vec3(0.0,1.0,0.0), iTime * _WaterMoveSpeed, rotatedHitPos);
+    vec3 n2 = noised(normalize(rotatedHitPos) * _WaterNormalScale).yzw;
+    
+    vec3 waterNormal = normalize( ((n1 + n2) *_WaterNormalStrength / 2.0) + normalize(waterHitPosNear));
+
+    return waterNormal;
+}
+
+void planetShading(bool hitSurface, vec3 rayoriginOS, vec3 viewVector, vec3 surfacePos, vec3 highInterpPosition, vec3 newNormal, bool useNewNormal, out vec3 color, out vec3 hitPos){
+    
+    bool hitWater = false;
+    if(hitSurface){
+        hitWater = length(surfacePos) < _PSWaterHeight;
+    }else{
+        vec2 waterIntersect = sphIntersect(rayoriginOS, viewVector, vec3(0.0), _PSWaterHeight);
+        hitWater = waterIntersect.x >= 0.0;
+    }
+
+    if(!hitWater && !hitSurface){
+        color = vec3(-1,0,0);
+        hitPos = vec3(0.0);
+    }else if(!hitWater && hitSurface){
+        vec3 planetNormal = useNewNormal? mix(-calcPlanetNormal(surfacePos), newNormal, _VoxelNormalInterp) : -calcPlanetNormal(surfacePos);
+        
+        float lightIntensity = mix(_SurfaceMinLight, 1.0, clamp(dot(planetNormal, lDirection), 0.0, 1.0) * planetLightOcclusion(surfacePos));
+        float hightColorInterp = smoothstep(_PSWaterHeight, _PSWaterHeight + _PSMaxHeightOffset, length(highInterpPosition));
+        
+        color = mix(_PlanetColor1.xyz, _PlanetColor2.xyz, vec3(hightColorInterp)) * lightIntensity;
+        hitPos = surfacePos;
+    }else if(hitWater){
+        vec3 waterHitPosNear = vec3(0.0);
+        float waterMaterial = 0.0;
+        vec3 waterNormal = getWaterNormal(rayoriginOS, viewVector, hitSurface ? surfacePos : vec3(-1.0), waterHitPosNear, waterMaterial);
+        float lightOcclusion = planetLightOcclusion(waterHitPosNear);
+
+        waterMaterial = smoothstep(_WaterMaterialSmoothStep.x, _WaterMaterialSmoothStep.y, waterMaterial);
+        hitPos = waterHitPosNear;
+
+        float lightIntensity = clamp(dot(waterNormal, lDirection), 0.0, 1.0) * lightOcclusion;
+        lightIntensity = mix(_WaterSurfaceMinLight,1.0, lightIntensity);
+
+        color = mix(_WaterColorDepth.xyz, _WaterColor.xyz, vec3(waterMaterial)) * lightIntensity;
+        
+        float waterSpec = specular(-lDirection, waterNormal, viewVector);
+        color += clamp(waterSpec, 0.0, 1.0) * lightIntensity;
+    }
+}
+
+void VoxelPlanetRender(vec3 viewVector, vec3 positionOS, out vec3 color, out vec3 hitPos){
+    //voxelization things
+    //https://medium.com/@calebleak/raymarching-voxel-rendering-58018201d9d6
+    float gridHalfSize = floor(_GridHalfSize);
+    vec3 ro = positionOS * gridHalfSize;
+    vec3 pos = floor(ro);
+    
+    vec3 rd = viewVector;
+	vec3 ri = 1.0/rd;
+	vec3 rs = sign(rd);
+	vec3 dis = (pos-ro + 0.5 + rs*0.5) * ri;
+	
+	float res = -1.0;
+	vec3 mm = vec3(0.0);
+	for( int i=0; i<128; i++ ) 
+	{
+        float distCenter = length(pos / gridHalfSize);
+		if( planetNoise(pos / gridHalfSize) * step(distCenter, _PSWaterHeight + _PSMaxHeightOffset) >0.1 ) { 
+            res=1.0; break; 
+        }
+		mm = step(dis.xyz, dis.yzx) * step(dis.xyz, dis.zxy);
+		dis += mm * rs * ri;
+        pos += mm * rs;
+	}
+
+	vec3 nor = mix(-mm*rs, calcPlanetNormal(pos / gridHalfSize), 0.01); //-mm*rs;
+	vec3 vos = pos;
+	
+    // intersect the cube	
+	vec3 mini = (pos-ro + 0.5 - 0.5*vec3(rs))*ri;
+	float t = max ( mini.x, max ( mini.y, mini.z ) );
+
+    //planetShading
+    float hitDistance = t*res;
+    bool hitSurface = t*res >= 0.0;
+    vec3 surfaceHitPosition = (ro + rd * hitDistance) / gridHalfSize;
+
+    planetShading(hitSurface, positionOS, viewVector, surfaceHitPosition, pos/gridHalfSize, nor, true, color, hitPos);
+}
+
+void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor, out vec3 planetHitPos){
+
+    //Normal ray march
+    float stepSize = _PlanetSurfaceWaterStepSize;
+
+    //Sample distance noise
     vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
     float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + 12231.23123);
     noiseValue = noiseValue/2.0;
-
+    //Starting raymarch position
     vec3 currentPosition = positionOS + viewVector * mix(0.0, stepSize, noiseValue);
     
     vec3 pColor = vec3(-1.0,0.0,0.0);//No initersetction
     bool hitWater = false;
     bool hitSurface = false;
-    float minLight = 0.2;
 
     for(int i = 0; i < int(floor(_PlanetSurfaceWaterMaxStepCount)); i ++){
         float cDist = length(currentPosition);
         
-        if(cDist > _PSWaterHeight + _PSMaxHeightOffset) break; //Plannet not hit surface
+        if(cDist > _PSWaterHeight + _PSMaxHeightOffset * 1.0) break; //Plannet not hit surface
         
         if(cDist < _PSWaterHeight && !hitWater){
             hitWater = true;
@@ -364,10 +482,10 @@ void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor
         if(length(currentPosition) < _CloudMidDistance){
             SampleCloudShadowPlanet(currentPosition, lDirection, lightOcclusion);
             lightOcclusion = mix(1.0, lightOcclusion,_CloudTransparency);
-            lightOcclusion = mix(_SurfaceMinLight, 1.0, lightOcclusion);
         }
-        float lightIntensity = mix(minLight, 1.0, clamp(dot(planetNormal, lDirection), 0.0, 1.0) * lightOcclusion);
+        float lightIntensity = mix(_SurfaceMinLight, 1.0, clamp(dot(planetNormal, lDirection), 0.0, 1.0) * lightOcclusion);
         float hightColorInterp = smoothstep(_PSWaterHeight, _PSWaterHeight + _PSMaxHeightOffset, length(currentPosition));
+        
         pColor = mix(_PlanetColor1.xyz, _PlanetColor2.xyz, vec3(hightColorInterp)) * lightIntensity;
         planetHitPos = currentPosition;
     }else if(hitWater){
@@ -434,18 +552,21 @@ void main() {
     atmosphereDepth = InvLerp(0.0, 2.0, atmosphereDepth);
     atmosphereDepth = pow(atmosphereDepth, _AmbientPower);
 
-    //gl_FragColor = vec4(viewVecNorm, 1.0);
-    //return;
-
-    if(!hitPlanet){
+    /*if(!hitPlanet){
         vec3 fColor = (cloudInterp < 0.0 ? vec3(0.0) : fCloudColor * _CloudTransparency) + _AmbientColor * atmosphereDepth;
         float fAlpha = cloudInterp < 0.0 ? atmosphereIntersec.y : max(atmosphereIntersec.y, _CloudTransparency) ;
         gl_FragColor = vec4(fColor, fAlpha);//cloudHit ? vec4(fCloudColor,1) : vec4(0.0);
-    }else{
+    }else{*/
+
         vec3 planetInterPoint = vPosition + viewVecNorm * sInter.x;
         vec3 rpColor = vec3(0,0,0);
         vec3 planetHitPos = vec3(0,0,0);
-        PlanetRenderRaymarch(viewVecNorm, planetInterPoint, rpColor, planetHitPos);
+
+        if(_EnableVoxelizer){
+            VoxelPlanetRender(viewVecNorm, vPosition, rpColor, planetHitPos);
+        }else{
+            PlanetRenderRaymarch(viewVecNorm, planetInterPoint, rpColor, planetHitPos);
+        }
 
         vec3 fColor = vec3(0.0);
         float fAlpha = 0.0;
@@ -457,10 +578,10 @@ void main() {
             vec3 vToPlanet = planetHitPos - vPosition;
             vec3 vToCloud = cloudHitPos - vPosition;
             fColor = cloudInterp < 0.0 ? rpColor : dot(vToPlanet, vToPlanet) < dot(vToCloud, vToCloud) ? rpColor : mix(rpColor, fCloudColor, _CloudTransparency);
-            fColor = clamp(fColor, vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0)) + _AmbientColor * atmosphereDepth;
+            fColor = clamp(fColor, vec3(0.0), vec3(1.0)) + _AmbientColor * atmosphereDepth;
             fAlpha = 1.0;
         }
 
         gl_FragColor = vec4(fColor, fAlpha);
-    }
+    //}
 }

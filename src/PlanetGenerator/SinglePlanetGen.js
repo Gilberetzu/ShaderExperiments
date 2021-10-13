@@ -7,10 +7,10 @@ export default class SinglePlanetGen{
         this.canvasElement = canvasHtmlElement;
 
         this.lowFidelityParameters = {
-            PSW_StepSize: 0.01,
-            PSW_MaxStepCount: 80,
-            C_StepSize: 0.03,
-            C_StepCount: 80
+            PSW_StepSize: 0.015,
+            PSW_MaxStepCount: 60,
+            C_StepSize: 0.05,
+            C_StepCount: 60
         }
         
         this.normalFidelityParameters = {
@@ -20,9 +20,9 @@ export default class SinglePlanetGen{
             C_StepCount: 100
         };
         
-        this.higrFidelityParameters = {
-            PSW_StepSize: 0.001,
-            PSW_MaxStepCount: 200,
+        this.highFidelityParameters = {
+            PSW_StepSize: 0.0015,
+            PSW_MaxStepCount: 300,
             C_StepSize: 0.0025,
             C_StepCount: 400
         };
@@ -58,6 +58,9 @@ export default class SinglePlanetGen{
             _SurfaceMinLight: {value: 0.2},
             _PlanetSurfaceWaterStepSize: {value: 0.005},
             _PlanetSurfaceWaterMaxStepCount: {value: 100},
+            _GridHalfSize: {value: 30.0},
+            _VoxelNormalInterp: {value: 1.0},
+            _EnableVoxelizer: {value: false},
             //Ocean uniforms
             _WaterColorDepth: {value: new THREE.Color(0.1,0.1,0.3)},
             _WaterColor: {value: new THREE.Color(0.6,0.8,1)},
@@ -123,6 +126,12 @@ export default class SinglePlanetGen{
     setRenderScale(scale){
         //this.renderScale = scale;
         //this.resizeRenderer();
+    }
+
+    resizeRendererWH(resolution){
+        this.renderer.setSize(resolution.x, resolution.y, false);
+        this.camera.aspect = resolution.x / resolution.y;
+        this.camera.updateProjectionMatrix();
     }
 
     resizeRenderer(desiredWidth){
@@ -211,10 +220,10 @@ export default class SinglePlanetGen{
         this.renderer.render( this.scene, this.camera );
     };
 
-    renderForFile(){
-        this.setRaymarchSetting(this.higrFidelityParameters);
+    renderForFile(resolution){
+        this.setRaymarchSetting(this.highFidelityParameters);
 
-        this.resizeRenderer(1080);
+        this.resizeRendererWH(resolution);
         this.renderer.render( this.scene, this.camera );
 
         this.setRaymarchSetting(this.normalFidelityParameters);
@@ -229,5 +238,8 @@ export default class SinglePlanetGen{
     }
     setRaymarchNormalSettings(){
         this.setRaymarchSetting(this.normalFidelityParameters);
+    }
+    setRaymarchHighSettings(){
+        this.setRaymarchSetting(this.highFidelityParameters);
     }
 }
