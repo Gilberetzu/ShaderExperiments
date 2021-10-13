@@ -763,14 +763,14 @@
       },
       {
         type: ControlTypes.HEADER,
-        label: 'Ambien Parameters'
+        label: 'Atmosphere Parameters'
       },
       {
         type: ControlTypes.CONTROL,
         component: Vec3Color,
         dataType: 'vec3Color',
         params: {
-          label: 'Ambient Color',
+          label: 'Atmosphere Color',
           uniformName: '_AmbientColor',
           defaultValue:
             planetGenerator.uniforms['_AmbientColor'].value.getHexString()
@@ -784,7 +784,7 @@
           min: 0.5,
           max: 10.0,
           step: 0.01,
-          label: 'Ambient Power',
+          label: 'Atmosphere Power',
           uniformName: '_AmbientPower',
           defaultValue: planetGenerator.uniforms['_AmbientPower'].value
         }
