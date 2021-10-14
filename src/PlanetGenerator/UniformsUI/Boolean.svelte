@@ -5,7 +5,7 @@
 
     export let defaultValue;
 
-    let value;
+    export let value;
 
     let updateControlValue = ()=>{
         value = defaultValue ? defaultValue : false;

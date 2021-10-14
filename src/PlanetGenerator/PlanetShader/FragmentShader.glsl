@@ -252,7 +252,7 @@ void cloudRender(vec3 viewVector, vec3 positionOS, out float value, out vec3 hit
         if(cDist < _CloudMidDistance - _CloudHalfHeight){
 
             vec2 sInter = sphIntersect(currentPosition, viewVector, vec3(0.0,0.0,0.0), _CloudMidDistance - _CloudHalfHeight);
-            currentPosition = currentPosition + viewVector * max(sInter.x, sInter.y) * (1.0 + mix(0.0, stepSize, noiseValue));
+            currentPosition = currentPosition + viewVector * max(sInter.x, sInter.y) * (1.0 + mix(stepSize * 0.3, stepSize * 1.3, noiseValue));
         }
         if(cDist < _PSWaterHeight) break; //Hit surface
 

@@ -2,6 +2,12 @@ import * as THREE from 'three';
 import PlanetFragmentShader from "./PlanetShader/FragmentShader.glsl?raw";
 import PlanetVertexShader from "./PlanetShader/VertexShader.glsl?raw";
 
+const RaymarchSettingType = {
+	NORMAL: 'NORMAL',
+	LOW: 'LOW',
+	HIGH: 'HIGH'
+};
+
 export default class SinglePlanetGen{
     constructor(canvasHtmlElement){
         this.canvasElement = canvasHtmlElement;
@@ -222,13 +228,19 @@ export default class SinglePlanetGen{
         this.renderer.render( this.scene, this.camera );
     };
 
-    renderForFile(resolution){
+    renderForFile(resolution, currentRaymarchRuntimeSetting){
         this.setRaymarchSetting(this.highFidelityParameters);
 
         this.resizeRendererWH(resolution);
         this.renderer.render( this.scene, this.camera );
 
-        this.setRaymarchSetting(this.normalFidelityParameters);
+		if(currentRaymarchRuntimeSetting == RaymarchSettingType.NORMAL){
+			this.setRaymarchNormalSettings();
+		}else if(currentRaymarchRuntimeSetting == RaymarchSettingType.LOW){
+			this.setRaymarchLowSettings();
+		}else{
+			this.setRaymarchHighSettings();
+		}
     }
 
     renderForFileCurrent(){
