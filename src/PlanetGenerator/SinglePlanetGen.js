@@ -11,6 +11,7 @@ const RaymarchSettingType = {
 export default class SinglePlanetGen{
     constructor(canvasHtmlElement){
         this.canvasElement = canvasHtmlElement;
+		this.prevTime = 0;
 
         this.lowFidelityParameters = {
             PSW_StepSize: 0.015,
@@ -20,14 +21,14 @@ export default class SinglePlanetGen{
         }
         
         this.normalFidelityParameters = {
-            PSW_StepSize: 0.005,
+            PSW_StepSize: 0.01,
             PSW_MaxStepCount: 100,
             C_StepSize: 0.01,
             C_StepCount: 100
         };
         
         this.highFidelityParameters = {
-            PSW_StepSize: 0.0015,
+            PSW_StepSize: 0.0020,
             PSW_MaxStepCount: 300,
             C_StepSize: 0.0025,
             C_StepCount: 400
@@ -40,9 +41,12 @@ export default class SinglePlanetGen{
         this.renderScale = 0.25;
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, cWidth / cHeight, 0.1, 1000 );
-        this.renderer = new THREE.WebGLRenderer({canvas: this.canvasElement});
+        this.renderer = new THREE.WebGLRenderer({
+			canvas: this.canvasElement,
+		});
 
         this.renderer.setSize( cWidth, cHeight, false);
+		this.renderer.outputEncoding = THREE.sRGBEncoding;
 
         this.planetGeometry = new THREE.SphereGeometry(1, 24, 24);
 
@@ -216,6 +220,14 @@ export default class SinglePlanetGen{
         this.updateCameraRotation();
     }
 
+	setToneMapping(value){
+		if(value){
+			this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		}else{
+			this.renderer.toneMapping = THREE.NoToneMapping;
+		}
+	}
+
     animate() {
         requestAnimationFrame( (this.animate).bind(this) );
 
@@ -226,10 +238,19 @@ export default class SinglePlanetGen{
         this.uniforms.iTime.value = ((new Date()).getTime() - this.startTime) / 1000;
 
         this.renderer.render( this.scene, this.camera );
+		const time = performance.now();
+		console.log(`Redner time ${time - this.prevTime} milliseconds.`);
+		this.prevTime = time;
     };
 
-    renderForFile(resolution, currentRaymarchRuntimeSetting){
-        this.setRaymarchSetting(this.highFidelityParameters);
+    renderForFile(resolution, currentRaymarchRuntimeSetting, renderRaymarchSetting){
+		if(renderRaymarchSetting == RaymarchSettingType.NORMAL){
+			this.setRaymarchNormalSettings();
+		}else if(renderRaymarchSetting == RaymarchSettingType.LOW){
+			this.setRaymarchLowSettings();
+		}else{
+			this.setRaymarchHighSettings();
+		}
 
         this.resizeRendererWH(resolution);
         this.renderer.render( this.scene, this.camera );

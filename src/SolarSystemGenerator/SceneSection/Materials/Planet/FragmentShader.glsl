@@ -26,7 +26,6 @@ uniform bool _EnableVoxelizer;
 uniform float _PlanetSurfaceWaterStepSize;
 uniform float _PlanetSurfaceWaterMaxStepCount;
 
-
 //Ocean uniforms
 uniform vec3 _WaterColorDepth;
 uniform vec3 _WaterColor;
@@ -36,6 +35,7 @@ uniform float _WaterSurfaceMinLight;
 uniform float _WaterNormalStrength;
 uniform vec2 _SpecularParams;
 uniform float _WaterMoveSpeed;
+
 //Cloud parameters
 uniform float _CloudTransparency;
 uniform vec3 _CloudColor1;
@@ -62,11 +62,11 @@ uniform float _CloudsPosterizeCount;
 uniform vec3 _AmbientColor;
 uniform float _AmbientPower;
 
-const vec3 lDirection = normalize(vec3(1,0,1));
-
 //Misc
 uniform float _CylinderHeight;
 uniform float _CylinderRad;
+
+const vec3 lDirection = normalize(vec3(1,0,1));
 
 float InterleavedGradientNoise(vec2 screnPos){
 	vec3 magic = vec3( 0.06711056, 0.00583715, 52.9829189 );
@@ -183,9 +183,7 @@ vec3 SpherePlanarMapping(vec3 positionOS, float cyRad, float cyHeight, float sRa
     float currentHeight = cyRad * (positionOS.y / planeMag);
     float verticalMask = smoothstep(maxAngle, maxAngle - 0.3, abs(currentVerticalAngle));
     
-    
     vec2 nUV = vec2(0.0,0.0);
-    
 
     vec3 planeVector = normalize(vec3(positionOS.x, 0.0, positionOS.z));
     float dotAxis = dot(vec3(1.0,0.0,0.0), planeVector);
@@ -244,10 +242,6 @@ vec3 calcCloudNormal( in vec3 sp ) // for function f(p) // From https://iquilezl
 void cloudRender(vec3 viewVector, vec3 positionOS, out vec2 lightTransparency, out vec3 hitPos){
     float stepSize = _CloudsStepSize;
     float totalDensity = 0.0;
-
-    //vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
-    //float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + iTime);
-    //noiseValue = noiseValue/2.0;
 
 	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy);
 
@@ -458,13 +452,7 @@ void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor
     float stepSize = _PlanetSurfaceWaterStepSize;
 
     //Sample distance noise
-    /*vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
-    float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + 12231.23123);
-    noiseValue = noiseValue/2.0;*/
-	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy); /*+
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(1,0)) +
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(1,1)) +
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(0,1));*/
+	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy);
 	noiseValue = noiseValue;
 
     //Starting raymarch position

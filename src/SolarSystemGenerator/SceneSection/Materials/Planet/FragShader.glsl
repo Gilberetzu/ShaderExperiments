@@ -1,208 +1,3 @@
-varying vec3 vPosition;
-varying vec3 viewVector;
-varying mat4 modelMatrixFrag;
-
-uniform vec3 iResolution;
-uniform float iTime;
-
-//Planet parameters
-uniform vec3 _PSNoiseOffset;
-uniform float _PSNoiseGlobalScale;
-uniform float _PSWaterHeight;
-uniform float _PSWaterDepthOffset;
-uniform float _PSMaxHeightOffset;
-uniform vec3 _PlanetColor1;
-uniform vec3 _PlanetColor2;
-uniform vec2 _PSNoiseScales;
-uniform float _SecondaryNoiseStrengthGround;
-uniform float _MaxScrewTerrain;
-uniform float _PSDensityOffset;
-uniform float _SurfaceMinLight;
-
-uniform float _GridHalfSize;
-uniform float _VoxelNormalInterp;
-uniform bool _EnableVoxelizer;
-
-uniform float _PlanetSurfaceWaterStepSize;
-uniform float _PlanetSurfaceWaterMaxStepCount;
-
-
-//Ocean uniforms
-uniform vec3 _WaterColorDepth;
-uniform vec3 _WaterColor;
-uniform vec2 _WaterMaterialSmoothStep;
-uniform float _WaterNormalScale;
-uniform float _WaterSurfaceMinLight;
-uniform float _WaterNormalStrength;
-uniform vec2 _SpecularParams;
-uniform float _WaterMoveSpeed;
-//Cloud parameters
-uniform float _CloudTransparency;
-uniform vec3 _CloudColor1;
-uniform vec3 _CloudColor2;
-uniform float _MaxScrewCloud;
-uniform float _BreakDistanceCloud;
-uniform float _CloudMidDistance;
-uniform float _CloudHalfHeight;
-uniform vec2 _CloudNoiseScales;
-uniform vec3 _CloudNoiseOffset;
-uniform float _CloudNoiseGlobalScale;
-uniform float _SecondaryNoiseStrength;
-uniform float _CloudDensityMultiplier;
-uniform float _CloudDensityOffset;
-uniform float _CloudMoveSpeed;
-
-uniform float _CloudsStepSize;
-uniform float _CloudsMaxStepCount;
-
-uniform bool _CloudsPosterize;
-uniform float _CloudsPosterizeCount;
-
-//Ambient Parameters
-uniform vec3 _AmbientColor;
-uniform float _AmbientPower;
-
-const vec3 lDirection = normalize(vec3(1,0,1));
-
-//Misc
-uniform float _CylinderHeight;
-uniform float _CylinderRad;
-
-float InterleavedGradientNoise(vec2 screnPos){
-	vec3 magic = vec3( 0.06711056, 0.00583715, 52.9829189 );
-	return fract( magic.z * fract( dot( screnPos, magic.xy ) ) );
-}
-
-void Unity_RotateAboutAxis_Radians_float(vec3 In, vec3 Axis, float Rotation, out vec3 Out)
-{
-    float s = sin(Rotation);
-    float c = cos(Rotation);
-    float one_minus_c = 1.0 - c;
-
-    Axis = normalize(Axis);
-    vec3 r0 = vec3(one_minus_c * Axis.x * Axis.x + c, one_minus_c * Axis.x * Axis.y - Axis.z * s, one_minus_c * Axis.z * Axis.x + Axis.y * s);
-    vec3 r1 = vec3(one_minus_c * Axis.x * Axis.y + Axis.z * s, one_minus_c * Axis.y * Axis.y + c, one_minus_c * Axis.y * Axis.z - Axis.x * s);
-    vec3 r2 = vec3(one_minus_c * Axis.z * Axis.x - Axis.y * s, one_minus_c * Axis.y * Axis.z + Axis.x * s, one_minus_c * Axis.z * Axis.z + c);
-
-    mat3 rot_mat;
-    rot_mat[0] = r0;
-    rot_mat[1] = r1;
-    rot_mat[2] = r2;
-
-    Out = (rot_mat * In).xyz;
-}
-
-vec3 hash( vec3 p ) // replace this by something better. really. do
-{
-	p = vec3( dot(p,vec3(127.1,311.7, 74.7)),
-			  dot(p,vec3(269.5,183.3,246.1)),
-			  dot(p,vec3(113.5,271.9,124.6)));
-
-	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
-}
-
-// returns 3D value noise (in .x)  and its derivatives (in .yzw)
-vec4 noised( in vec3 x )
-{
-    // grid
-    vec3 p = floor(x);
-    vec3 w = fract(x);
-    
-    // quintic interpolant
-    vec3 u = w*w*w*(w*(w*6.0-15.0)+10.0);
-    vec3 du = 30.0*w*w*(w*(w-2.0)+1.0);
-    
-    // gradients
-    vec3 ga = hash( p+vec3(0.0,0.0,0.0) );
-    vec3 gb = hash( p+vec3(1.0,0.0,0.0) );
-    vec3 gc = hash( p+vec3(0.0,1.0,0.0) );
-    vec3 gd = hash( p+vec3(1.0,1.0,0.0) );
-    vec3 ge = hash( p+vec3(0.0,0.0,1.0) );
-    vec3 gf = hash( p+vec3(1.0,0.0,1.0) );
-    vec3 gg = hash( p+vec3(0.0,1.0,1.0) );
-    vec3 gh = hash( p+vec3(1.0,1.0,1.0) );
-    
-    // projections
-    float va = dot( ga, w-vec3(0.0,0.0,0.0) );
-    float vb = dot( gb, w-vec3(1.0,0.0,0.0) );
-    float vc = dot( gc, w-vec3(0.0,1.0,0.0) );
-    float vd = dot( gd, w-vec3(1.0,1.0,0.0) );
-    float ve = dot( ge, w-vec3(0.0,0.0,1.0) );
-    float vf = dot( gf, w-vec3(1.0,0.0,1.0) );
-    float vg = dot( gg, w-vec3(0.0,1.0,1.0) );
-    float vh = dot( gh, w-vec3(1.0,1.0,1.0) );
-	
-    // interpolation
-    float v = va + 
-              u.x*(vb-va) + 
-              u.y*(vc-va) + 
-              u.z*(ve-va) + 
-              u.x*u.y*(va-vb-vc+vd) + 
-              u.y*u.z*(va-vc-ve+vg) + 
-              u.z*u.x*(va-vb-ve+vf) + 
-              u.x*u.y*u.z*(-va+vb+vc-vd+ve-vf-vg+vh);
-              
-    vec3 d = ga + 
-             u.x*(gb-ga) + 
-             u.y*(gc-ga) + 
-             u.z*(ge-ga) + 
-             u.x*u.y*(ga-gb-gc+gd) + 
-             u.y*u.z*(ga-gc-ge+gg) + 
-             u.z*u.x*(ga-gb-ge+gf) + 
-             u.x*u.y*u.z*(-ga+gb+gc-gd+ge-gf-gg+gh) +   
-             
-             du * (vec3(vb-va,vc-va,ve-va) + 
-                   u.yzx*vec3(va-vb-vc+vd,va-vc-ve+vg,va-vb-ve+vf) + 
-                   u.zxy*vec3(va-vb-ve+vf,va-vb-vc+vd,va-vc-ve+vg) + 
-                   u.yzx*u.zxy*(-va+vb+vc-vd+ve-vf-vg+vh) );
-                   
-    return vec4( v, d.xyz );                   
-}
-
-vec2 sphIntersect( in vec3 ro, in vec3 rd, in vec3 ce, float ra ) //from https://iquilezles.org/www/articles/intersectors/intersectors.htm
-{
-    vec3 oc = ro - ce;
-    float b = dot( oc, rd );
-    float c = dot( oc, oc ) - ra*ra;
-    float h = b*b - c;
-    if( h<0.0 ) return vec2(-1.0, 0); // no intersection
-    h = sqrt( h );
-    return vec2( -b-h, -b+h );
-}
-
-float InvLerp(float a, float b, float v){
-    return (v - a) / (b - a);
-}
-
-vec3 SpherePlanarMapping(vec3 positionOS, float cyRad, float cyHeight, float sRad){
-    float halfHeight = cyHeight/2.0;
-    float maxAngle = atan(halfHeight/ cyRad);
-
-    float planeMag = length(vec2(positionOS.x, positionOS.z));
-    float currentVerticalAngle = atan(positionOS.y/ planeMag);
-    float currentHeight = cyRad * (positionOS.y / planeMag);
-    float verticalMask = smoothstep(maxAngle, maxAngle - 0.3, abs(currentVerticalAngle));
-    
-    
-    vec2 nUV = vec2(0.0,0.0);
-    
-
-    vec3 planeVector = normalize(vec3(positionOS.x, 0.0, positionOS.z));
-    float dotAxis = dot(vec3(1.0,0.0,0.0), planeVector);
-    float horizAngle = acos(dotAxis)/3.1415;
-    float dotAxisSign = sign(cross(vec3(1.0, 0.0, 0.0), planeVector).y);
-    float dotAxisRemap = horizAngle;
-    nUV.x = ((dotAxisSign * dotAxisRemap) + 1.0)/2.0;//horizAngle;//((dotAxisSign * dotAxisRemap) + 1)/2; //dotAxisRemap;//((dotAxisSign * dotAxisRemap) + 1)/2;
-    nUV.y = InvLerp(-halfHeight, halfHeight, currentHeight);//* verticalMask;
-
-    return vec3(nUV, verticalMask);
-}
-
-float unity_noise_randomValue (vec2 uv)
-{
-    return fract(sin(dot(uv, vec2(12.9898, 78.233)))*43758.5453);
-}
-
 float cloudNoise2(vec3 p){
     float screwInterp = (p.y + 0.5) / 2.0; // Create a variable to check what happens when this is done
     vec3 screwedPos = vec3(0,0,0);
@@ -244,10 +39,6 @@ vec3 calcCloudNormal( in vec3 sp ) // for function f(p) // From https://iquilezl
 void cloudRender(vec3 viewVector, vec3 positionOS, out vec2 lightTransparency, out vec3 hitPos){
     float stepSize = _CloudsStepSize;
     float totalDensity = 0.0;
-
-    //vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
-    //float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + iTime);
-    //noiseValue = noiseValue/2.0;
 
 	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy);
 
@@ -330,15 +121,6 @@ vec3 calcPlanetNormal( in vec3 sp ) // for function f(p) // From https://iquilez
                       k.xxx*planetNoise( sp + k.xxx*h ) );
 }
 
-float specular(vec3 lightDirection, vec3 normal, vec3 viewVector){
-    vec3 VertexToEye = -viewVector;
-    vec3 LightReflect = normalize(reflect(lightDirection, normal));
-    float SpecularFactor = dot(VertexToEye, LightReflect);
-    SpecularFactor = pow(SpecularFactor, _SpecularParams.x);
-    SpecularFactor = _SpecularParams.y * SpecularFactor;
-    return SpecularFactor;
-}
-
 float planetLightOcclusion(vec3 planetSurfacePos){
     float lightOcclusion = 1.0;
     if(length(planetSurfacePos) < _CloudMidDistance){
@@ -407,14 +189,13 @@ void planetShading(bool hitSurface, vec3 rayoriginOS, vec3 viewVector, vec3 surf
 
         color = mix(_WaterColorDepth.xyz, _WaterColor.xyz, vec3(waterMaterial)) * lightIntensity;
         
-        float waterSpec = specular(-lDirection, waterNormal, viewVector);
+        float waterSpec = specular(-lDirection, waterNormal, viewVector, _SpecularParams);
         color += clamp(waterSpec, 0.0, 1.0) * lightIntensity;
     }
 }
 
 void VoxelPlanetRender(vec3 viewVector, vec3 positionOS, out vec3 color, out vec3 hitPos){
-    //voxelization things
-    //https://medium.com/@calebleak/raymarching-voxel-rendering-58018201d9d6
+    //voxelization form inigo quilez
     float gridHalfSize = floor(_GridHalfSize);
     vec3 ro = positionOS * gridHalfSize;
     vec3 pos = floor(ro);
@@ -458,13 +239,7 @@ void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor
     float stepSize = _PlanetSurfaceWaterStepSize;
 
     //Sample distance noise
-    /*vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
-    float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + 12231.23123);
-    noiseValue = noiseValue/2.0;*/
-	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy); /*+
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(1,0)) +
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(1,1)) +
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(0,1));*/
+	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy);
 	noiseValue = noiseValue;
 
     //Starting raymarch position
@@ -541,17 +316,10 @@ void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor
         float lightIntensity = clamp(dot(waterNormal, lDirection), 0.0, 1.0) * lightOcclusion;
         pColor = mix(_WaterColorDepth.xyz, _WaterColor.xyz, vec3(waterMaterial)) * mix(_WaterSurfaceMinLight,1.0, lightIntensity);// * //mix(minLight,1, );//exp(-waterMaterial * 20);
         
-        float waterSpec = specular(-lDirection, waterNormal, viewVector);
+        float waterSpec = specular(-lDirection, waterNormal, viewVector, _SpecularParams);
         pColor += max(0.0,waterSpec) * lightIntensity * _WaterColor.xyz;
     }   
     planetColor = pColor;
-}
-
-vec3 filmicToneMapping(vec3 color)
-{
-	color = max(vec3(0.), color - vec3(0.004));
-	color = (color * (6.2 * color + .5)) / (color * (6.2 * color + 1.7) + 0.06);
-	return color;
 }
 
 void main() {
@@ -610,8 +378,6 @@ void main() {
             fColor = clamp(fColor, vec3(0.0), vec3(1.0)) + _AmbientColor * atmosphereDepth;
             fAlpha = 1.0;
         }
-
-		//fColor = filmicToneMapping(fColor);
 
         gl_FragColor = vec4(fColor, fAlpha);
     //}

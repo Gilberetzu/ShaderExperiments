@@ -13,6 +13,12 @@
     import Boolean from '../PlanetGenerator/UniformsUI/Boolean.svelte';
     import SocialLinks from '../CommonComponents/SocialLinks.svelte';
 
+	const RaymarchSettingType = {
+        NORMAL: 'NORMAL',
+        LOW: 'LOW',
+        HIGH: 'HIGH'
+    };
+
     let canvasElement;
     let planetGenerator;
 	let canvasNearestFiltering = false;
@@ -47,7 +53,7 @@
     ];
 
     let renderResolution = { x: 800, y: 450 };
-
+	let renderRaymarchSetting = RaymarchSettingType.HIGH;
     let updateShaderUniform = () => {};
 
     let controls = [];
@@ -66,7 +72,8 @@
     let saveImage = () => {
         planetGenerator.renderForFile(
             renderResolution,
-            currentRaymarchRuntimeSetting
+            currentRaymarchRuntimeSetting,
+			renderRaymarchSetting
         );
         canvasElement.toBlob((blob) => {
             saveRenderToImage(
@@ -92,11 +99,7 @@
         planetGenerator.resizeRenderer(planetGenerator.desiredWidth);
     };
 
-    const RaymarchSettingType = {
-        NORMAL: 'NORMAL',
-        LOW: 'LOW',
-        HIGH: 'HIGH'
-    };
+    
     let currentRaymarchRuntimeSetting = RaymarchSettingType.NORMAL;
 
     let convertJSONtoControls = () => {
@@ -119,7 +122,7 @@
                 let uniformVal =
                     planetGenerator.uniforms[control.params.uniformName].value;
                 if (control.dataType == 'vec3Color') {
-                    val = uniformVal.getHexString();
+                    val = uniformVal.convert.convertLinearToSRGB().getHexString();
                 } else if (control.dataType == 'float') {
                     val = uniformVal;
                 } else if (control.dataType == 'vec2') {
@@ -265,6 +268,15 @@
                     label: 'Camera Distance',
                     uniformName: 'setCameraDistance',
                     defaultValue: 2
+                }
+            },
+			{
+                type: ControlTypes.SYSTEM,
+                component: Boolean,
+                params: {
+                    label: 'Tone mapping',
+                    uniformName: 'setToneMapping',
+                    defaultValue: false
                 }
             },
             {
@@ -904,6 +916,41 @@
             <div class="RButton" on:click={saveImage}>Render</div>
             <div class="RButton" on:click={saveImageCurrent}>
                 Render Current
+            </div>
+        </div>
+		<div class="TripleButtons">
+            <div
+                class:RButton={renderRaymarchSetting !=
+                    RaymarchSettingType.LOW}
+                class:RButtonSelected={renderRaymarchSetting ==
+                    RaymarchSettingType.LOW}
+                on:click={() => {
+                    renderRaymarchSetting = RaymarchSettingType.LOW;
+                }}
+            >
+                Low
+            </div>
+            <div
+                class:RButton={renderRaymarchSetting !=
+                    RaymarchSettingType.NORMAL}
+                class:RButtonSelected={renderRaymarchSetting ==
+                    RaymarchSettingType.NORMAL}
+                on:click={() => {
+                    renderRaymarchSetting = RaymarchSettingType.NORMAL;
+                }}
+            >
+                Normal
+            </div>
+            <div
+                class:RButton={renderRaymarchSetting !=
+                    RaymarchSettingType.HIGH}
+                class:RButtonSelected={renderRaymarchSetting ==
+                    RaymarchSettingType.HIGH}
+                on:click={() => {
+                    renderRaymarchSetting = RaymarchSettingType.HIGH;
+                }}
+            >
+                High
             </div>
         </div>
         <ControlHeader HeaderLabel={'Raymarching Settings'} />
