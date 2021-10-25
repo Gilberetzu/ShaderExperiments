@@ -43,7 +43,11 @@ float starNoise(vec3 p){
 	float rot2 = -mod2 + p.y*_screwInterpMultiplier + saturate(heightMaskRotation)* _screwHeightMaskMultiplier;
 	Unity_RotateAboutAxis_Radians_float(voroP2, vec3(0.0,1.0,0.0), rot2 * _screwMultiplier, rotP2);
 
-	vec3 voroS1 = voronoi(p*_voronoiScale); //voronoi scale || float
+	vec3 rotVoro1 = vec3(0.0);
+	float rot3 = scaledTime + p.y*_screwInterpMultiplier + saturate(heightMaskRotation)* _screwHeightMaskMultiplier; //screw Height mask multiplier || float
+	Unity_RotateAboutAxis_Radians_float(p, vec3(0.0,1.0,0.0), rot3 * _screwMultiplier, rotVoro1); 
+
+	vec3 voroS1 = voronoi(rotVoro1*_voronoiScale); //voronoi scale || float
 
 	float mixParam = abs((mod1 - 0.5) * 2.0);
 	float per1 = noise3dvalue(rotP1);

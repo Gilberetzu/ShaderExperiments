@@ -140,6 +140,7 @@ export default class PlanetSatelliteEditor {
 		});
 		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores);
 		this.sceneBackground = new SceneBackground(threeScene, this.scene);
+		
 		this.planetsRaymarchQualityStore = writable(1);
 		this.planetsRaymarchQualityStore.subscribe(setting => {
 			if(this.mainPlanetMesh){
