@@ -33,21 +33,31 @@ function getAvailableID(stateArrays){
 function createObjectStore() {
 	const { subscribe, set, update } = writable({
 		planets:[],
+		backgrounds:[],
 		stars:[],
 		combinedPlanets:[],
 		planetarySystems:[],
-		galaxies:[],
-		cameras:[]
+		galaxies:[]
 	});
 
 	return {
 		subscribe,
 		addPlanet: (newPlanet) => update(state => {
 			let newId = getAvailableID(state);
+			newPlanet.name = `${newPlanet.name} - ${newId}`;
 			let newArr = [...state.planets, {id: newId, object: newPlanet}];
 			return {
 				...state,
 				planets: newArr,
+			};
+		}),
+		addBackground: (newBackground) => update(state => {
+			let newId = getAvailableID(state);
+			newBackground.name = `${newBackground.name} - ${newId}`;
+			let newArr = [...state.backgrounds, {id: newId, object: newBackground}];
+			return {
+				...state,
+				backgrounds: newArr,
 			};
 		}),
 		addStar: (newStar) => update(state => {
@@ -68,6 +78,7 @@ function createObjectStore() {
 		}),
 		addPlanetarySystem: (newPlanetarySystem)=> update(state => {
 			let newId = getAvailableID(state);
+			newPlanetarySystem.name = `${newPlanetarySystem.name} - ${newId}`;
 			let newArr = [...state.planetarySystems, {id: newId, object: newPlanetarySystem}];
 			return {
 				...state,
@@ -82,19 +93,40 @@ function createObjectStore() {
 				galaxies: newArr,
 			};
 		}),
-		addCamera: (newCamera)=> update(state => {
-			let newId = getAvailableID(state);
-			let newArr = [...state.cameras, {id: newId, object: newCamera}];
+		updateObject: (obj, key, index) => update(state => {
+			let objIndex = state[key].findIndex(elem => {
+				return elem.id == obj.id;
+			});
+			if(objIndex >= 0){
+				state[key][objIndex] = obj;
+			}
+			return {...state};
+		}),
+		removeObject: (key, id) => update(state => {
+			let newArr = state[key].filter((elem)=>elem.id != id);
 			return {
 				...state,
-				cameras: newArr,
+				[key]: newArr,
 			};
 		}),
-		updateObject: (obj, listName, index) => update(state => {
-			state[listName][index] = obj;
-			return {...state};
+		duplicateObject: (key:string, id) => update(state => {
+			let objToDuplicate = state[key].find(obj => obj.id == id);
+			if(objToDuplicate == null || objToDuplicate == undefined){
+				return {
+					...state
+				}
+			}else{
+				let duplicate = objToDuplicate.object.copy();
+				let newId = getAvailableID(state);
+				let newArr = [...state[key], {id: newId, object: duplicate}];
+				console.log(newArr);
+				return {
+					...state,
+					[key]: newArr,
+				}
+			}
 		})
 	};
 }
-const objectStore = createObjectStore();
-export default objectStore;
+const ObjectsStore = createObjectStore();
+export default ObjectsStore;

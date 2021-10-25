@@ -1,6 +1,10 @@
 <script>
 	export let label = "error?";
 	export let selected = false;
+
+	import WebIcon from "../../CommonComponents/Icons/ControlSelect/WebIcon.svelte";
+	import Camera from "../../CommonComponents/Icons/ControlSelect/Camera.svelte";
+
 	let hovered = false;
 
 	let buttonElement;
@@ -55,6 +59,11 @@
 </style>
 
 <div class:controlSelectButton={true} bind:this={buttonElement} class:selected on:click on:mouseenter={startHover} on:mouseleave={endHover}>
+	{#if label == "About"}
+		<WebIcon/>
+	{:else if label == "Camera"}
+		<Camera/>
+	{/if}
 	{#if hovered}
 		<div class="controlSelectButtonAfter" style={`top: ${position.top}px; left: ${position.left}px`}>
 			{label}

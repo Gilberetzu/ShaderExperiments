@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 type PlanetUniforms = {
 	iTime: { value: number },
-	iResolution: { value: THREE.Vector3 },
 	//Planet uniforms
 	_PSNoiseOffset: { value: THREE.Vector3 },
 	_PSNoiseGlobalScale: { value: number },
@@ -11,6 +10,7 @@ type PlanetUniforms = {
 	_PSMaxHeightOffset: { value: number },
 	_PlanetColor1: { value: THREE.Color },
 	_PlanetColor2: { value: THREE.Color },
+	_PlanetHighInterpRange: {value: THREE.Vector2},
 	_PSNoiseScales: { value: THREE.Vector2 },
 	_SecondaryNoiseStrengthGround: { value: number },
 	_MaxScrewTerrain: { value: number },
@@ -22,8 +22,10 @@ type PlanetUniforms = {
 	_VoxelNormalInterp: { value: number },
 	_EnableVoxelizer: { value: boolean },
 	//Ocean uniforms
+	_showWater: {value: boolean},
 	_WaterColorDepth: { value: THREE.Color },
 	_WaterColor: { value: THREE.Color },
+	_WaterSpecularColor: {value: THREE.Color},
 	_WaterMaterialSmoothStep: { value: THREE.Vector2 },
 	_WaterNormalScale: { value: number },
 	_WaterSurfaceMinLight: { value: number },

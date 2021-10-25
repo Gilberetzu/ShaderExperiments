@@ -68,11 +68,6 @@ const vec3 lDirection = normalize(vec3(1,0,1));
 uniform float _CylinderHeight;
 uniform float _CylinderRad;
 
-float InterleavedGradientNoise(vec2 screnPos){
-	vec3 magic = vec3( 0.06711056, 0.00583715, 52.9829189 );
-	return fract( magic.z * fract( dot( screnPos, magic.xy ) ) );
-}
-
 void Unity_RotateAboutAxis_Radians_float(vec3 In, vec3 Axis, float Rotation, out vec3 Out)
 {
     float s = sin(Rotation);
@@ -204,17 +199,14 @@ float unity_noise_randomValue (vec2 uv)
 }
 
 float cloudNoise2(vec3 p){
-    float screwInterp = (p.y + 0.5) / 2.0; // Create a variable to check what happens when this is done
+    float screwInterp = p.y + 0.5;
     vec3 screwedPos = vec3(0,0,0);
     Unity_RotateAboutAxis_Radians_float(p, vec3(0,1,0), screwInterp * _MaxScrewCloud, screwedPos);
     vec3 samplePos = (screwedPos + _CloudNoiseOffset) * _CloudNoiseGlobalScale;
 
     vec3 np = vec3(0,0,0);
     Unity_RotateAboutAxis_Radians_float(samplePos, vec3(0,1,0), iTime * _CloudMoveSpeed, np);
-	//Unity_RotateAboutAxis_Radians_float(p, vec3(0,1,0), iTime * _CloudMoveSpeed, np);
-
-	float density = noised(np * _CloudNoiseScales.x).x + noised(samplePos * _CloudNoiseScales.y).x * _SecondaryNoiseStrength;
-	//density = noised(samplePos * _CloudNoiseScales.y + density * _SecondaryNoiseStrength).x;
+    float density = noised(np * _CloudNoiseScales.x).x + noised(samplePos * _CloudNoiseScales.y).x * _SecondaryNoiseStrength;
     return density * _CloudDensityMultiplier + _CloudDensityOffset;
 }
 
@@ -241,19 +233,16 @@ vec3 calcCloudNormal( in vec3 sp ) // for function f(p) // From https://iquilezl
                       k.xxx*SampleCloudDensity( sp + k.xxx*h ) );
 }
 
-void cloudRender(vec3 viewVector, vec3 positionOS, out vec2 lightTransparency, out vec3 hitPos){
+void cloudRender(vec3 viewVector, vec3 positionOS, out float value, out vec3 hitPos){
     float stepSize = _CloudsStepSize;
     float totalDensity = 0.0;
 
-    //vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
-    //float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + iTime);
-    //noiseValue = noiseValue/2.0;
-
-	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy);
+    vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
+    float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + iTime);
+    noiseValue = noiseValue/2.0;
 
     vec3 currentPosition = positionOS + viewVector * mix(0.0, stepSize, noiseValue);
     float cloudLightIntensity = -1.0;
-	float cloudTransparency = 0.0;
 
     for(int i = 0; i < int(floor(_CloudsMaxStepCount)); i ++){
         float cDist = length(currentPosition);
@@ -268,13 +257,12 @@ void cloudRender(vec3 viewVector, vec3 positionOS, out vec2 lightTransparency, o
         if(cDist < _PSWaterHeight) break; //Hit surface
 
         float cloudSample = clamp(SampleCloudDensity(currentPosition), 0.0, 1.0);
-        if(cloudSample > 0.2){
+        if(cloudSample > 0.1){
             
             vec3 lColor = vec3(0,0,0);
 
             vec3 cloudNormal = -calcCloudNormal(currentPosition);
             cloudLightIntensity = clamp(dot(cloudNormal, lDirection), 0.0, 1.0);
-			cloudTransparency = 1.0;
 
             //cloudLightIntensity = float(i) / 200.0;
             break;
@@ -283,7 +271,7 @@ void cloudRender(vec3 viewVector, vec3 positionOS, out vec2 lightTransparency, o
         currentPosition += viewVector * stepSize;
     }
     hitPos = currentPosition;
-    lightTransparency = vec2(cloudLightIntensity, cloudTransparency);
+    value = cloudLightIntensity;
 }
 
 void SampleCloudShadowPlanet(vec3 position, vec3 lightDir,out float lightOcclusion){
@@ -294,7 +282,7 @@ void SampleCloudShadowPlanet(vec3 position, vec3 lightDir,out float lightOcclusi
     vec3 sampleShadowPos = position + lightDir * t;
 
     float density = SampleCloudDensity(sampleShadowPos);
-    lightOcclusion = 1.0 - smoothstep(0.05, 0.25, density);
+    lightOcclusion = 1.0 - smoothstep(0.0, 0.05, density);
 }
 
 float distSphere(vec3 samplePos, vec3 spherePos, float sphereRad){
@@ -426,7 +414,7 @@ void VoxelPlanetRender(vec3 viewVector, vec3 positionOS, out vec3 color, out vec
 	
 	float res = -1.0;
 	vec3 mm = vec3(0.0);
-	for( int i=0; i<int(floor(_PlanetSurfaceWaterMaxStepCount)); i++ ) 
+	for( int i=0; i<128; i++ ) 
 	{
         float distCenter = length(pos / gridHalfSize);
 		if( planetNoise(pos / gridHalfSize) * step(distCenter, _PSWaterHeight + _PSMaxHeightOffset) >0.1 ) { 
@@ -458,15 +446,9 @@ void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor
     float stepSize = _PlanetSurfaceWaterStepSize;
 
     //Sample distance noise
-    /*vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
+    vec3 uvMask = SpherePlanarMapping(positionOS, _CylinderRad, _CylinderHeight, 1.0);
     float noiseValue = unity_noise_randomValue(uvMask.xy) + unity_noise_randomValue(uvMask.yx + 12231.23123);
-    noiseValue = noiseValue/2.0;*/
-	float noiseValue = InterleavedGradientNoise(gl_FragCoord.xy); /*+
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(1,0)) +
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(1,1)) +
-		InterleavedGradientNoise(gl_FragCoord.xy + vec2(0,1));*/
-	noiseValue = noiseValue;
-
+    noiseValue = noiseValue/2.0;
     //Starting raymarch position
     vec3 currentPosition = positionOS + viewVector * mix(0.0, stepSize, noiseValue);
     
@@ -542,16 +524,9 @@ void PlanetRenderRaymarch(vec3 viewVector, vec3 positionOS, out vec3 planetColor
         pColor = mix(_WaterColorDepth.xyz, _WaterColor.xyz, vec3(waterMaterial)) * mix(_WaterSurfaceMinLight,1.0, lightIntensity);// * //mix(minLight,1, );//exp(-waterMaterial * 20);
         
         float waterSpec = specular(-lDirection, waterNormal, viewVector);
-        pColor += max(0.0,waterSpec) * lightIntensity * _WaterColor.xyz;
+        pColor += clamp(waterSpec, 0.0, 1.0) * lightIntensity;
     }   
     planetColor = pColor;
-}
-
-vec3 filmicToneMapping(vec3 color)
-{
-	color = max(vec3(0.), color - vec3(0.004));
-	color = (color * (6.2 * color + .5)) / (color * (6.2 * color + 1.7) + 0.06);
-	return color;
 }
 
 void main() {
@@ -561,20 +536,19 @@ void main() {
     vec2 sInter = sphIntersect(vPosition, viewVecNorm, vec3(0,0,0), _PSWaterHeight + _PSMaxHeightOffset);
     bool hitPlanet = sInter.x >= 0.0;
     
-    vec2 cloudlightTransparency;
+    float cloudInterp;
     vec3 cloudHitPos;
-    cloudRender(viewVecNorm, vPosition, cloudlightTransparency, cloudHitPos);
-    bool cloudHit = cloudlightTransparency.x < 0.0 ? false : true;
+    cloudRender(viewVecNorm, vPosition, cloudInterp, cloudHitPos);
+    bool cloudHit = cloudInterp < 0.0 ? false : true;
 
-    float posterizedCloudInterp = _CloudsPosterize && _CloudsPosterizeCount >=2.0 ? floor(cloudlightTransparency.x * _CloudsPosterizeCount) /(_CloudsPosterizeCount - 1.0) : cloudlightTransparency.x;
+    float posterizedCloudInterp = _CloudsPosterize && _CloudsPosterizeCount >=2.0 ? floor(cloudInterp * _CloudsPosterizeCount) /(_CloudsPosterizeCount - 1.0) : cloudInterp;
     float cloudPlanetOclussion = 1.0;
     
     if(cloudHit){
-        vec2 cloudPlanetInt = vec2(0.0);//sphIntersect(cloudHitPos, lDirection, vec3(0,0,0), _PSWaterHeight + _PSMaxHeightOffset);
-		vec2 cloudPlanetInt2 = sphIntersect(cloudHitPos, lDirection, vec3(0,0,0), _PSWaterHeight);
-        cloudPlanetOclussion = (cloudPlanetInt.x > 0.0 || cloudPlanetInt2.x > 0.0) ? 0.0 : 1.0;
+        vec2 cloudPlanetInt = sphIntersect(cloudHitPos, lDirection, vec3(0,0,0), _PSWaterHeight + _PSMaxHeightOffset);
+        cloudPlanetOclussion = cloudPlanetInt.x < 0.0 ? 1.0 : 0.0;
     }
-    vec3 fCloudColor = mix(_CloudColor1, _CloudColor2, vec3(posterizedCloudInterp) * cloudPlanetOclussion);
+    vec3 fCloudColor = mix(_CloudColor1, _CloudColor2, vec3(posterizedCloudInterp));
 
     vec2 atmosphereIntersec = sphIntersect(vPosition, viewVecNorm, vec3(0,0,0), 1.0);
     float atmosphereDepth = atmosphereIntersec.y - atmosphereIntersec.x;
@@ -601,17 +575,15 @@ void main() {
         float fAlpha = 0.0;
 
         if(rpColor.x < 0.0){
-            fColor = (cloudlightTransparency.x < 0.0 ? vec3(0.0) : fCloudColor * _CloudTransparency * cloudlightTransparency.y) + _AmbientColor * atmosphereDepth;
-            fAlpha = cloudlightTransparency.x < 0.0 ? atmosphereDepth : max(atmosphereDepth, _CloudTransparency * cloudlightTransparency.y) ;
+            fColor = (cloudInterp < 0.0 ? vec3(0.0) : fCloudColor * _CloudTransparency) + _AmbientColor * atmosphereDepth;
+            fAlpha = cloudInterp < 0.0 ? atmosphereDepth : max(atmosphereDepth, _CloudTransparency) ;
         }else{
             vec3 vToPlanet = planetHitPos - vPosition;
             vec3 vToCloud = cloudHitPos - vPosition;
-            fColor = cloudlightTransparency.x < 0.0 ? rpColor : dot(vToPlanet, vToPlanet) < dot(vToCloud, vToCloud) ? rpColor : mix(rpColor, fCloudColor, _CloudTransparency * cloudlightTransparency.y);
+            fColor = cloudInterp < 0.0 ? rpColor : dot(vToPlanet, vToPlanet) < dot(vToCloud, vToCloud) ? rpColor : mix(rpColor, fCloudColor, _CloudTransparency);
             fColor = clamp(fColor, vec3(0.0), vec3(1.0)) + _AmbientColor * atmosphereDepth;
             fAlpha = 1.0;
         }
-
-		//fColor = filmicToneMapping(fColor);
 
         gl_FragColor = vec4(fColor, fAlpha);
     //}

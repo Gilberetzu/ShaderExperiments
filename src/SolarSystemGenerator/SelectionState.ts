@@ -10,13 +10,23 @@ function createCameraStore(){
 	}
 }
 
+
+const selectedEditableInit = {
+	id: -1,
+	key: ""
+};
 function createEditableStore(){
-	const { subscribe, set, update } = writable(-1);
+	const { subscribe, set, update } = writable(selectedEditableInit);
 	return {
 		subscribe,
-		set,
+		setSelected: (id, key) => {
+			set({
+				id,
+				key
+			});
+		},
 		reset: ()=>{
-			set(-1);
+			set(selectedEditableInit);
 		}
 	}
 }

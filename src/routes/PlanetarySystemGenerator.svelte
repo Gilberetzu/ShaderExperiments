@@ -12,7 +12,6 @@
 		//console.log(testEnum[testEnum.start]);
 		//console.log(testEnum);
 	})
-
 </script>
 
 <style>
@@ -57,11 +56,12 @@
 		padding: 0.1em 1em;
 		background-color: var(--cs2_2);
 		color: var(--cs2_6);
-		grid-area: top;
 	}
     
 	.outlinerContainer{
 		grid-area: outliner;
+		grid-template-rows: auto 1fr;
+		display: grid;
 		min-height: 300px;
 		background-color: var(--cs2_3);
 	}

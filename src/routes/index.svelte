@@ -8,7 +8,7 @@
 <div>
 	Currently available:
 	<ul>
-		<li><a href="/SolarSystemGenerator">Solar System Generator</a></li>
+		<li><a href="/PlanetarySystemGenerator">Planetary System Generator</a></li>
 		<li><a href="/PlanetGenerator">Planet Generator</a></li>
 	</ul>
 </div>

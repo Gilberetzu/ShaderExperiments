@@ -16,7 +16,7 @@
     
     $:{
         value;
-        updateShaderUniform(uniformName, new THREE.Color(value).convertSRGBToLinear());
+        updateShaderUniform(uniformName, new THREE.Color(value));
     }
 </script>
 

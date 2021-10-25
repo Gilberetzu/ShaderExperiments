@@ -1,8 +1,8 @@
 varying vec3 vPosition;
 varying vec3 viewVector;
 varying mat4 modelMatrixFrag;
+//varying vec3 vNormal;
 
-uniform vec3 iResolution;
 uniform float iTime;
 
 //Planet parameters
@@ -11,8 +11,11 @@ uniform float _PSNoiseGlobalScale;
 uniform float _PSWaterHeight;
 uniform float _PSWaterDepthOffset;
 uniform float _PSMaxHeightOffset;
+
 uniform vec3 _PlanetColor1;
 uniform vec3 _PlanetColor2;
+uniform vec2 _PlanetHighInterpRange;
+
 uniform vec2 _PSNoiseScales;
 uniform float _SecondaryNoiseStrengthGround;
 uniform float _MaxScrewTerrain;
@@ -27,8 +30,10 @@ uniform float _PlanetSurfaceWaterStepSize;
 uniform float _PlanetSurfaceWaterMaxStepCount;
 
 //Ocean uniforms
+uniform bool _showWater;
 uniform vec3 _WaterColorDepth;
 uniform vec3 _WaterColor;
+uniform vec3 _WaterSpecularColor;
 uniform vec2 _WaterMaterialSmoothStep;
 uniform float _WaterNormalScale;
 uniform float _WaterSurfaceMinLight;

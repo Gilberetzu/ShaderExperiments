@@ -57,11 +57,13 @@
 <style>
     .container{
         display: flex;
+		flex-wrap: wrap;
         place-content: center;
     }
     .iconContainer{
         line-height: 0;
-        max-width: 2.5em;
+        max-width: 2.3em;
+		min-width: 2.2em;
         padding: 0.5em;
 
     }

@@ -17,7 +17,7 @@
 	}
 	.checkFalse{
 		transform-origin: center;
-		transform: rotate(0deg);
+		transform: rotate(90deg);
 	}
 	.container{
 		background-color: var(--cs2_3);
@@ -38,6 +38,8 @@
 	.propContainer{
 		padding: 1em;
 		background-color: var(--cs2_5);
+		display: grid;
+		gap: 1em;
 	}
 </style>
 
