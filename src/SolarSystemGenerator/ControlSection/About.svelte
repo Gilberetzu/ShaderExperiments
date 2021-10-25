@@ -47,7 +47,7 @@
 <div class="icon">
 	<div class="linkContainer">
 		<WebIcon />
-		<a class="portfolioLink" href="https://www.euriherasme.com/"/>
+		<a class="portfolioLink" href="https://www.euriherasme.com/"><div style="display: none;">sad</div></a>
 	</div>
 	<div>By Euri Herasme</div>
 </div>

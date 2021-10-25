@@ -80,12 +80,12 @@ export default class PlanetarySystemEditor{
 	}
 
 	startSystem(planetarySystemId: number){
-		let psObj = get(ObjectsStore).planetarySystems.find(ps => ps.id == planetarySystemId);
+		/*let psObj = get(ObjectsStore).planetarySystems.find(ps => ps.id == planetarySystemId);
 		if(psObj != undefined && psObj != null){
 			this.selectedPSId = psObj.id;
 			this.selectedPSObject = psObj.object;
 
-			this.selectedPSObject.
-		}
+			//this.selectedPSObject.
+		}*/
 	}
 }

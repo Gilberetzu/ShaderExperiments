@@ -5,7 +5,7 @@ import { writable, get} from "svelte/store";
 import { Writable } from 'svelte/store';
 import SceneCameraController from './SceneCameraController';
 import CameraStores from './CameraStores';
-import SceneBackground from './SceneBackground';
+import SceneBackground from "./SceneBackground";
 import ObjectsStore from '../ObjectsStore';
 import ProceduralStar from '../ProceduralStar';
 

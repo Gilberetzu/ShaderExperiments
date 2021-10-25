@@ -3,7 +3,7 @@
 	import { Writable } from "svelte/store";
 	import * as THREE from "three";
 
-	export let tooltip = "";
+	//export let tooltip = "";
 	export let colorStore: Writable<THREE.Color>;
 	export let label;
 

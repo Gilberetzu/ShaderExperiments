@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
     import { Writable, writable, get } from 'svelte/store';
-    import ObjectsStore from '../ObjectsStore';
+    import ObjectsStore from "../ObjectsStore"
     import * as THREE from 'three';
 
 	import RaymarchQuality from "../RaymarchingQuality";
@@ -175,7 +175,7 @@
 
 {#if selectedSection.typeIndex == 1 && selectedSection.index == 0}
     <ControlGroup label={'Main Planet'}>
-        <String label="Name" tooltip={''} stringStore={nameStore} />
+        <String label="Name" stringStore={nameStore} />
         <Dropdown
             possibleOptions={dropDownOptions}
             bind:value={mainPlanetSelect}

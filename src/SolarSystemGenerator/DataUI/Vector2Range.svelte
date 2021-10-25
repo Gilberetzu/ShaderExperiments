@@ -4,7 +4,7 @@
 	import * as THREE from "three";
 	import { createEventDispatcher } from 'svelte';
 
-	export let tooltip = "";
+	//export let tooltip = "";
 	export let vector2Store: Writable<THREE.Vector2>;
 	export let label;
 	export let min = 0;
@@ -118,11 +118,6 @@
 <svelte:window on:mousemove={mouseMove} on:mouseup ={mouseUp}/>
 
 <style>
-	.label{
-		color: var(--cs2_6);
-		font-weight: 300;
-		font-size: 1.2em;
-	}
 
 	.slider{
 		width: 100%;

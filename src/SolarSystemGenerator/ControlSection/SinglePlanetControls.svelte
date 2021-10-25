@@ -99,12 +99,22 @@
                             });
 
                             let storeIndex = newEditableStores.length - 1;
+
+							let typeN = "";
+							if(editableObject[prop.prop].isColor){
+								typeN = "color";
+							}else if(editableObject[prop.prop].isVector2){
+								typeN = "vector2";
+							}else if(editableObject[prop.prop].isVector3){
+								typeN = "vector3"
+							}else{
+								typeN = editableObject[prop.prop].constructor.name;
+							}
                             return {
                                 label: prop.label,
                                 overrideType: prop.overrideType,
                                 enumObject: prop.enumObject,
-                                typeName:
-                                    editableObject[prop.prop].constructor.name,
+                                typeName: typeN,
                                 storeIndex: storeIndex,
                                 extras: prop.extras,
                                 tooltip: prop.tooltip
@@ -185,27 +195,23 @@
                     {#if overrideType == 'enum'}
                         <EnumSelector
                             {label}
-                            {tooltip}
                             enumStore={getUIStore(storeIndex)}
                             {enumObject}
                         />
                     {:else if overrideType == 'range'}
                         <Vector2Range
                             {label}
-                            {tooltip}
                             vector2Store={getUIStore(storeIndex)}
                             {...extras}
                         />
                     {:else if typeName.toLowerCase() == 'boolean'}
                         <Bool
                             boolStore={getUIStore(storeIndex)}
-                            {tooltip}
                             {label}
                         />
                     {:else if typeName.toLowerCase() == 'number'}
                         <Float
                             floatStore={getUIStore(storeIndex)}
-                            {tooltip}
                             {label}
                             {...extras}
                         />

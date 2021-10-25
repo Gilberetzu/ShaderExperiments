@@ -5,8 +5,6 @@ import BackgroundShader from "./Materials/SpaceBackground/SpaceBackgroundShader"
 import SceneGridShader from "./Materials/SceneGrid/SceneGridShader";
 import PlanetShader from "./Materials/Planet/PlanetShader";
 import StarShader from "./Materials/Star/StarShader";
-
-import PlanetUniformT from "./Materials/Planet/UniformsType";
 import PlanetEditor from './PlanetEditor';
 
 import PlanetSatelliteEditor from "./PlanetSatelliteEditor";
