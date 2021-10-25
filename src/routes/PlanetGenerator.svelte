@@ -2,7 +2,7 @@
 </script>
 
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import SinglePlanetGen from '../PlanetGenerator/SinglePlanetGen';
     import SliderFloat from '../PlanetGenerator/UniformsUI/SliderFloat.svelte';
     import Vec2 from '../PlanetGenerator/UniformsUI/Vec2.svelte';
@@ -12,6 +12,7 @@
     import ControlHeader from '../PlanetGenerator/UniformsUI/ControlHeader.svelte';
     import Boolean from '../PlanetGenerator/UniformsUI/Boolean.svelte';
     import SocialLinks from '../CommonComponents/SocialLinks.svelte';
+
 
     let canvasElement;
     let planetGenerator;
@@ -216,8 +217,12 @@
         renderResolution.y = value.y;
     };
 
+	onDestroy(()=>{
+		planetGenerator.enabled = false;
+	})
     onMount(() => {
         planetGenerator = new SinglePlanetGen(canvasElement);
+		planetGenerator.enabled = true;
         planetGenerator.animate();
 
         renderScale = planetGenerator.renderScale;

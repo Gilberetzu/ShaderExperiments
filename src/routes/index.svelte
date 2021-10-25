@@ -6,5 +6,12 @@
 </div>
 
 <div>
-	Here you can access a <a href="/PlanetGenerator">Planet Generator</a> I hope you like it!!
+	Currently available:
+	<ul>
+		<li><a href="/PlanetarySystemGenerator">Planetary System Generator</a></li>
+		<li><a href="/PlanetGenerator">Planet Generator</a></li>
+	</ul>
+</div>
+<div>
+	I hope you like them!!
 </div>

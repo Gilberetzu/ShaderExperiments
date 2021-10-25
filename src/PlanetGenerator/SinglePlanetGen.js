@@ -10,6 +10,7 @@ const RaymarchSettingType = {
 
 export default class SinglePlanetGen{
     constructor(canvasHtmlElement){
+		this.enabled = false;
         this.canvasElement = canvasHtmlElement;
 
         this.lowFidelityParameters = {
@@ -217,6 +218,7 @@ export default class SinglePlanetGen{
     }
 
     animate() {
+		if(!this.enabled) return;
         requestAnimationFrame( (this.animate).bind(this) );
 
         if(this.shouldResize()){

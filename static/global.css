@@ -7,6 +7,15 @@
 	--c4: #00172D;
 	--codeHighlight: #f92672;
     --navLayoutMaxWidth: 1500px;
+
+	--cs2_1: #181818;
+	--cs2_2: #353535;
+	--cs2_3: #494949;
+	--cs2_4: #FF4C29;
+	--cs2_5: #2a2a2a;
+	--cs2_6: #e0e0e0;
+	--cs2_7: #555555;
+	--cs2_8: #777777;
 }
 
 body {
@@ -15,4 +24,28 @@ body {
 	font-size: 14px;
 	line-height: 1.5;
 	color: #333;
+}
+
+::-webkit-scrollbar {
+width: 0.5em;
+position:absolute
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	width: 0.5em;
+background: #f1f1f100; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	border-radius: 1em;
+background: var(--cs2_6); 
+opacity: 0.5;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: var(--cs2_6); 
+	opacity: 1;
 }
