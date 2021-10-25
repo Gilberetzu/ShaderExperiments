@@ -3,7 +3,7 @@
 	import { Writable } from "svelte/store";
 
 	export let label;
-	export let tooltip = "";
+	//export let tooltip = "";
 	export let stringStore: Writable<string>;
 
 	let unsubscribeStore;

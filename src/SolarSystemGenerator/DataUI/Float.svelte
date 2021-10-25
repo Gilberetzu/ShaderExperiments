@@ -2,7 +2,7 @@
 	import {onMount, onDestroy} from "svelte";
 	import { Writable } from "svelte/store";
 	import NumberInput from "./NumberInput.svelte";
-	export let tooltip = "";
+	//export let tooltip = "";
 	export let floatStore: Writable<Number>;
 	export let label;
 	export let min = 0.0;

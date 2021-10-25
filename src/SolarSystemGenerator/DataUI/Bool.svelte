@@ -2,7 +2,7 @@
 	import {onMount, onDestroy} from "svelte";
 	import { Writable } from "svelte/store";
 
-	export let tooltip = "";
+	//export let tooltip = "";
 	export let boolStore: Writable<boolean>;
 	export let label;
 
