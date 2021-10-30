@@ -84,7 +84,7 @@ export default class BackgroundEditor {
 			pixelPerfect: writable(true)
 		};
 
-		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores);
+		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores, this.scene);
 	}
 
 	startSystem(backgroundId: number) {
@@ -188,6 +188,7 @@ export default class BackgroundEditor {
 
 			this.enabled = true;
 			this.sceneCameraController.addEventListeners();
+			this.sceneCameraController.resizeRenderer(this.sceneCameraController.desiredWidth, this.sceneCameraController.camera);
 			this.animate();
 		}
 	}

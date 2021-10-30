@@ -27,7 +27,6 @@
             floatStore={cameraControlStores.cameraDistance}
             label={'Camera Distance'}
             addSlider={false}
-            tooltip={''}
         />
         <Vector3
             label={'Camera Rotation Center'}
@@ -40,7 +39,6 @@
             addSlider={false}
             max={0}
             min={0}
-            tooltip={''}
         />
         <Float
             floatStore={cameraControlStores.renderWidth}
@@ -48,7 +46,6 @@
             addSlider={true}
             max={1080}
             min={256}
-            tooltip={''}
         />
         <Bool
             label="Pixel Perfect Viewport"

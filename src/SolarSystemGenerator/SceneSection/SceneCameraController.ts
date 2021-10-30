@@ -26,12 +26,19 @@ export default class SceneCameraController{
 		wheel: (event)=>void
 	}
 
-	constructor(threeScene, controlStores){
+	centerSphereMesh: THREE.Mesh;
+
+	constructor(threeScene, controlStores, scene:THREE.Scene){
 		this.threeScene = threeScene;
 		this.desiredWidth = 300;
 		this.cameraRotationCenter = new THREE.Vector3(0.0,0.0,0.0);
 		this.camera = new THREE.PerspectiveCamera( 75, 1, 0.0001, 150 );
 		this.camera.position.z = 2;
+
+		let sphereMesh = new THREE.SphereGeometry(0.1, 6, 6);
+		let sphereMat = new THREE.MeshBasicMaterial({color: 0xffcccc});
+		this.centerSphereMesh = new THREE.Mesh(sphereMesh, sphereMat);
+		//scene.add(this.centerSphereMesh);
 
 		this.controlStores = controlStores;
 		this.controlStores.cameraRotation.subscribe((state)=>{
@@ -42,6 +49,7 @@ export default class SceneCameraController{
 		this.controlStores.cameraDistance.subscribe((this.setCameraDistance).bind(this));
 		this.controlStores.cameraRotationCenter.subscribe((state)=>{
 			this.cameraRotationCenter = state;
+			this.centerSphereMesh.position.set(state.x, state.y, state.z);
 			this.updateCameraRotation();
 		});
 		this.controlStores.cameraFOV.subscribe((this.setCameraFOV).bind(this));
@@ -82,12 +90,33 @@ export default class SceneCameraController{
 
 	mouseMoveEvent(mouseEvent){
 		if(this.isLeftButtonDown){
-			let newVertical = this.verticalRotation + mouseEvent.movementY * 0.01;
-			newVertical = newVertical > 3.14/2 ? 3.1399/2 : newVertical < -3.14/2 ? -3.1399/2 : newVertical;
-			this.controlStores.cameraRotation.set({
-				x: this.planarRotation - mouseEvent.movementX * 0.01,
-				y: newVertical
-			});
+			if(mouseEvent.ctrlKey){
+				//panning
+				let rightDirection = new THREE.Vector4(1,0,0,0);
+				let upDirection = new THREE.Vector4(0,1,0,0);
+				
+				rightDirection.applyMatrix4(this.camera.matrix);
+				upDirection.applyMatrix4(this.camera.matrix);
+
+				let rightMovement = new THREE.Vector3(rightDirection.x, rightDirection.y, rightDirection.z);
+				let upMovement = new THREE.Vector3(upDirection.x, upDirection.y, upDirection.z);
+
+				let moveRight = rightMovement.multiplyScalar(-mouseEvent.movementX*0.01);
+				let moveUp = upMovement.multiplyScalar(mouseEvent.movementY*0.01);
+
+				let newCenter = new THREE.Vector3(this.cameraRotationCenter.x, this.cameraRotationCenter.y, this.cameraRotationCenter.z);
+				newCenter.add(moveRight).add(moveUp);
+				
+				this.controlStores.cameraRotationCenter.set(newCenter);
+			}else{
+				//rotating
+				let newVertical = this.verticalRotation + mouseEvent.movementY * 0.01;
+				newVertical = newVertical > 3.14/2 ? 3.1399/2 : newVertical < -3.14/2 ? -3.1399/2 : newVertical;
+				this.controlStores.cameraRotation.set({
+					x: this.planarRotation - mouseEvent.movementX * 0.01,
+					y: newVertical
+				});
+			}
 		}
 	}
 
@@ -117,6 +146,7 @@ export default class SceneCameraController{
         this.camera.position.z = z + this.cameraRotationCenter.z;
         //this.camera.position =
         this.camera.lookAt(this.cameraRotationCenter);
+		this.camera.updateMatrix();
         this.camera.updateProjectionMatrix();
     }
 

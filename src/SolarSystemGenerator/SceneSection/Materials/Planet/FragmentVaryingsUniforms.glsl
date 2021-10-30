@@ -71,4 +71,5 @@ uniform float _AmbientPower;
 uniform float _CylinderHeight;
 uniform float _CylinderRad;
 
-const vec3 lDirection = normalize(vec3(1,0,1));
+//const vec3 lDirection = normalize(vec3(1,0,1));
+uniform vec3 lDirection;

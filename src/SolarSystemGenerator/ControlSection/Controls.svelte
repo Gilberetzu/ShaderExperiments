@@ -4,10 +4,12 @@
     import SelectionState from '../SelectionState';
 
     import About from './About.svelte';
+	import Save from "./Save.svelte";
     import SinglePlanetControls from './SinglePlanetControls.svelte';
     import PlanetSatelliteControls from './PlanetSatelliteControls.svelte';
     import BackgroundControls from './BackgroundControls.svelte';
     import StarControls from './StarControls.svelte';
+	import PlanetarySystemControls from "./PlanetarySystemControls.svelte";
 
     let editableUISections = [];
     let systemUISections = [];
@@ -32,6 +34,10 @@
             key: ''
         }; //This ensures that the svelte object is destroyed and recreated the next frame
         requestAnimationFrame(() => {
+			if(state.id == -1){
+				setSystemUISections([]);
+				setEditabelUISections([]);
+			}
             loadedEditableObject = state;
         });
     };
@@ -52,6 +58,17 @@
             selectedSection = {
                 typeIndex: 2,
                 index: 0
+            };
+        }}
+    />
+	<ControlSelector
+        label="Save"
+        selected={selectedSection.typeIndex == 2 &&
+            selectedSection.index == 1}
+        on:click={() => {
+            selectedSection = {
+                typeIndex: 2,
+                index: 1
             };
         }}
     />
@@ -88,6 +105,9 @@
 	{#if selectedSection.typeIndex == 2 && selectedSection.index == 0}
 		<About/>
 	{/if}
+	{#if selectedSection.typeIndex == 2 && selectedSection.index == 1}
+		<Save/>
+	{/if}
     {#if loadedEditableObject.id >= 0}
         {#if loadedEditableObject.key == 'planets'}
             <SinglePlanetControls
@@ -117,6 +137,13 @@
                 {setEditabelUISections}
                 {setSystemUISections}
             />
+		{:else if loadedEditableObject.key == 'planetarySystems'}
+			<PlanetarySystemControls
+				selectedObject={loadedEditableObject}
+				{selectedSection}
+				{setEditabelUISections}
+				{setSystemUISections}
+			/>
         {/if}
     {/if}
 </div>

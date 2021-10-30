@@ -53,6 +53,10 @@
 	</div>
 {/if}
 
+<div class="canvasContainer">
+	<canvas bind:this={canvasElement} class:canvasRender = {true} class:crispCanvas={canvasCrisp}></canvas>
+</div>
+
 <style>
 	.splashContainer{
 		position: fixed;
@@ -93,5 +97,10 @@
         image-rendering: pixelated; /* Awesome future-browsers       */
         -ms-interpolation-mode: nearest-neighbor; /* IE                            */
     }
+	.canvasContainer{
+		position: relative;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
 </style>
-<canvas bind:this={canvasElement} class:canvasRender = {true} class:crispCanvas={canvasCrisp}></canvas>

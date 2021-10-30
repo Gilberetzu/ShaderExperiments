@@ -56,5 +56,7 @@ export default {
 	_AmbientPower: {value: 4.0},
 	//Misc
 	_CylinderHeight: {value: 5.0},
-	_CylinderRad: {value: 2.88}
+	_CylinderRad: {value: 2.88},
+
+	lDirection: {value: new THREE.Vector3(1,0,1).normalize()} //normalize(vec3(1,0,1));
 };

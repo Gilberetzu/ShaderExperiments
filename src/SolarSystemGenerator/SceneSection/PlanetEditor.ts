@@ -51,7 +51,7 @@ export default class PlanetEditor{
 			pixelPerfect: writable(true)
 		};
 
-		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores);
+		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores, this.scene);
 		this.sceneBackground = new SceneBackground(threeScene, this.scene);
 	}
 
@@ -110,6 +110,7 @@ export default class PlanetEditor{
 		}
 
 		//this.threeScene.renderer.render( this.scene, this.camera );
+		this.sceneCameraController.resizeRenderer(this.sceneCameraController.desiredWidth, this.sceneCameraController.camera);
 		this.animate();
 	}
 

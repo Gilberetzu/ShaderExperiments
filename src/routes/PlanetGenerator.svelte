@@ -13,10 +13,9 @@
     import Boolean from '../PlanetGenerator/UniformsUI/Boolean.svelte';
     import SocialLinks from '../CommonComponents/SocialLinks.svelte';
 
-
     let canvasElement;
     let planetGenerator;
-	let canvasNearestFiltering = false;
+    let canvasNearestFiltering = false;
 
     let currentResolution = {
         width: 1,
@@ -217,659 +216,674 @@
         renderResolution.y = value.y;
     };
 
-	onDestroy(()=>{
-		planetGenerator.enabled = false;
-	})
+    onDestroy(() => {
+        if (planetGenerator) {
+            planetGenerator.enabled = false;
+        }
+    });
     onMount(() => {
         planetGenerator = new SinglePlanetGen(canvasElement);
-		planetGenerator.enabled = true;
-        planetGenerator.animate();
+        if (planetGenerator) {
+            planetGenerator.enabled = true;
+            planetGenerator.animate();
 
-        renderScale = planetGenerator.renderScale;
+            renderScale = planetGenerator.renderScale;
 
-        updateShaderUniform = (uniformName, newValue) => {
-            planetGenerator.uniforms[uniformName].value = newValue;
-        };
+            updateShaderUniform = (uniformName, newValue) => {
+                planetGenerator.uniforms[uniformName].value = newValue;
+            };
 
-        let newControls = [
-            {
-                type: ControlTypes.HEADER,
-                label: 'Camera Controls'
-            },
-            {
-                type: ControlTypes.SYSTEM,
-                component: SliderFloat,
-                params: {
-                    min: -3.14,
-                    max: 3.14,
-                    step: 0.01,
-                    label: 'Camera Rotation Planar',
-                    uniformName: 'cameraRotationPlanar',
-                    defaultValue: 0
-                }
-            },
-            {
-                type: ControlTypes.SYSTEM,
-                component: SliderFloat,
-                params: {
-                    min: -3.14 / 2,
-                    max: 3.14 / 2,
-                    step: 0.01,
-                    label: 'Camera Rotation Vertical',
-                    uniformName: 'cameraRotationVertical',
-                    defaultValue: 0
-                }
-            },
-            {
-                type: ControlTypes.SYSTEM,
-                component: SliderFloat,
-                params: {
-                    min: 1.2,
-                    max: 2.5,
-                    step: 0.01,
-                    label: 'Camera Distance',
-                    uniformName: 'setCameraDistance',
-                    defaultValue: 2
-                }
-            },
-            {
-                type: ControlTypes.SYSTEM,
-                component: SliderFloat,
-                params: {
-                    min: 40,
-                    max: 90,
-                    step: 0.01,
-                    label: 'Camera FOV',
-                    uniformName: 'setCameraFOV',
-                    defaultValue: 60
-                }
-            },
-            {
-                type: ControlTypes.SYSTEM,
-                component: SliderFloat,
-                params: {
-                    min: 246,
-                    max: 1080,
-                    step: 0.01,
-                    label: 'Render Width',
-                    uniformName: 'setRenderWidth',
-                    defaultValue: 300
-                }
-            },
-            {
-                type: ControlTypes.HEADER,
-                label: 'Planet Surface Parameters'
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3,
-                dataType: 'vec3',
-                params: {
-                    label: 'Noise Offset',
-                    uniformName: '_PSNoiseOffset',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSNoiseOffset'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.01,
-                    max: 20.0,
-                    step: 0.01,
-                    label: 'Noise Global Scale',
-                    uniformName: '_PSNoiseGlobalScale',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSNoiseGlobalScale'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.01,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Water Height',
-                    uniformName: '_PSWaterHeight',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSWaterHeight'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.01,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Water Depth',
-                    uniformName: '_PSWaterDepthOffset',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSWaterDepthOffset'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.01,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Height Over Water',
-                    uniformName: '_PSMaxHeightOffset',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSMaxHeightOffset'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec2,
-                dataType: 'vec2',
-                params: {
-                    label: 'Noise Scales',
-                    uniformName: '_PSNoiseScales',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSNoiseScales'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -1.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Secondary Noise Strength',
-                    uniformName: '_SecondaryNoiseStrengthGround',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_SecondaryNoiseStrengthGround'
-                        ].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -10.0,
-                    max: 10.0,
-                    step: 0.01,
-                    label: 'Max Screw Terrain',
-                    uniformName: '_MaxScrewTerrain',
-                    defaultValue:
-                        planetGenerator.uniforms['_MaxScrewTerrain'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -1.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Density Offset',
-                    uniformName: '_PSDensityOffset',
-                    defaultValue:
-                        planetGenerator.uniforms['_PSDensityOffset'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Surface Min Light',
-                    uniformName: '_SurfaceMinLight',
-                    defaultValue:
-                        planetGenerator.uniforms['_SurfaceMinLight'].value
-                }
-            },
-            {
-                type: ControlTypes.DIVISOR
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Boolean,
-                dataType: 'bool',
-                params: {
-                    label: 'Enable Voxel',
-                    uniformName: '_EnableVoxelizer',
-                    defaultValue:
-                        planetGenerator.uniforms['_EnableVoxelizer'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 1.0,
-                    max: 100.0,
-                    step: 1,
-                    label: 'Grid Half Size',
-                    uniformName: '_GridHalfSize',
-                    defaultValue:
-                        planetGenerator.uniforms['_GridHalfSize'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Voxel Normal Interp',
-                    uniformName: '_VoxelNormalInterp',
-                    defaultValue:
-                        planetGenerator.uniforms['_VoxelNormalInterp'].value
-                }
-            },
+            let newControls = [
+                {
+                    type: ControlTypes.HEADER,
+                    label: 'Camera Controls'
+                },
+                {
+                    type: ControlTypes.SYSTEM,
+                    component: SliderFloat,
+                    params: {
+                        min: -3.14,
+                        max: 3.14,
+                        step: 0.01,
+                        label: 'Camera Rotation Planar',
+                        uniformName: 'cameraRotationPlanar',
+                        defaultValue: 0
+                    }
+                },
+                {
+                    type: ControlTypes.SYSTEM,
+                    component: SliderFloat,
+                    params: {
+                        min: -3.14 / 2,
+                        max: 3.14 / 2,
+                        step: 0.01,
+                        label: 'Camera Rotation Vertical',
+                        uniformName: 'cameraRotationVertical',
+                        defaultValue: 0
+                    }
+                },
+                {
+                    type: ControlTypes.SYSTEM,
+                    component: SliderFloat,
+                    params: {
+                        min: 1.2,
+                        max: 2.5,
+                        step: 0.01,
+                        label: 'Camera Distance',
+                        uniformName: 'setCameraDistance',
+                        defaultValue: 2
+                    }
+                },
+                {
+                    type: ControlTypes.SYSTEM,
+                    component: SliderFloat,
+                    params: {
+                        min: 40,
+                        max: 90,
+                        step: 0.01,
+                        label: 'Camera FOV',
+                        uniformName: 'setCameraFOV',
+                        defaultValue: 60
+                    }
+                },
+                {
+                    type: ControlTypes.SYSTEM,
+                    component: SliderFloat,
+                    params: {
+                        min: 246,
+                        max: 1080,
+                        step: 0.01,
+                        label: 'Render Width',
+                        uniformName: 'setRenderWidth',
+                        defaultValue: 300
+                    }
+                },
+                {
+                    type: ControlTypes.HEADER,
+                    label: 'Planet Surface Parameters'
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3,
+                    dataType: 'vec3',
+                    params: {
+                        label: 'Noise Offset',
+                        uniformName: '_PSNoiseOffset',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSNoiseOffset'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.01,
+                        max: 20.0,
+                        step: 0.01,
+                        label: 'Noise Global Scale',
+                        uniformName: '_PSNoiseGlobalScale',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSNoiseGlobalScale']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.01,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Water Height',
+                        uniformName: '_PSWaterHeight',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSWaterHeight'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.01,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Water Depth',
+                        uniformName: '_PSWaterDepthOffset',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSWaterDepthOffset']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.01,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Height Over Water',
+                        uniformName: '_PSMaxHeightOffset',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSMaxHeightOffset'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec2,
+                    dataType: 'vec2',
+                    params: {
+                        label: 'Noise Scales',
+                        uniformName: '_PSNoiseScales',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSNoiseScales'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -1.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Secondary Noise Strength',
+                        uniformName: '_SecondaryNoiseStrengthGround',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_SecondaryNoiseStrengthGround'
+                            ].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -10.0,
+                        max: 10.0,
+                        step: 0.01,
+                        label: 'Max Screw Terrain',
+                        uniformName: '_MaxScrewTerrain',
+                        defaultValue:
+                            planetGenerator.uniforms['_MaxScrewTerrain'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -1.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Density Offset',
+                        uniformName: '_PSDensityOffset',
+                        defaultValue:
+                            planetGenerator.uniforms['_PSDensityOffset'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Surface Min Light',
+                        uniformName: '_SurfaceMinLight',
+                        defaultValue:
+                            planetGenerator.uniforms['_SurfaceMinLight'].value
+                    }
+                },
+                {
+                    type: ControlTypes.DIVISOR
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Boolean,
+                    dataType: 'bool',
+                    params: {
+                        label: 'Enable Voxel',
+                        uniformName: '_EnableVoxelizer',
+                        defaultValue:
+                            planetGenerator.uniforms['_EnableVoxelizer'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 1.0,
+                        max: 100.0,
+                        step: 1,
+                        label: 'Grid Half Size',
+                        uniformName: '_GridHalfSize',
+                        defaultValue:
+                            planetGenerator.uniforms['_GridHalfSize'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Voxel Normal Interp',
+                        uniformName: '_VoxelNormalInterp',
+                        defaultValue:
+                            planetGenerator.uniforms['_VoxelNormalInterp'].value
+                    }
+                },
 
-            {
-                type: ControlTypes.DIVISOR
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: '_Planet Color 1',
-                    uniformName: '_PlanetColor1',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_PlanetColor1'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: '_Planet Color 2',
-                    uniformName: '_PlanetColor2',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_PlanetColor2'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.HEADER,
-                label: 'Ocean Parameters'
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: 'Water Color Depth',
-                    uniformName: '_WaterColorDepth',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_WaterColorDepth'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: 'Water Color Surface',
-                    uniformName: '_WaterColor',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_WaterColor'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.DIVISOR
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec2,
-                dataType: 'vec2',
-                params: {
-                    label: 'Water Depth Smooth Step',
-                    uniformName: '_WaterMaterialSmoothStep',
-                    defaultValue:
-                        planetGenerator.uniforms['_WaterMaterialSmoothStep']
-                            .value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 20.0,
-                    step: 0.01,
-                    label: 'Water Normal Scale',
-                    uniformName: '_WaterNormalScale',
-                    defaultValue:
-                        planetGenerator.uniforms['_WaterNormalScale'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Water Min Light',
-                    uniformName: '_WaterSurfaceMinLight',
-                    defaultValue:
-                        planetGenerator.uniforms['_WaterSurfaceMinLight'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Water Normal Strength',
-                    uniformName: '_WaterNormalStrength',
-                    defaultValue:
-                        planetGenerator.uniforms['_WaterNormalStrength'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec2,
-                dataType: 'vec2',
-                params: {
-                    label: 'Specular Params',
-                    uniformName: '_SpecularParams',
-                    defaultValue:
-                        planetGenerator.uniforms['_SpecularParams'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Water Move Speed',
-                    uniformName: '_WaterMoveSpeed',
-                    defaultValue:
-                        planetGenerator.uniforms['_WaterMoveSpeed'].value
-                }
-            },
-            {
-                type: ControlTypes.HEADER,
-                label: 'Cloud Parameters'
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1,
-                    step: 0.01,
-                    label: 'Cloud Transparency',
-                    uniformName: '_CloudTransparency',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudTransparency'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: 'Cloud Color 1',
-                    uniformName: '_CloudColor1',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_CloudColor1'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: 'Cloud Color 2',
-                    uniformName: '_CloudColor2',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_CloudColor2'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -10.0,
-                    max: 10.0,
-                    step: 0.01,
-                    label: 'Cloud Max Screw',
-                    uniformName: '_MaxScrewCloud',
-                    defaultValue:
-                        planetGenerator.uniforms['_MaxScrewCloud'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Cloud Mid Distance',
-                    uniformName: '_CloudMidDistance',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudMidDistance'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 0.5,
-                    step: 0.01,
-                    label: 'Cloud Half Height',
-                    uniformName: '_CloudHalfHeight',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudHalfHeight'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec2,
-                dataType: 'vec2',
-                params: {
-                    label: 'Cloud Noise Scales',
-                    uniformName: '_CloudNoiseScales',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudNoiseScales'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3,
-                dataType: 'vec3',
-                params: {
-                    label: 'Cloud Noise Offset',
-                    uniformName: '_CloudNoiseOffset',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudNoiseOffset'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 20,
-                    step: 0.01,
-                    label: 'Cloud Noise Global Scale',
-                    uniformName: '_CloudNoiseGlobalScale',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudNoiseGlobalScale'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -1.0,
-                    max: 1.0,
-                    step: 0.01,
-                    label: 'Cloud Secondary Noise Strength',
-                    uniformName: '_SecondaryNoiseStrength',
-                    defaultValue:
-                        planetGenerator.uniforms['_SecondaryNoiseStrength']
-                            .value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.0,
-                    max: 20,
-                    step: 0.01,
-                    label: 'Cloud Noise Multiplier',
-                    uniformName: '_CloudDensityMultiplier',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudDensityMultiplier']
-                            .value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -10.0,
-                    max: 10.0,
-                    step: 0.01,
-                    label: 'Cloud Noise Offset',
-                    uniformName: '_CloudDensityOffset',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudDensityOffset'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: -2.0,
-                    max: 2.0,
-                    step: 0.01,
-                    label: 'Cloud Move Speeed',
-                    uniformName: '_CloudMoveSpeed',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudMoveSpeed'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Boolean,
-                dataType: 'bool',
-                params: {
-                    label: 'Cloud Posterize',
-                    uniformName: '_CloudsPosterize',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudsPosterize'].value
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 1.0,
-                    max: 10.0,
-                    step: 1.0,
-                    label: 'Posterize Count',
-                    uniformName: '_CloudsPosterizeCount',
-                    defaultValue:
-                        planetGenerator.uniforms['_CloudsPosterizeCount'].value
-                }
-            },
-            {
-                type: ControlTypes.HEADER,
-                label: 'Atmosphere Parameters'
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: Vec3Color,
-                dataType: 'vec3Color',
-                params: {
-                    label: 'Atmosphere Color',
-                    uniformName: '_AmbientColor',
-                    defaultValue:
-                        planetGenerator.uniforms[
-                            '_AmbientColor'
-                        ].value.getHexString()
-                }
-            },
-            {
-                type: ControlTypes.CONTROL,
-                component: SliderFloat,
-                dataType: 'float',
-                params: {
-                    min: 0.5,
-                    max: 10.0,
-                    step: 0.01,
-                    label: 'Atmosphere Power',
-                    uniformName: '_AmbientPower',
-                    defaultValue:
-                        planetGenerator.uniforms['_AmbientPower'].value
-                }
-            },
+                {
+                    type: ControlTypes.DIVISOR
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: '_Planet Color 1',
+                        uniformName: '_PlanetColor1',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_PlanetColor1'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: '_Planet Color 2',
+                        uniformName: '_PlanetColor2',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_PlanetColor2'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.HEADER,
+                    label: 'Ocean Parameters'
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: 'Water Color Depth',
+                        uniformName: '_WaterColorDepth',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_WaterColorDepth'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: 'Water Color Surface',
+                        uniformName: '_WaterColor',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_WaterColor'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.DIVISOR
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec2,
+                    dataType: 'vec2',
+                    params: {
+                        label: 'Water Depth Smooth Step',
+                        uniformName: '_WaterMaterialSmoothStep',
+                        defaultValue:
+                            planetGenerator.uniforms['_WaterMaterialSmoothStep']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 20.0,
+                        step: 0.01,
+                        label: 'Water Normal Scale',
+                        uniformName: '_WaterNormalScale',
+                        defaultValue:
+                            planetGenerator.uniforms['_WaterNormalScale'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Water Min Light',
+                        uniformName: '_WaterSurfaceMinLight',
+                        defaultValue:
+                            planetGenerator.uniforms['_WaterSurfaceMinLight']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Water Normal Strength',
+                        uniformName: '_WaterNormalStrength',
+                        defaultValue:
+                            planetGenerator.uniforms['_WaterNormalStrength']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec2,
+                    dataType: 'vec2',
+                    params: {
+                        label: 'Specular Params',
+                        uniformName: '_SpecularParams',
+                        defaultValue:
+                            planetGenerator.uniforms['_SpecularParams'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Water Move Speed',
+                        uniformName: '_WaterMoveSpeed',
+                        defaultValue:
+                            planetGenerator.uniforms['_WaterMoveSpeed'].value
+                    }
+                },
+                {
+                    type: ControlTypes.HEADER,
+                    label: 'Cloud Parameters'
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1,
+                        step: 0.01,
+                        label: 'Cloud Transparency',
+                        uniformName: '_CloudTransparency',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudTransparency'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: 'Cloud Color 1',
+                        uniformName: '_CloudColor1',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_CloudColor1'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: 'Cloud Color 2',
+                        uniformName: '_CloudColor2',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_CloudColor2'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -10.0,
+                        max: 10.0,
+                        step: 0.01,
+                        label: 'Cloud Max Screw',
+                        uniformName: '_MaxScrewCloud',
+                        defaultValue:
+                            planetGenerator.uniforms['_MaxScrewCloud'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Cloud Mid Distance',
+                        uniformName: '_CloudMidDistance',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudMidDistance'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 0.5,
+                        step: 0.01,
+                        label: 'Cloud Half Height',
+                        uniformName: '_CloudHalfHeight',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudHalfHeight'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec2,
+                    dataType: 'vec2',
+                    params: {
+                        label: 'Cloud Noise Scales',
+                        uniformName: '_CloudNoiseScales',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudNoiseScales'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3,
+                    dataType: 'vec3',
+                    params: {
+                        label: 'Cloud Noise Offset',
+                        uniformName: '_CloudNoiseOffset',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudNoiseOffset'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 20,
+                        step: 0.01,
+                        label: 'Cloud Noise Global Scale',
+                        uniformName: '_CloudNoiseGlobalScale',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudNoiseGlobalScale']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -1.0,
+                        max: 1.0,
+                        step: 0.01,
+                        label: 'Cloud Secondary Noise Strength',
+                        uniformName: '_SecondaryNoiseStrength',
+                        defaultValue:
+                            planetGenerator.uniforms['_SecondaryNoiseStrength']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.0,
+                        max: 20,
+                        step: 0.01,
+                        label: 'Cloud Noise Multiplier',
+                        uniformName: '_CloudDensityMultiplier',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudDensityMultiplier']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -10.0,
+                        max: 10.0,
+                        step: 0.01,
+                        label: 'Cloud Noise Offset',
+                        uniformName: '_CloudDensityOffset',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudDensityOffset']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: -2.0,
+                        max: 2.0,
+                        step: 0.01,
+                        label: 'Cloud Move Speeed',
+                        uniformName: '_CloudMoveSpeed',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudMoveSpeed'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Boolean,
+                    dataType: 'bool',
+                    params: {
+                        label: 'Cloud Posterize',
+                        uniformName: '_CloudsPosterize',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudsPosterize'].value
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 1.0,
+                        max: 10.0,
+                        step: 1.0,
+                        label: 'Posterize Count',
+                        uniformName: '_CloudsPosterizeCount',
+                        defaultValue:
+                            planetGenerator.uniforms['_CloudsPosterizeCount']
+                                .value
+                    }
+                },
+                {
+                    type: ControlTypes.HEADER,
+                    label: 'Atmosphere Parameters'
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: Vec3Color,
+                    dataType: 'vec3Color',
+                    params: {
+                        label: 'Atmosphere Color',
+                        uniformName: '_AmbientColor',
+                        defaultValue:
+                            planetGenerator.uniforms[
+                                '_AmbientColor'
+                            ].value.getHexString()
+                    }
+                },
+                {
+                    type: ControlTypes.CONTROL,
+                    component: SliderFloat,
+                    dataType: 'float',
+                    params: {
+                        min: 0.5,
+                        max: 10.0,
+                        step: 0.01,
+                        label: 'Atmosphere Power',
+                        uniformName: '_AmbientPower',
+                        defaultValue:
+                            planetGenerator.uniforms['_AmbientPower'].value
+                    }
+                },
 
-            {
-                type: ControlTypes.DIVISOR
-            }
-        ];
+                {
+                    type: ControlTypes.DIVISOR
+                }
+            ];
 
-        controls = newControls;
+            controls = newControls;
+        }
     });
 </script>
 
 <a style="display: none;" bind:this={downloadAElement}>download</a>
 <div class="container">
     <div class="canvasRenderHolder">
-        <canvas class:crispCanvas={canvasNearestFiltering} class="canvasRender" bind:this={canvasElement} />
+        <canvas
+            class:crispCanvas={canvasNearestFiltering}
+            class="canvasRender"
+            bind:this={canvasElement}
+        />
     </div>
     <div class="sideControls">
         <h1>Raymarching Planet Generator</h1>
@@ -950,7 +964,11 @@
                 High
             </div>
         </div>
-		<Boolean label={"Pixel Perfect Viewport"} defaultValue={false} bind:value={canvasNearestFiltering}/>
+        <Boolean
+            label={'Pixel Perfect Viewport'}
+            defaultValue={false}
+            bind:value={canvasNearestFiltering}
+        />
         {#each controls as control}
             {#if control.type == ControlTypes.CONTROL}
                 <svelte:component
@@ -1110,9 +1128,6 @@
         grid-template-columns: 1fr 400px;
 
         grid-template-areas: 'render sideControls';
-    }
-    .topControls {
-        grid-area: topControls;
     }
     .canvasRenderHolder {
         grid-area: render;

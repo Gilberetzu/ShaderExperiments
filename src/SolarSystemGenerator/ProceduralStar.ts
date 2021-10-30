@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import StarShader from "./SceneSection/Materials/Star/StarShader";
+import SerializeDataType from "./SerializeDataType";
 
 export default class ProceduralStar{
 	name:string;
@@ -78,5 +78,50 @@ export default class ProceduralStar{
 			}
 		});
 		return copy;
+	}
+
+	createSerializableObject(){
+		let serializableObject = [
+			SerializeDataType.SString("name", this.name),
+			SerializeDataType.SVector2("heightMaskInvLerp", this.heightMaskInvLerp),
+			SerializeDataType.SVector2("heightMask", this.heightMask),
+			SerializeDataType.SNumber("expansionSpeed", this.expansionSpeed),
+			SerializeDataType.SNumber("expansionScale", this.expansionScale),
+			SerializeDataType.SNumber("expansionScaleHeightOffset",this.expansionScaleHeightOffset),
+			SerializeDataType.SNumber("expansionDistance",this.expansionDistance),
+			
+			SerializeDataType.SNumber("screwHeightMaskMultiplier",this.screwHeightMaskMultiplier),
+			SerializeDataType.SNumber("screwInterpMultiplier",this.screwInterpMultiplier),
+			SerializeDataType.SNumber("screwMultiplier", this.screwMultiplier),
+
+			SerializeDataType.SNumber("voronoiScale", this.voronoiScale),
+			SerializeDataType.SNumber("noiseSample2Scale",this.noiseSample2Scale),
+			
+			SerializeDataType.SNumber("fresnelPower", this.fresnelPower),
+			SerializeDataType.SVector2("fresnelRemap", this.fresnelRemap),
+			
+			SerializeDataType.SVector3Color("color1", this.color1),
+			SerializeDataType.SVector3Color("color2", this.color2),
+
+			SerializeDataType.SNumber("radius", this.radius),
+
+			SerializeDataType.SNumber("densityMultiplier", this.densityMultiplier),
+			
+			SerializeDataType.SNumber("fireRemapMax", this.fireRemapMax),
+			SerializeDataType.SVector3Color("fireColor", this.fireColor),
+
+			SerializeDataType.SNumber("outerLightPower", this.outerLightPower),
+			SerializeDataType.SVector3Color("outerColor", this.outerColor)
+		];
+
+		return serializableObject;
+	}
+
+	static createFromSerializableObject(obj){
+		let nStar = new ProceduralStar("newBackground");
+		obj.forEach(param => {
+			nStar[param.paramName] = SerializeDataType.DeserializeData(param);
+		});
+		return nStar;
 	}
 }

@@ -53,7 +53,7 @@ export default class StarEditor{
 		this.selectedStarId = -1;
 		this.selectedStarObj = null;
 
-		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores);
+		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores, this.scene);
 		this.sceneBackground = new SceneBackground(threeScene, this.scene);
 
 		this.editorStores = null;
@@ -151,6 +151,7 @@ export default class StarEditor{
 			subscribeToStore("outerColor");
 
 			this.sceneCameraController.addEventListeners();
+			this.sceneCameraController.resizeRenderer(this.sceneCameraController.desiredWidth, this.sceneCameraController.camera);
 			this.animate();
 		}
 	}

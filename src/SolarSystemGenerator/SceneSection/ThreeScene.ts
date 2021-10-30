@@ -6,6 +6,7 @@ import SceneGridShader from "./Materials/SceneGrid/SceneGridShader";
 import PlanetShader from "./Materials/Planet/PlanetShader";
 import StarShader from "./Materials/Star/StarShader";
 import PlanetEditor from './PlanetEditor';
+import PlanetarySystemEditor from './PlanetarySystemEditor';
 
 import PlanetSatelliteEditor from "./PlanetSatelliteEditor";
 import BackgroundEditor from './BackgroundEditor';
@@ -25,12 +26,13 @@ type Editors = {
 	backgroundEditor: BackgroundEditor,
 	planetSatelliteEditor: PlanetSatelliteEditor,
 	starEditor: StarEditor,
-	planetarySystemEditor,
+	planetarySystemEditor: PlanetarySystemEditor,
 }
 
 declare global {
 	interface Window { 
 		threeScene: {
+			sceneManager: ThreeScene,
 			editors: Editors
 		}
 	}
@@ -140,10 +142,11 @@ export default class ThreeScene{
 			backgroundEditor: new BackgroundEditor(this),
 			planetSatelliteEditor: new PlanetSatelliteEditor(this),
 			starEditor: new StarEditor(this),
-			planetarySystemEditor: null,
+			planetarySystemEditor: new PlanetarySystemEditor(this),
 		};
 
 		window.threeScene = {
+			sceneManager: this,
 			editors: this.editors
 		};
 	}

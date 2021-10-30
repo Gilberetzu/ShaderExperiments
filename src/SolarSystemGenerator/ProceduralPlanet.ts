@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import SerializeDataType from "./SerializeDataType";
 import RaymarchingQuality from "./RaymarchingQuality";
 
 function GetRandomColor(){
@@ -149,6 +150,77 @@ export default class ProceduralPlanet {
 			}
 		});
 		return copy;
+	}
+
+	createSerializableObject(){
+		let serializableObject = [
+			SerializeDataType.SString("name", this.name),
+			SerializeDataType.SVector3("_PSNoiseOffset", this._PSNoiseOffset),
+			SerializeDataType.SNumber("_PSNoiseGlobalScale", this._PSNoiseGlobalScale),
+			SerializeDataType.SNumber("_PSWaterHeight", this._PSWaterHeight),
+			SerializeDataType.SNumber("_PSWaterDepthOffset", this._PSWaterDepthOffset),
+			SerializeDataType.SNumber("_PSMaxHeightOffset", this._PSMaxHeightOffset),
+			SerializeDataType.SVector3Color("_PlanetColor1", this._PlanetColor1),
+			SerializeDataType.SVector3Color("_PlanetColor2", this._PlanetColor2),
+			SerializeDataType.SVector2("_PlanetHighInterpRange", this._PlanetHighInterpRange),
+
+			SerializeDataType.SVector2("_PSNoiseScales", this._PSNoiseScales),
+			SerializeDataType.SNumber("_SecondaryNoiseStrengthGround", this._SecondaryNoiseStrengthGround),
+			SerializeDataType.SNumber("_MaxScrewTerrain", this._MaxScrewTerrain),
+			SerializeDataType.SNumber("_PSDensityOffset", this._PSDensityOffset),
+			SerializeDataType.SNumber("_SurfaceMinLight", this._SurfaceMinLight),
+
+			SerializeDataType.SNumber("_PlanetRaymarchQuality", this._PlanetRaymarchQuality),
+
+			SerializeDataType.SNumber("_GridHalfSize", this._GridHalfSize),
+			SerializeDataType.SNumber("_VoxelNormalInterp", this._VoxelNormalInterp),
+			SerializeDataType.SBool("_EnableVoxelizer", this._EnableVoxelizer),
+
+			SerializeDataType.SBool("_showWater", this._showWater),
+			SerializeDataType.SVector3Color("_WaterColorDepth", this._WaterColorDepth),
+			SerializeDataType.SVector3Color("_WaterColor", this._WaterColor),
+			SerializeDataType.SVector3Color("_WaterSpecularColor", this._WaterSpecularColor),
+			SerializeDataType.SVector2("_WaterMaterialSmoothStep", this._WaterMaterialSmoothStep),
+			SerializeDataType.SNumber("_WaterNormalScale", this._WaterNormalScale),
+			SerializeDataType.SNumber("_WaterSurfaceMinLight", this._WaterSurfaceMinLight),
+			SerializeDataType.SNumber("_WaterNormalStrength", this._WaterNormalStrength),
+			SerializeDataType.SVector2("_SpecularParams", this._SpecularParams),
+			SerializeDataType.SNumber("_WaterMoveSpeed", this._WaterMoveSpeed),
+
+			SerializeDataType.SNumber("_CloudTransparency", this._CloudTransparency),
+			SerializeDataType.SVector3Color("_CloudColor1", this._CloudColor1),
+			SerializeDataType.SVector3Color("_CloudColor2", this._CloudColor2),
+			SerializeDataType.SNumber("_MaxScrewCloud", this._MaxScrewCloud),
+			SerializeDataType.SNumber("_BreakDistanceCloud", this._BreakDistanceCloud),
+			SerializeDataType.SNumber("_CloudMidDistance", this._CloudMidDistance),
+			SerializeDataType.SNumber("_CloudHalfHeight", this._CloudHalfHeight),
+			SerializeDataType.SVector2("_CloudNoiseScales", this._CloudNoiseScales),
+			SerializeDataType.SVector3("_CloudNoiseOffset", this._CloudNoiseOffset),
+			SerializeDataType.SNumber("_CloudNoiseGlobalScale", this._CloudNoiseGlobalScale),
+			SerializeDataType.SNumber("_SecondaryNoiseStrength", this._SecondaryNoiseStrength),
+			SerializeDataType.SNumber("_CloudDensityMultiplier", this._CloudDensityMultiplier),
+			SerializeDataType.SNumber("_CloudDensityOffset", this._CloudDensityOffset),
+			SerializeDataType.SNumber("_CloudMoveSpeed", this._CloudMoveSpeed),
+
+			SerializeDataType.SNumber("_CloudRaymarchQuality", this._CloudRaymarchQuality),
+			//_CloudsStepSize: number;
+			//_CloudsMaxStepCount: number;
+
+			SerializeDataType.SBool("_CloudsPosterize", this._CloudsPosterize),
+			SerializeDataType.SNumber("_CloudsPosterizeCount", this._CloudsPosterizeCount),
+
+			SerializeDataType.SVector3Color("_AmbientColor", this._AmbientColor),
+			SerializeDataType.SNumber("_AmbientPower", this._AmbientPower)
+		];
+		return serializableObject;
+	}
+
+	static createFromSerializableObject(obj){
+		let nProcPlanet = new ProceduralPlanet("newPlanet");
+		obj.forEach(param => {
+			nProcPlanet[param.paramName] = SerializeDataType.DeserializeData(param);
+		});
+		return nProcPlanet;
 	}
 
 	static GetGUIStructure() {

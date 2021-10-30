@@ -53,7 +53,8 @@
 		showBackgroundStore,
 		backgroundIdStore,
 		planetQuality,
-		cloudQuality
+		cloudQuality,
+		showPath
 	}
 
     onMount(() => {
@@ -105,13 +106,15 @@
 			cloudQuality: null,
 			planetQuality: null,
 			showGridStore: null,
-			backgroundIdStore: null
+			backgroundIdStore: null,
+			showPath: null
 		};
 		sceneStores.showBackgroundStore = window.threeScene.editors.planetSatelliteEditor.sceneBackground.showBackgroundStore;
 		sceneStores.showGridStore = window.threeScene.editors.planetSatelliteEditor.sceneBackground.showGridStore;
 		sceneStores.backgroundIdStore = window.threeScene.editors.planetSatelliteEditor.sceneBackground.selectedBackgroundStore;
 		sceneStores.planetQuality = window.threeScene.editors.planetSatelliteEditor.planetsRaymarchQualityStore;
 		sceneStores.cloudQuality = window.threeScene.editors.planetSatelliteEditor.cloudsRaymarchQualityStore;
+		sceneStores.showPath = window.threeScene.editors.planetSatelliteEditor.showPlanetsPath;
     });
 
 	let removeSatellite = (satId)=>{
@@ -170,6 +173,9 @@
 			enumStore={sceneStores.cloudQuality}
 			enumObject={RaymarchQuality}
 		/>
+	</ControlGroup>
+	<ControlGroup label={"Path"}>
+		<Bool boolStore={sceneStores.showPath} label="Show Path"/>
 	</ControlGroup>
 {/if}
 

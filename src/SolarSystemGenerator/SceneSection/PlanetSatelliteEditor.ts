@@ -9,8 +9,9 @@ import ProceduralPlanet from '../ProceduralPlanet';
 import ObjectsStore from "../ObjectsStore";
 import CameraStores from './CameraStores';
 import SceneBackground from './SceneBackground';
+import OrbitController from "./OrbitController";
 
-let loadMaterialProperties = (material: THREE.Material, planet: ProceduralPlanet) => {
+export let loadMaterialProperties = (material: THREE.Material, planet: ProceduralPlanet) => {
 	let planetProperties = Object.keys(planet);
 	planetProperties.forEach(prop => {
 		let uni = material.uniforms[prop];
@@ -18,6 +19,8 @@ let loadMaterialProperties = (material: THREE.Material, planet: ProceduralPlanet
 			uni.value = planet[prop];
 		}
 	});
+	window.threeScene.sceneManager.setPlanetQuality(RaymarchingQuality.medium, material);
+	window.threeScene.sceneManager.setCloudQuality(RaymarchingQuality.medium, material);
 	//The fidelity of the planet needs to be set in a different way
 }
 
@@ -26,13 +29,7 @@ type SatelliteData = {
 	planetId: number,
 	mesh: THREE.Mesh,
 
-	orbitData: {
-		orbitStart: number,
-		orbitElipse: THREE.Vector2,
-		orbitRotation: THREE.Vector2,
-		orbitCenter: THREE.Vector3,
-		orbitSpeed: number
-	}
+	orbitController: OrbitController
 
 	rotationData: {
 		rotationAxis: THREE.Vector3,
@@ -88,6 +85,8 @@ export default class PlanetSatelliteEditor {
 
 	sceneBackground: SceneBackground;
 
+	showPlanetsPath: Writable<boolean>;
+
 	planetsRaymarchQualityStore: Writable<number>;
 	cloudsRaymarchQualityStore: Writable<number>;
 
@@ -95,6 +94,7 @@ export default class PlanetSatelliteEditor {
 		this.enabled = false;
 		this.threeScene = threeScene;
 
+		this.showPlanetsPath = writable(false);
 		this.mainPlanetIdStore = writable(-1);
 		this.planetWSatelliteNameStore = writable("");
 
@@ -131,14 +131,23 @@ export default class PlanetSatelliteEditor {
 						let planetMat = this.threeScene.planetMaterial.clone();
 						loadMaterialProperties(planetMat, pData);
 						this.mainPlanetMesh = new THREE.Mesh(this.planetGeometry, planetMat);
+						this.setAllPlanetsQualitiesFromStore();
 						this.scene.add(this.mainPlanetMesh);
 					}else{
 						loadMaterialProperties(this.mainPlanetMesh.material, pData);
+						this.setAllPlanetsQualitiesFromStore();
 					}
+				}
+			}else{
+				if(this.mainPlanetMesh != null && this.mainPlanetMesh != undefined){
+					this.scene.remove(this.mainPlanetMesh);
+					this.mainPlanetMesh.material.dispose();
+					this.mainPlanetMesh = null;
 				}
 			}
 		});
-		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores);
+
+		this.sceneCameraController = new SceneCameraController(threeScene, this.cameraControlStores, this.scene);
 		this.sceneBackground = new SceneBackground(threeScene, this.scene);
 		
 		this.planetsRaymarchQualityStore = writable(1);
@@ -167,6 +176,12 @@ export default class PlanetSatelliteEditor {
 
 	}
 
+	setAllPlanetsQualitiesFromStore(){
+		let pQuality = get(this.planetsRaymarchQualityStore);
+		let cQuality = get(this.cloudsRaymarchQualityStore);
+		this.setAllPlanetsQualities(pQuality, cQuality);
+	}
+
 	setAllPlanetsQualities(planetQuality, cloudQuality){
 		if(this.mainPlanetMesh){
 			this.threeScene.setPlanetQuality(planetQuality, this.mainPlanetMesh.material);
@@ -188,6 +203,7 @@ export default class PlanetSatelliteEditor {
 
 	startSystem(planetWSatelliteId: number){
 		this.startTime = (new Date()).getTime();
+		this.lastFrameTime = this.startTime;
 		this.enabled = true;
 		let planetWSatellite = get(ObjectsStore).combinedPlanets.find(ps => ps.id == planetWSatelliteId);
 		this.currentObjectId = planetWSatellite.id;
@@ -197,7 +213,7 @@ export default class PlanetSatelliteEditor {
 		let pQuality = get(this.planetsRaymarchQualityStore);
 		let cQuality = get(this.cloudsRaymarchQualityStore);
 		this.setAllPlanetsQualities(pQuality, cQuality);
-
+		this.sceneCameraController.resizeRenderer(this.sceneCameraController.desiredWidth, this.sceneCameraController.camera);
 		this.animate();
 	}
 
@@ -212,11 +228,11 @@ export default class PlanetSatelliteEditor {
 		savePlanetWSatellite.satelites = this.satelliteCollection.map(satellite => {
 			let newSatellite = new Satellite(satellite.planetId);
 
-			newSatellite.orbitCenter = satellite.orbitData.orbitCenter;
-			newSatellite.orbitElipse = satellite.orbitData.orbitElipse;
-			newSatellite.orbitRotation = satellite.orbitData.orbitRotation;
-			newSatellite.orbitSpeed = satellite.orbitData.orbitSpeed;
-			newSatellite.orbitStart = satellite.orbitData.orbitStart;
+			newSatellite.orbitCenter = satellite.orbitController.center;
+			newSatellite.orbitElipse = satellite.orbitController.ellipse;
+			newSatellite.orbitRotation = satellite.orbitController.rotation;
+			newSatellite.orbitSpeed = satellite.orbitController.speed;
+			newSatellite.orbitStart = satellite.orbitController.startParam;
 
 			newSatellite.rotationAxis = satellite.rotationData.rotationAxis;
 			newSatellite.rotationSpeed = satellite.rotationData.rotationSpeed;
@@ -232,6 +248,7 @@ export default class PlanetSatelliteEditor {
 
 		while(this.satelliteCollection.length > 0){
 			let satData = this.satelliteCollection.pop();
+			satData.orbitController.hideEllipse();
 			this.scene.remove(satData.mesh);
 			satData.mesh.material.dispose();
 		}
@@ -249,10 +266,9 @@ export default class PlanetSatelliteEditor {
 
 		this.planetWSatelliteNameStore.set(planetWSatellite.name);
 	
+		this.mainPlanetIdStore.set(-1);
 		if (planetWSatellite.mainPlanetId >= 0) {
 			this.mainPlanetIdStore.set(planetWSatellite.mainPlanetId);
-		}else{
-			this.mainPlanetIdStore.set(-1);
 		}
 
 
@@ -294,17 +310,14 @@ export default class PlanetSatelliteEditor {
 	addSatellite(satellite, satellitePlanet, index) {
 		let satelliteMat = this.createMaterialFromProcPlanet(satellitePlanet);
 
+		let newOrbitController = new OrbitController(satellite.orbitStart, satellite.orbitElipse, satellite.orbitRotation, 
+			satellite.orbitCenter, satellite.orbitSpeed, this.scene);
+
 		let data: SatelliteData = {
 			id: index,
 			planetId: satellite.planetId,
 
-			orbitData: {
-				orbitCenter: satellite.orbitCenter,
-				orbitElipse: satellite.orbitElipse,
-				orbitRotation: satellite.orbitRotation,
-				orbitSpeed: satellite.orbitSpeed,
-				orbitStart: satellite.orbitStart
-			},
+			orbitController: newOrbitController,
 
 			rotationData: {
 				rotationAxis: satellite.rotationAxis,
@@ -334,6 +347,14 @@ export default class PlanetSatelliteEditor {
 			unsubArray: []
 		};
 
+		unsubSatellite.unsubArray.push(this.showPlanetsPath.subscribe((show) => {
+			if(show){
+				data.orbitController.showEllipse();
+			}else{
+				data.orbitController.hideEllipse();
+			}
+		}));
+
 		//Planet id change - material parameter load from planet
 		unsubSatellite.unsubArray.push(data.planetIdStore.subscribe((state) => {
 			data.planetId = state;
@@ -344,21 +365,29 @@ export default class PlanetSatelliteEditor {
 
 		//Orbit parameter stores
 		unsubSatellite.unsubArray.push(data.orbitCenterStore.subscribe((state) => {
-			data.orbitData.orbitCenter = state;
+			data.orbitController.center = state;
+
+			//REMOVE FROM HERE
+			data.orbitController.updateLineLoop();
 		}));
 		unsubSatellite.unsubArray.push(data.orbitElipseStore.subscribe((state) => {
-			data.orbitData.orbitElipse = state;
+			data.orbitController.ellipse = state;
+			data.orbitController.computeMovementTable();
+			
+			//REMOVE FROM HERE
+			data.orbitController.updateLineLoop();
 		}));
 		unsubSatellite.unsubArray.push(data.orbitRotationStore.subscribe((state) => {
-			data.orbitData.orbitRotation = state;
+			data.orbitController.rotation = state;
+			
+			//REMOVE FROM HERE
+			data.orbitController.updateLineLoop();
 		}));
 		unsubSatellite.unsubArray.push(data.orbitSpeedStore.subscribe((state) => {
-			data.orbitData.orbitSpeed = state;
+			data.orbitController.speed = state;
 		}));
 		unsubSatellite.unsubArray.push(data.orbitStartStore.subscribe((state) => {
-			let changeDelta = state - data.orbitData.orbitStart;
-			data.currentOrbit += changeDelta;
-			data.orbitData.orbitStart = state;
+			data.orbitController.startParam = state;
 		}));
 
 		//Rotation parameter stores
@@ -385,30 +414,10 @@ export default class PlanetSatelliteEditor {
 
 	animateSatellites(deltaTime:number){
 		this.satelliteCollection.forEach((satellite,index) => {
-			satellite.currentOrbit += deltaTime * satellite.orbitData.orbitSpeed;
-			satellite.currentRotation += deltaTime * satellite.rotationData.rotationSpeed;
-
-			//Accoarding to the current orbit this is the position in a 2d ellipse
-			let pos2d = {
-				x: satellite.orbitData.orbitElipse.x * Math.cos(satellite.currentOrbit),
-				y: satellite.orbitData.orbitElipse.y * Math.sin(satellite.currentOrbit)
-			}
-
-			let orbitAxis1: THREE.Vector3 = new THREE.Vector3(1,0,0);
-			let orbitAxis2: THREE.Vector3 = new THREE.Vector3(0,0,1);
-
-			let pos3d = orbitAxis1.multiplyScalar(pos2d.x).add(orbitAxis2.multiplyScalar(pos2d.y));
-			
-			pos3d.applyAxisAngle(new THREE.Vector3(1,0,0), satellite.orbitData.orbitRotation.x);
-			pos3d.applyAxisAngle(new THREE.Vector3(0,1,0), satellite.orbitData.orbitRotation.y);
-			
-			pos3d.add(satellite.orbitData.orbitCenter);
-
+			let pos3d = satellite.orbitController.computeOrbit(deltaTime);
 			satellite.mesh.position.x = pos3d.x;
 			satellite.mesh.position.y = pos3d.y;
 			satellite.mesh.position.z = pos3d.z;
-
-			//console.log(`satelite ${index}`, satellite.mesh.position);
 		})
 	}
 

@@ -4,6 +4,8 @@
     import PlanetSatellite from '../PlanetSatellite';
     import Background from '../Background';
     import ProceduralStar from '../ProceduralStar';
+	import PlanetarySystem from "../PlanetarySystem";
+
     import ObjectStore from '../ObjectsStore';
     import SelectionState from '../SelectionState';
     import { get } from 'svelte/store';
@@ -89,6 +91,9 @@ import ObjectsStore from '../ObjectsStore';
         } else if (selectedListKey == 'stars') {
             let s = new ProceduralStar('Star');
             ObjectStore.addStar(s);
+        } else if (selectedListKey == 'planetarySystems') {
+            let ps = new PlanetarySystem('PlanetarySystem');
+            ObjectStore.addPlanetarySystem(ps);
         }
     };
 

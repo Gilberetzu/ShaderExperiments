@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import SerializeDataType from "./SerializeDataType";
 
 type noiseParams = {
 	scale: number;
@@ -84,5 +85,69 @@ export default class Background{
 			}
 		});
 		return copy;
+	}
+
+	createSerializableObject(){
+		let serializableObject = [
+			SerializeDataType.SString("name", this.name),
+			SerializeDataType.SVector3Color("color0", this.color0),
+			SerializeDataType.SVector3Color("color1", this.color1),
+			SerializeDataType.SVector3Color("color2", this.color2),
+
+			SerializeDataType.SVector3Color("colorStars", this.colorStars),
+			SerializeDataType.SNumber("noiseStarMaskSpeed", this.noiseStarMaskSpeed),
+			SerializeDataType.SNumber("noiseStarScale", this.noiseStarScale),
+			SerializeDataType.SVector2("noiseStarSmoothStep", this.noiseStarSmoothStep),
+
+			SerializeDataType.SNumber("stepSize", this.stepSize),
+
+			{
+				paramName: "noise1",
+				params:[
+					SerializeDataType.SNumber("scale", this.noise1.scale),
+					SerializeDataType.SNumber("mult", this.noise1.mult),
+					SerializeDataType.SNumber("screw", this.noise1.screw),
+					SerializeDataType.SNumber("speed", this.noise1.speed),
+				]
+			},
+			{
+				paramName: "noise2",
+				params:[
+					SerializeDataType.SNumber("scale", this.noise2.scale),
+					SerializeDataType.SNumber("mult", this.noise2.mult),
+					SerializeDataType.SNumber("screw", this.noise2.screw),
+					SerializeDataType.SNumber("speed", this.noise2.speed),
+				]
+			},
+
+			SerializeDataType.SNumber("mainNoiseScale", this.mainNoiseScale),
+			SerializeDataType.SNumber("mainNoiseScrew", this.mainNoiseScrew),
+
+			SerializeDataType.SVector2("noiseMaskSmoothStep", this.noiseMaskSmoothStep),
+			SerializeDataType.SNumber("noiseMaskScale", this.noiseMaskScale),
+			SerializeDataType.SVector3("noiseMaskOffset", this.noiseMaskOffset),
+
+			SerializeDataType.SNumber("densityMult", this.densityMult)
+		];
+
+		return serializableObject;
+	}
+
+	static createFromSerializableObject(obj){
+		let nBackground = new Background("newBackground");
+		obj.forEach(param => {
+			if(param.paramName == "noise1"){
+				param.params.forEach(p => {
+					nBackground.noise1[p.paramName] = SerializeDataType.DeserializeData(p);
+				});
+			}else if(param.paramName == "noise2"){
+				param.params.forEach(p => {
+					nBackground.noise2[p.paramName] = SerializeDataType.DeserializeData(p);
+				});
+			}else{
+				nBackground[param.paramName] = SerializeDataType.DeserializeData(param);
+			}
+		});
+		return nBackground;
 	}
 }

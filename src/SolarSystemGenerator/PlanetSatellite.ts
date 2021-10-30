@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import SerializeDataType from "./SerializeDataType";
 
 export class Satellite{
 	planetId: number;
@@ -50,5 +51,52 @@ export default class PlanetSatellite{
 			copy.satelites.push(sat);
 		});
 		return copy;
+	}
+
+	createSerializableObject(){
+		let serializableObject = [
+			SerializeDataType.SString("name", this.name),
+			SerializeDataType.SNumber("mainPlanetId", this.mainPlanetId),
+			{
+				paramName: "satellites",
+				data: this.satelites.map((sat) => {
+					let data = [
+						SerializeDataType.SNumber("planetId", sat.planetId),
+
+						SerializeDataType.SNumber("orbitStart", sat.orbitStart),
+						SerializeDataType.SVector2("orbitElipse", sat.orbitElipse),
+						SerializeDataType.SVector2("orbitRotation", sat.orbitRotation),
+						SerializeDataType.SVector3("orbitCenter", sat.orbitCenter),
+						SerializeDataType.SNumber("orbitSpeed", sat.orbitSpeed),
+
+						SerializeDataType.SVector2("rotationAxis", sat.rotationAxis),
+						SerializeDataType.SNumber("rotationSpeed", sat.rotationSpeed),
+
+						SerializeDataType.SNumber("scale", sat.scale)
+					];
+					return data;
+				})
+			}
+		];
+
+		return serializableObject;
+	}
+
+	static createFromSerializableObject(obj){
+		let nPlanetSatellite = new PlanetSatellite("newPlanetSatellite");
+		obj.forEach(param => {
+			if(param.paramName == "satellites"){
+				param.data.forEach(sat => {
+					let newSat = new Satellite(-1);
+					sat.forEach(satParam => {
+						newSat[satParam.paramName] = SerializeDataType.DeserializeData(satParam);
+					});
+					nPlanetSatellite.satelites.push(newSat);
+				});
+			}else{
+				nPlanetSatellite[param.paramName] = SerializeDataType.DeserializeData(param);
+			}
+		});
+		return nPlanetSatellite;
 	}
 }

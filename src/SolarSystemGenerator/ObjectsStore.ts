@@ -42,6 +42,7 @@ function createObjectStore() {
 
 	return {
 		subscribe,
+		set,
 		addPlanet: (newPlanet) => update(state => {
 			let newId = getAvailableID(state);
 			newPlanet.name = `${newPlanet.name} - ${newId}`;
@@ -62,6 +63,7 @@ function createObjectStore() {
 		}),
 		addStar: (newStar) => update(state => {
 			let newId = getAvailableID(state);
+			newStar.name = `${newStar.name} - ${newId}`;
 			let newArr = [...state.stars, {id: newId, object: newStar}];
 			return {
 				...state,
@@ -70,6 +72,7 @@ function createObjectStore() {
 		}),
 		addCombinedPlanet: (newCombinedPlanet) => update(state => {
 			let newId = getAvailableID(state);
+			newCombinedPlanet.name = `${newCombinedPlanet.name} - ${newId}`;
 			let newArr = [...state.combinedPlanets, {id: newId, object: newCombinedPlanet}];
 			return {
 				...state,
