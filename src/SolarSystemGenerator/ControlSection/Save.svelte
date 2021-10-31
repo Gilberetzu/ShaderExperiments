@@ -147,6 +147,9 @@
             };
 
             ObjectsStore.set(newObjectStore);
+			requestAnimationFrame(()=>{
+				window.threeScene.sceneManager.renderer.clear();
+			})
         });
     };
 
