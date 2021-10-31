@@ -1,0 +1,4147 @@
+{
+  "backgrounds": [
+    {
+      "id": 16,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "BG1",
+          "type": "string"
+        },
+        {
+          "paramName": "color0",
+          "value": "000000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color1",
+          "value": "230101",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color2",
+          "value": "292e05",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "colorStars",
+          "value": "ffffcc",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "noiseStarMaskSpeed",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseStarScale",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseStarSmoothStep",
+          "value": {
+            "x": 0.1,
+            "y": 0.1636251794135739
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "stepSize",
+          "value": 8.5,
+          "type": "number"
+        },
+        {
+          "paramName": "noise1",
+          "params": [
+            {
+              "paramName": "scale",
+              "value": 85,
+              "type": "number"
+            },
+            {
+              "paramName": "mult",
+              "value": -13,
+              "type": "number"
+            },
+            {
+              "paramName": "screw",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "paramName": "speed",
+              "value": 0.01,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "paramName": "noise2",
+          "params": [
+            {
+              "paramName": "scale",
+              "value": 22,
+              "type": "number"
+            },
+            {
+              "paramName": "mult",
+              "value": 15,
+              "type": "number"
+            },
+            {
+              "paramName": "screw",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "paramName": "speed",
+              "value": 0.09,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "paramName": "mainNoiseScale",
+          "value": 20,
+          "type": "number"
+        },
+        {
+          "paramName": "mainNoiseScrew",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseMaskSmoothStep",
+          "value": {
+            "x": -0.38404757022759894,
+            "y": 1
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "noiseMaskScale",
+          "value": 16.7,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseMaskOffset",
+          "value": {
+            "x": 8.5,
+            "y": 0,
+            "z": 0
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "densityMult",
+          "value": 0.04,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "BG2",
+          "type": "string"
+        },
+        {
+          "paramName": "color0",
+          "value": "000000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color1",
+          "value": "0c194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "colorStars",
+          "value": "ffffcc",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "noiseStarMaskSpeed",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseStarScale",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseStarSmoothStep",
+          "value": {
+            "x": 0.1,
+            "y": 0.18
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "stepSize",
+          "value": 1.9236666666666666,
+          "type": "number"
+        },
+        {
+          "paramName": "noise1",
+          "params": [
+            {
+              "paramName": "scale",
+              "value": 85,
+              "type": "number"
+            },
+            {
+              "paramName": "mult",
+              "value": -13,
+              "type": "number"
+            },
+            {
+              "paramName": "screw",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "paramName": "speed",
+              "value": 0.01,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "paramName": "noise2",
+          "params": [
+            {
+              "paramName": "scale",
+              "value": 22,
+              "type": "number"
+            },
+            {
+              "paramName": "mult",
+              "value": 15,
+              "type": "number"
+            },
+            {
+              "paramName": "screw",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "paramName": "speed",
+              "value": 0.09,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "paramName": "mainNoiseScale",
+          "value": 20,
+          "type": "number"
+        },
+        {
+          "paramName": "mainNoiseScrew",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseMaskSmoothStep",
+          "value": {
+            "x": -0.16533388011755856,
+            "y": 1
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "noiseMaskScale",
+          "value": 16.7,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseMaskOffset",
+          "value": {
+            "x": 10.550333333333333,
+            "y": 0,
+            "z": 0
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "densityMult",
+          "value": 0.04,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "BG3",
+          "type": "string"
+        },
+        {
+          "paramName": "color0",
+          "value": "000000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color1",
+          "value": "004cff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color2",
+          "value": "ff0000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "colorStars",
+          "value": "ffffcc",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "noiseStarMaskSpeed",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseStarScale",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseStarSmoothStep",
+          "value": {
+            "x": 0.1,
+            "y": 0.18
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "stepSize",
+          "value": 2.6486666666666667,
+          "type": "number"
+        },
+        {
+          "paramName": "noise1",
+          "params": [
+            {
+              "paramName": "scale",
+              "value": 85,
+              "type": "number"
+            },
+            {
+              "paramName": "mult",
+              "value": -13.564666666666668,
+              "type": "number"
+            },
+            {
+              "paramName": "screw",
+              "value": 4.168666666666667,
+              "type": "number"
+            },
+            {
+              "paramName": "speed",
+              "value": 0.01,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "paramName": "noise2",
+          "params": [
+            {
+              "paramName": "scale",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "paramName": "mult",
+              "value": 12.745333333333333,
+              "type": "number"
+            },
+            {
+              "paramName": "screw",
+              "value": -12.190333333333333,
+              "type": "number"
+            },
+            {
+              "paramName": "speed",
+              "value": 0.09,
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "paramName": "mainNoiseScale",
+          "value": 20,
+          "type": "number"
+        },
+        {
+          "paramName": "mainNoiseScrew",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseMaskSmoothStep",
+          "value": {
+            "x": -0.12159114209555055,
+            "y": 0.7357665231358075
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "noiseMaskScale",
+          "value": 16.755333333333336,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseMaskOffset",
+          "value": {
+            "x": 11.08,
+            "y": 0,
+            "z": 0
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "densityMult",
+          "value": 0.015,
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "planets": [
+    {
+      "id": 0,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Earth",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 7.36560046304239,
+            "y": 13.53536472720696,
+            "z": 4.666726074524892
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.031,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "9f5119",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "1a5700",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.10238534618276263,
+            "y": 0.24236210785318843
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 20
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.187,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 2,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "00052e",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "5199f0",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "326cae",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "002b4d",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.749,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.097,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 6
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 4.282757621010398,
+            "y": 6.588246329714043,
+            "z": 2.9220373173028524
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.29333333333333333,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.11366666666666667,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "0d0d54",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.2,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Mercury",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 18.244666666666664,
+            "y": 10.84,
+            "z": 5.052
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1.203,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.041,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.144,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "275db4",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.2554849292597909,
+            "y": 0.26860775066639325
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 8.985333333333333
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.237,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.431,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 2,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "388a1f",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "5e992d",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "365649",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "6e2834",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "dd5169",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.7649527885503024,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 3.319622243665359,
+            "y": 16.99945655575108
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 4.0270534611192925,
+            "y": 5.86229866303821,
+            "z": 6.69903678110455
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.5795015096365976,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.15998100667377832,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.11133333333333334,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Venus",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 14.803585030458638,
+            "y": 3.4777810134883813,
+            "z": 2.216813730752256
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 0.83,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.646,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.162,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "c355c0",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0,
+            "y": 0.43483015515002393
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 20
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.657,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "e83b97",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "fdbefe",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "3756fe",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 7.933,
+            "y": 0.9456666666666667
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 44.614,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.15,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": -0.24433333333333332,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "a3a3a3",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.712,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.028,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 3.3484880837792472,
+            "y": 25.60503363803245
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 3.1639788499942645,
+            "y": 3.2645461781687213,
+            "z": 5.613314569320571
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.6473901218029001,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.29395627710457095,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "762593",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.15,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Mars",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 21.993333333333332,
+            "y": 16.307,
+            "z": 2.91
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.73,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.152,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": -0.024,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "290000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "e23c3c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.24236210785318843,
+            "y": 0.36046750051261023
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 20
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 4.2763333333333335,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.439,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 50.964333333333336,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "4ad10e",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "97bbe6",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "c81e7b",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "4f2004",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "9f4008",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.7803280636611619,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 3.5262484837524797,
+            "y": 21.212480159987418
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 0.920718685818187,
+            "y": 6.522387375285348,
+            "z": 0.5404373851806388
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.35103953584200265,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.2949483996659663,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "b31919",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.2976666666666667,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Moon",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 9.45898272951549,
+            "y": 0.5806439024812038,
+            "z": 18.092769625792855
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1.576,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.63,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.124,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.051,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "424242",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.39546169093021666,
+            "y": 0.4654500717654296
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 20
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": -0.024,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.598,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.05,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "000000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.164,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "000000",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 11.015666666666666,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.045,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 4.49,
+            "y": 19.916
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 0.2506223408380692,
+            "y": 1.7754959498482292,
+            "z": 9.08356519218624
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 0.3,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.7256535161520689,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.30333333333333334,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "323239",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.1,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Deimos-M",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 16.324002840484248,
+            "y": 5.22427429451477,
+            "z": 2.25745095674581
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.162,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.685,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "03000f",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0,
+            "y": 1
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 0.5,
+            "y": 1
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.05,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "9a44b1",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "66a83a",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "b320d7",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "7b031a",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "f70634",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.749,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 3.390729744934812,
+            "y": 23.281135395547548
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 0.37506570881589374,
+            "y": 7.729933817360868,
+            "z": 4.142827570738808
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.45038403638938607,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.009516967611360977,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "19194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Phobos-M",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 11.48720543105664,
+            "y": 12.463672650755795,
+            "z": 11.197954451954978
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.256,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "6b6b6b",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "ffffff",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.39546169093021666,
+            "y": 0.43483015515002393
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 1.037,
+            "y": -3.229
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.088,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.632,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.03066666666666667,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "ae55cd",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "715a23",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "ae5a39",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "680328",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "d10650",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.8859630041238695,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 3.474971235187714,
+            "y": 6.135956447079756
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 3.039172999735227,
+            "y": 5.491250506584602,
+            "z": 9.563545238001243
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.6280742295833461,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.3187941485145147,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "19194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Jupiter-Like",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 5.976109511560104,
+            "y": 7.87498844010416,
+            "z": 14.95343349718417
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.768,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.143,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.144,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "020061",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "0b8cef",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.12425671519376666,
+            "y": 0.6535438452600643
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 7.5
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 7.513333333333334,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.523,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "dc0988",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "08e82c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "53b577",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "3d2400",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "ff3300",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 5.816,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.814,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.047,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 5.834,
+            "y": 5.175333333333334
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 2.630450608272117,
+            "y": 4.066877940889211,
+            "z": 2.0931400306259262
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 0.7,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.13232686950374883,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.31266666666666665,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "19194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.388,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "JupMoon1",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 13.065950320308342,
+            "y": 6.455935515550899,
+            "z": 16.35922227963677
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "06292d",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "d1ffda",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.20299364363338118,
+            "y": 0.7322807736996788
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 20
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.59,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "961eb4",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "650887",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "5c53b5",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "170371",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "2e06e2",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.7438364235117341,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 4.354921007644332,
+            "y": 18.298511953610173
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 4.88843129828833,
+            "y": 3.489178029617881,
+            "z": 4.006010605874564
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.6876493737324365,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.3566170185983647,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "19194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "JupMoon2",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 9.38822812442968,
+            "y": 17.632349583547324,
+            "z": 8.872368112579817
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 0.644,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.758,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.144,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "ff002b",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "4d1b00",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.478572893172032,
+            "y": 0.636046750051261
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": 2,
+            "y": 12.563333333333333
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 0.405,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 7.138333333333334,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.305,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "702700",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "e08b15",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "5c7d88",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 22.164333333333335,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 5.742666666666667,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 1.2793333333333334,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "227959",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "45f2b2",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.8414021243134522,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 4.112587691704079,
+            "y": 11.557954672341243
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 8.87430805358489,
+            "y": 0.250811159531128,
+            "z": 2.7921815321264543
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.07,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": 0.6914101981291149,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1.14,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.2941948020083055,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "19194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0,
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "JupMoon3",
+          "type": "string"
+        },
+        {
+          "paramName": "_PSNoiseOffset",
+          "value": {
+            "x": 13.040684977962943,
+            "y": 5.844776983441906,
+            "z": 10.799773689626857
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_PSNoiseGlobalScale",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterHeight",
+          "value": 0.73,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSWaterDepthOffset",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSMaxHeightOffset",
+          "value": 0.17652596250865457,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetColor1",
+          "value": "d6a800",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetColor2",
+          "value": "fbfecd",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_PlanetHighInterpRange",
+          "value": {
+            "x": 0.23798783405098764,
+            "y": 0.23798783405098764
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_PSNoiseScales",
+          "value": {
+            "x": -6.777666666666667,
+            "y": 3.366
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrengthGround",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_MaxScrewTerrain",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "_PSDensityOffset",
+          "value": 0.3678626655727326,
+          "type": "number"
+        },
+        {
+          "paramName": "_SurfaceMinLight",
+          "value": 0.05,
+          "type": "number"
+        },
+        {
+          "paramName": "_PlanetRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_GridHalfSize",
+          "value": 30,
+          "type": "number"
+        },
+        {
+          "paramName": "_VoxelNormalInterp",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_EnableVoxelizer",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_showWater",
+          "value": false,
+          "type": "bool"
+        },
+        {
+          "paramName": "_WaterColorDepth",
+          "value": "3b81f7",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterColor",
+          "value": "d1cf04",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterSpecularColor",
+          "value": "556603",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_WaterMaterialSmoothStep",
+          "value": {
+            "x": 4.92,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterNormalScale",
+          "value": 12.46,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterSurfaceMinLight",
+          "value": 0.44,
+          "type": "number"
+        },
+        {
+          "paramName": "_WaterNormalStrength",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "_SpecularParams",
+          "value": {
+            "x": 3.4,
+            "y": 0.33
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_WaterMoveSpeed",
+          "value": 0.2,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudTransparency",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudColor1",
+          "value": "4d1700",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_CloudColor2",
+          "value": "ffa914",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_MaxScrewCloud",
+          "value": 0.6,
+          "type": "number"
+        },
+        {
+          "paramName": "_BreakDistanceCloud",
+          "value": 1.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMidDistance",
+          "value": 0.73,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudHalfHeight",
+          "value": 0.06,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudNoiseScales",
+          "value": {
+            "x": 1,
+            "y": 2
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "_CloudNoiseOffset",
+          "value": {
+            "x": 1.4615740292139412,
+            "y": 7.433742751963517,
+            "z": 8.77115188016488
+          },
+          "type": "vector3"
+        },
+        {
+          "paramName": "_CloudNoiseGlobalScale",
+          "value": 1.1893333333333334,
+          "type": "number"
+        },
+        {
+          "paramName": "_SecondaryNoiseStrength",
+          "value": -0.8963333333333333,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityMultiplier",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudDensityOffset",
+          "value": 0.04666666666666667,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudMoveSpeed",
+          "value": 0.1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudRaymarchQuality",
+          "value": 1,
+          "type": "number"
+        },
+        {
+          "paramName": "_CloudsPosterize",
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "paramName": "_CloudsPosterizeCount",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "_AmbientColor",
+          "value": "19194c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "_AmbientPower",
+          "value": 0.388,
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "stars": [
+    {
+      "id": 9,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Sun",
+          "type": "string"
+        },
+        {
+          "paramName": "heightMaskInvLerp",
+          "value": {
+            "x": 0.8241405235458957,
+            "y": 0.9772401066229239
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "heightMask",
+          "value": {
+            "x": 0.75,
+            "y": 1.2
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "expansionSpeed",
+          "value": 0.25,
+          "type": "number"
+        },
+        {
+          "paramName": "expansionScale",
+          "value": 14,
+          "type": "number"
+        },
+        {
+          "paramName": "expansionScaleHeightOffset",
+          "value": 2,
+          "type": "number"
+        },
+        {
+          "paramName": "expansionDistance",
+          "value": 4,
+          "type": "number"
+        },
+        {
+          "paramName": "screwHeightMaskMultiplier",
+          "value": 0.25,
+          "type": "number"
+        },
+        {
+          "paramName": "screwInterpMultiplier",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "screwMultiplier",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "voronoiScale",
+          "value": 3,
+          "type": "number"
+        },
+        {
+          "paramName": "noiseSample2Scale",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "fresnelPower",
+          "value": 2.5,
+          "type": "number"
+        },
+        {
+          "paramName": "fresnelRemap",
+          "value": {
+            "x": 0,
+            "y": 0.5
+          },
+          "type": "vector2"
+        },
+        {
+          "paramName": "color1",
+          "value": "da0b0b",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "color2",
+          "value": "df560c",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "radius",
+          "value": 0.7,
+          "type": "number"
+        },
+        {
+          "paramName": "densityMultiplier",
+          "value": 0.5,
+          "type": "number"
+        },
+        {
+          "paramName": "fireRemapMax",
+          "value": 0.9,
+          "type": "number"
+        },
+        {
+          "paramName": "fireColor",
+          "value": "ffc800",
+          "type": "vector3color"
+        },
+        {
+          "paramName": "outerLightPower",
+          "value": 2,
+          "type": "number"
+        },
+        {
+          "paramName": "outerColor",
+          "value": "fff700",
+          "type": "vector3color"
+        }
+      ]
+    }
+  ],
+  "planetsWithSatellites": [
+    {
+      "id": 5,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Earth-Moon",
+          "type": "string"
+        },
+        {
+          "paramName": "mainPlanetId",
+          "value": 0,
+          "type": "number"
+        },
+        {
+          "paramName": "satellites",
+          "data": [
+            [
+              {
+                "paramName": "planetId",
+                "value": 4,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 3,
+                  "y": 2
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0.33,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": -1.0463333333333333,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 1.2,
+                "type": "number"
+              },
+              {
+                "paramName": "rotationAxis",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "rotationSpeed",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.4,
+                "type": "number"
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Mars-Sat",
+          "type": "string"
+        },
+        {
+          "paramName": "mainPlanetId",
+          "value": 3,
+          "type": "number"
+        },
+        {
+          "paramName": "satellites",
+          "data": [
+            [
+              {
+                "paramName": "planetId",
+                "value": 6,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 1.339,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 1.495,
+                  "y": 1.6166666666666665
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0.6223333333333333,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 2,
+                "type": "number"
+              },
+              {
+                "paramName": "rotationAxis",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "rotationSpeed",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.15,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetId",
+                "value": 7,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 1.9613333333333334,
+                  "y": 2.316
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 1,
+                "type": "number"
+              },
+              {
+                "paramName": "rotationAxis",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "rotationSpeed",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.25,
+                "type": "number"
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Jup",
+          "type": "string"
+        },
+        {
+          "paramName": "mainPlanetId",
+          "value": 11,
+          "type": "number"
+        },
+        {
+          "paramName": "satellites",
+          "data": [
+            [
+              {
+                "paramName": "planetId",
+                "value": 12,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0.861,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 2,
+                  "y": 2
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0.49533333333333335,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 1,
+                "type": "number"
+              },
+              {
+                "paramName": "rotationAxis",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "rotationSpeed",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.25,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetId",
+                "value": 13,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 3,
+                  "y": 2.5
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0,
+                  "y": 0.8256666666666667
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 1,
+                "type": "number"
+              },
+              {
+                "paramName": "rotationAxis",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "rotationSpeed",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.25,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetId",
+                "value": 14,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 2.528,
+                  "y": 3.71
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": -0.5676666666666667,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 1,
+                "type": "number"
+              },
+              {
+                "paramName": "rotationAxis",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "rotationSpeed",
+                "value": {
+                  "x": 0,
+                  "y": 0
+                },
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.45,
+                "type": "number"
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "planetarySystems": [
+    {
+      "id": 10,
+      "object": [
+        {
+          "paramName": "name",
+          "value": "Solar System",
+          "type": "string"
+        },
+        {
+          "paramName": "starId",
+          "value": 9,
+          "type": "number"
+        },
+        {
+          "paramName": "starScale",
+          "value": 2.2503333333333333,
+          "type": "number"
+        },
+        {
+          "paramName": "planets",
+          "data": [
+            [
+              {
+                "paramName": "planetSatelliteId",
+                "value": 1,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 4,
+                  "y": 4
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0.353,
+                  "y": 3.5646666666666667
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0.25066666666666665,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 4,
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.5,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetSatelliteId",
+                "value": 2,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 5.122,
+                  "y": 6.485333333333333
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0.234,
+                  "y": 1.9053333333333335
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 3,
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.5,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetSatelliteId",
+                "value": 5,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 1.476,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 7.556,
+                  "y": 8.954
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": 0.274,
+                  "y": 0.7456666666666667
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": -0.406,
+                  "y": 0,
+                  "z": 1.0566666666666666
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 1.5,
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.9,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetSatelliteId",
+                "value": 8,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 10,
+                  "y": 13
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": -0.15133333333333332,
+                  "y": 1.615
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 2,
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 0.6653333333333333,
+                "type": "number"
+              }
+            ],
+            [
+              {
+                "paramName": "planetSatelliteId",
+                "value": 15,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitStart",
+                "value": 0.656,
+                "type": "number"
+              },
+              {
+                "paramName": "orbitElipse",
+                "value": {
+                  "x": 15.092,
+                  "y": 10.181666666666667
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitRotation",
+                "value": {
+                  "x": -0.5336666666666667,
+                  "y": 0.949
+                },
+                "type": "vector2"
+              },
+              {
+                "paramName": "orbitCenter",
+                "value": {
+                  "x": 0,
+                  "y": 0,
+                  "z": 0
+                },
+                "type": "vector3"
+              },
+              {
+                "paramName": "orbitSpeed",
+                "value": 2,
+                "type": "number"
+              },
+              {
+                "paramName": "scale",
+                "value": 1,
+                "type": "number"
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -116,6 +116,7 @@ export default class StarEditor{
 			this.unsubscribeArray.push(this.editorStores["nameStore"].subscribe(
 				((value) => {
 					this.selectedStarObj.name = value;
+					ObjectsStore.updateObjectName(value, "stars", this.selectedStarId);
 				}).bind(this)
 			));
 

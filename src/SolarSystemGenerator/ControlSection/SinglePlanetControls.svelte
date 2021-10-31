@@ -28,6 +28,7 @@
     let editableObjectUIStores = [];
     let editableUISections = [];
     let planetEditorControlStores: CameraStores;
+	let unsubName:()=>void;
 
     export let selectedObject: {
         id;
@@ -97,6 +98,12 @@
                                 propType: prop.propType,
                                 store: writable(editableObject[prop.prop])
                             });
+
+							if(prop.prop == "name"){
+								unsubName = newEditableStores[newEditableStores.length - 1].store.subscribe(name =>{
+									ObjectsStore.updateObjectName(name, "planets", selectedObject.id);
+								});
+							}
 
                             let storeIndex = newEditableStores.length - 1;
 
@@ -169,6 +176,7 @@
 
     onDestroy(() => {
         saveObject(selectedObject);
+		unsubName();
         window.threeScene.editors.planetEditor.unsubscribeFromStores();
         setEditabelUISections([]);
         setSystemUISections([]);

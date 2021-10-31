@@ -119,6 +119,9 @@ export default class PlanetSatelliteEditor {
 		};
 
 		this.planetWSatelliteNameStore.subscribe((name)=>{
+			if(this.currentObjectId != -1){
+				ObjectsStore.updateObjectName(name, "combinedPlanets", this.currentObjectId);
+			}
 			this.currentObjectName = name;
 		})
 

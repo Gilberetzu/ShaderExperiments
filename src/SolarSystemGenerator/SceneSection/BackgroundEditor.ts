@@ -148,6 +148,10 @@ export default class BackgroundEditor {
 				)
 			}
 
+			this.unsubscribeArray.push(this.editorStores.nameStore.subscribe((name)=>{
+				ObjectsStore.updateObjectName(name, "backgrounds", this.selectedBackgroundId);
+			}))
+
 			this.unsubscribeArray.push(subscribeToStore("color0Store", "color0"));
 			this.unsubscribeArray.push(subscribeToStore("color1Store", "color1"));
 			this.unsubscribeArray.push(subscribeToStore("color2Store", "color2"));

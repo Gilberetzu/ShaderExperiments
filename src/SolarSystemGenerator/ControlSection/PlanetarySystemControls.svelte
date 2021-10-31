@@ -29,6 +29,7 @@
     export let setSystemUISections = (sections) => {};
 
     let loaded = false;
+	let planetarySystemNameStore;
     let selectedStarStore;
     let starScaleStore;
     let managedPlanetsStores: Array<ManagedPlanetStore>;
@@ -45,6 +46,7 @@
         window.threeScene.editors.planetarySystemEditor.startSystem(
             selectedObject.id
         );
+		planetarySystemNameStore = window.threeScene.editors.planetarySystemEditor.planetarySystemName;
         selectedStarStore =
             window.threeScene.editors.planetarySystemEditor.selectedStar;
         starScaleStore =
@@ -132,6 +134,9 @@
 		</ControlGroup>
     {/if}
     {#if selectedSection.typeIndex == 1 && selectedSection.index == 0}
+		<ControlGroup label={'name'}>
+			<String label="Name" stringStore={planetarySystemNameStore}/>
+		</ControlGroup>
         <ControlGroup label={'Star'}>
             <StarDropdown selectedIdStore={selectedStarStore} />
             <Float label={'Star Scale'} floatStore={starScaleStore} />

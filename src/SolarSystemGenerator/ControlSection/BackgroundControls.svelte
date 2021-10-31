@@ -68,6 +68,9 @@
 
 {#if backgroundMaterialStores != undefined && backgroundMaterialStores != null}
     {#if selectedSection.typeIndex == 1 && selectedSection.index == 0}
+		<ControlGroup label="Name">
+			<String label="name" stringStore={backgroundMaterialStores.nameStore} />
+		</ControlGroup>
         <ControlGroup label={'Colors'}>
             <Vector3Color
                 label="Color 1"

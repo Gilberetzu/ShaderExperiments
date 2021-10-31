@@ -18,10 +18,14 @@
     let uploadHTMLElement;
     let fileInput;
 
-	let exampleList = [
+    let exampleList = [
         {
             name: 'Test Example',
             url: '/PlanetarySystemExamples/TestExample.json'
+        },
+        {
+            name: 'Solar System',
+            url: '/PlanetarySystemExamples/SolarSystem.json'
         }
     ];
 
@@ -90,53 +94,60 @@
     };
 
     let convertJSONToObjectCollection = (jsondata) => {
-        let newObjectStore = {
-            planets: jsondata.planets.map((jsonPlanet) => {
-                return {
-                    id: jsonPlanet.id,
-                    object: ProceduralPlanet.createFromSerializableObject(
-                        jsonPlanet.object
-                    )
-                };
-            }),
-            backgrounds: jsondata.backgrounds.map((jsonPlanet) => {
-                return {
-                    id: jsonPlanet.id,
-                    object: Background.createFromSerializableObject(
-                        jsonPlanet.object
-                    )
-                };
-            }),
-            stars: jsondata.stars.map((jsonPlanet) => {
-                return {
-                    id: jsonPlanet.id,
-                    object: ProceduralStar.createFromSerializableObject(
-                        jsonPlanet.object
-                    )
-                };
-            }),
-            combinedPlanets: jsondata.planetsWithSatellites.map(
-                (jsonPlanet) => {
+        SelectionState.editable.reset();
+        window.threeScene.sceneManager.renderer.clear();
+
+        requestAnimationFrame(() => {
+            let newObjectStore = {
+                planets: jsondata.planets.map((jsonPlanet) => {
                     return {
                         id: jsonPlanet.id,
-                        object: PlanetSatellite.createFromSerializableObject(
+                        object: ProceduralPlanet.createFromSerializableObject(
                             jsonPlanet.object
                         )
                     };
-                }
-            ),
-            planetarySystems: jsondata.planetarySystems.map((jsonPlanet) => {
-                return {
-                    id: jsonPlanet.id,
-                    object: PlanetarySystem.createFromSerializableObject(
-                        jsonPlanet.object
-                    )
-                };
-            }),
-            galaxies: []
-        };
+                }),
+                backgrounds: jsondata.backgrounds.map((jsonPlanet) => {
+                    return {
+                        id: jsonPlanet.id,
+                        object: Background.createFromSerializableObject(
+                            jsonPlanet.object
+                        )
+                    };
+                }),
+                stars: jsondata.stars.map((jsonPlanet) => {
+                    return {
+                        id: jsonPlanet.id,
+                        object: ProceduralStar.createFromSerializableObject(
+                            jsonPlanet.object
+                        )
+                    };
+                }),
+                combinedPlanets: jsondata.planetsWithSatellites.map(
+                    (jsonPlanet) => {
+                        return {
+                            id: jsonPlanet.id,
+                            object: PlanetSatellite.createFromSerializableObject(
+                                jsonPlanet.object
+                            )
+                        };
+                    }
+                ),
+                planetarySystems: jsondata.planetarySystems.map(
+                    (jsonPlanet) => {
+                        return {
+                            id: jsonPlanet.id,
+                            object: PlanetarySystem.createFromSerializableObject(
+                                jsonPlanet.object
+                            )
+                        };
+                    }
+                ),
+                galaxies: []
+            };
 
-        ObjectsStore.set(newObjectStore);
+            ObjectsStore.set(newObjectStore);
+        });
     };
 
     let fileChanged = (event) => {
@@ -151,7 +162,7 @@
         reader.readAsText(event.target.files[0]);
     };
 
-	let fetchExample = (exampleURL) => {
+    let fetchExample = (exampleURL) => {
         fetch(exampleURL)
             .then((response) => {
                 if (!response.ok) {
@@ -163,8 +174,6 @@
                 //console.log(json);
                 try {
                     convertJSONToObjectCollection(json);
-					SelectionState.editable.reset();
-					window.threeScene.sceneManager.renderer.clear();
                 } catch (e) {
                     console.log(e);
                 }
@@ -186,40 +195,45 @@
 <div>
     <ControlGroup label="Save / Load">
         <div>
-			<Button
-				label={'Save to JSON'}
-				on:click={convertObjectCollectionToJSON}
-			/>
-		</div>
+            <Button
+                label={'Save to JSON'}
+                on:click={convertObjectCollectionToJSON}
+            />
+        </div>
         <div>
-			<Button label={'Load from JSON'} on:click={openFileUpload} />
-		</div>
+            <Button label={'Load from JSON'} on:click={openFileUpload} />
+        </div>
     </ControlGroup>
 
     <ControlGroup label="Examples">
-		{#each exampleList as example}
-			<div class="exampleElement">
-				<div>{example.name}</div>
-				<Button label={"Load"} on:click={()=>{fetchExample(example.url)}}/>
-			</div>
-		{/each}
-	</ControlGroup>
+        {#each exampleList as example}
+            <div class="exampleElement">
+                <div>{example.name}</div>
+                <Button
+                    label={'Load'}
+                    on:click={() => {
+                        fetchExample(example.url);
+                    }}
+                />
+            </div>
+        {/each}
+    </ControlGroup>
 </div>
 
 <style>
-	.exampleElement{
-		color: var(--cs2_6);
-		font-weight: 300;
-		font-size: 1.1em;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		place-content: center;
-		padding: 0.5em 1em;
-		background-color: var(--cs2_2);
-		border-radius: 0.5em;
-	}
-	.exampleElement:hover{
-		background-color: var(--cs2_3);
-		font-weight: 700;
-	}
+    .exampleElement {
+        color: var(--cs2_6);
+        font-weight: 300;
+        font-size: 1.1em;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        place-content: center;
+        padding: 0.5em 1em;
+        background-color: var(--cs2_2);
+        border-radius: 0.5em;
+    }
+    .exampleElement:hover {
+        background-color: var(--cs2_3);
+        font-weight: 700;
+    }
 </style>

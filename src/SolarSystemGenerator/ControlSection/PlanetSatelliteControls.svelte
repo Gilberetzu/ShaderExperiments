@@ -134,7 +134,7 @@
     let mainPlanetSelectorDropdownChange = (event) => {
         mainPlanetSelect = event.detail;
         window.threeScene.editors.planetSatelliteEditor.mainPlanetIdStore.set(
-            mainPlanetSelect
+			planetList[mainPlanetSelect].id
         );
     };
 

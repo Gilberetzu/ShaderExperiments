@@ -105,6 +105,13 @@ function createObjectStore() {
 			}
 			return {...state};
 		}),
+		updateObjectName: (name, key, id) => update(state => {
+			let objIndex = state[key].findIndex(s => s.id == id);
+			if(objIndex >= 0){
+				state[key][objIndex].object.name = name;
+			}
+			return {...state}
+		}),
 		removeObject: (key, id) => update(state => {
 			let newArr = state[key].filter((elem)=>elem.id != id);
 			return {

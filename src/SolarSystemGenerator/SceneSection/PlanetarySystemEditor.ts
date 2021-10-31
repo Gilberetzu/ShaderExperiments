@@ -214,8 +214,17 @@ export default class PlanetarySystemEditor{
 		this.starMesh = new THREE.Mesh(starGeometry, starMaterial);
 		this.selectedStar = writable(-1);
 		this.starScale = writable(1.0);
+		this.selectedPSId = -1;
 
 		this.starAdded = false;
+
+		this.planetarySystemName = writable("name");
+
+		this.planetarySystemName.subscribe((name)=>{
+			if(this.selectedPSId != -1){
+				ObjectsStore.updateObjectName(name, "planetarySystems", this.selectedPSId);
+			}
+		})
 
 		this.selectedStar.subscribe((starId) => {
 			if(starId >= 0){
@@ -261,6 +270,7 @@ export default class PlanetarySystemEditor{
 			this.selectedStar.set(-1);
 			this.selectedStar.set(this.selectedPSObject.starId);
 			this.starScale.set(this.selectedPSObject.starScale);
+			this.planetarySystemName.set(this.selectedPSObject.name);
 
 			this.selectedPSObject.planets.forEach(ps => {
 				this.addPlanet(ps);
@@ -276,7 +286,7 @@ export default class PlanetarySystemEditor{
 	stopSystem(){
 		this.enabled = false;
 
-		let newPlanetarySystem = new PlanetarySystem(this.selectedPSObject.name);
+		let newPlanetarySystem = new PlanetarySystem(get(this.planetarySystemName));
 		newPlanetarySystem.starId = get(this.selectedStar);
 		newPlanetarySystem.starScale = get(this.starScale);
 		newPlanetarySystem.planets = this.managedPlanets.map(mp => {
@@ -299,6 +309,7 @@ export default class PlanetarySystemEditor{
 			this.removePlanet(0);
 		}
 
+		this.selectedPSId = -1;
 		this.selectedStar.set(-1);
 
 		this.sceneCameraController.removeEventListeners();
