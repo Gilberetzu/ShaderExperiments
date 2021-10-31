@@ -26,7 +26,11 @@
         {
             name: 'Solar System',
             url: '/PlanetarySystemExamples/SolarSystem.json'
-        }
+        },
+		{
+			name: 'Showcase Video',
+			url: '/PlanetarySystemExamples/ShowcaseVideo.json'
+		}
     ];
 
     let convertObjectCollectionToJSON = () => {
