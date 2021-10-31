@@ -91,7 +91,9 @@
         window.threeScene.editors.planetSatelliteEditor.startSystem(
             selectedObject.id
         );
-		planetIdStoreUnsub = window.threeScene.editors.planetSatelliteEditor.mainPlanetIdStore.subscribe(pId => mainPlanetSelect = pId);
+		planetIdStoreUnsub = window.threeScene.editors.planetSatelliteEditor.mainPlanetIdStore.subscribe(pId => {
+			mainPlanetSelect = planetList.findIndex(pl => pl.id == pId);
+		});
 		nameStore = window.threeScene.editors.planetSatelliteEditor.planetWSatelliteNameStore;
         satelliteColl = [
             ...window.threeScene.editors.planetSatelliteEditor
@@ -130,13 +132,6 @@
 		planetIdStoreUnsub();
         window.threeScene.editors.planetSatelliteEditor.stopSystem();
     });
-
-    let mainPlanetSelectorDropdownChange = (event) => {
-        mainPlanetSelect = event.detail;
-        window.threeScene.editors.planetSatelliteEditor.mainPlanetIdStore.set(
-			planetList[mainPlanetSelect].id
-        );
-    };
 
     let addSatellite = () => {
         let satellitePlanetId = planetList[dropdownValue].id;
@@ -185,7 +180,12 @@
         <Dropdown
             possibleOptions={dropDownOptions}
             bind:value={mainPlanetSelect}
-            on:click={mainPlanetSelectorDropdownChange}
+            on:click={(event)=>{
+				mainPlanetSelect = event.detail;
+				window.threeScene.editors.planetSatelliteEditor.mainPlanetIdStore.set(
+					planetList[mainPlanetSelect].id
+				);
+			}}
         />
     </ControlGroup>
 
