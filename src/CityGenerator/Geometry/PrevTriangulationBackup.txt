@@ -1,0 +1,547 @@
+static DelaunayTriangulationBackup(vertices, polygon) {
+		console.log(vertices.length);
+		//Step 1
+		/*Normalize coodinates of points. Scale the coordinates of the points so that they all lie between 0 and 1
+		Normalization x` = (x - xmin) / dmax ; y` = (y - ymin) / dmax
+		Where dmax is max( xmax - xmin, ymax - ymin )*/
+
+		let xmin = vertices[0].x;
+		let xmax = vertices[0].x;
+		let ymin = vertices[0].y;
+		let ymax = vertices[0].y;
+		for (let i = 1; i < vertices.length; i++) {
+			const v = vertices[i];
+
+			if (v.x < xmin) xmin = v.x;
+			if (v.x > xmax) xmax = v.x;
+
+			if (v.y < ymin) ymin = v.y;
+			if (v.y > ymax) ymax = v.y;
+		}
+		let dmax = Math.max(xmax - xmin, ymax - ymin);
+
+		console.log("dmax", dmax);
+		console.log("xmin", xmin);
+		console.log("ymin", ymin);
+
+		/**
+		 * @type {Array.<Vec2>}
+		 */
+		let normVerts = [];
+		vertices.forEach(v => {
+			const nv = new Vec2(
+				(v.x - xmin) / dmax,
+				(v.y - ymin) / dmax
+			)
+			normVerts.push(nv);
+		});
+
+		//Step2
+		/*Sort points into bins. Cover the region to be triangulated by a rectangular grid so that each 
+		rectangle (bin) contains roughly N^1/2 points. --Read more on the paper
+		This step is going to be skipped as it is just meant to reduce the time complexity of the algorithm
+		*/
+
+		//Step3
+		/*Establish a supertriangle. Select three dummy points to formm a supertriangle that completly encompasses
+		all of the points to be triangulated. This supertriangle initially defines the Delaunay triangulation which
+		is comprised of a single triangle.
+
+		The points are not going to be added to the vertices array, as they are not going to be used after the triangulation is finished
+		*/
+		const N1 = new Vec2(-100, -100);
+		const N2 = new Vec2(100, -100);
+		const N3 = new Vec2(0, 100);
+
+		const getVertex = (index) => {
+			if (index == -1) {
+				return N1;
+			}
+			else if (index == -2) {
+				return N2;
+			}
+			else if (index == -3) {
+				return N3;
+			}
+			else {
+				return normVerts[index];
+			}
+		}
+		// Whenever a vertex position is needed, this funciton should be used instead of doing the lookup directly
+		//on the vertices array, as this function gives the vertex position of the super triangle vertices
+
+		let newTriangle = (verts) => {
+			return {
+				verts,
+				adjacent: [null, null, null]
+			};
+		}
+
+		let triangles = [];
+		triangles.push(
+			newTriangle([-1, -2, -3])
+			/*{
+				verts: [-1, -2, -3], //index to vertex in vertices array
+				adjacent: [null, null, null] //reference of triangle object
+			}*/
+		);
+
+		//Maybe reprenset the system with a quad edge data structure like the one explained in this article
+		//http://gwlucastrig.github.io/Tinfour/doc/TinfourAlgorithmsAndDataElements.pdf
+
+		const circumcircleTest = (p, v1, v2, v3) => {
+			console.log("Point ", JSON.stringify(p));
+			console.log("Vertices ", JSON.stringify(v1), JSON.stringify(v2), JSON.stringify(v3));
+			console.log("Circumcircle test, is clockwise? ", Polygon2D.ClockwiseOrder([v1, v2, v3]));
+
+			const x13 = v1.x - v3.x;
+			const x23 = v2.x - v3.x;
+			const x1p = v1.x - p.x;
+			const x2p = v2.x - p.x;
+
+			const y13 = v1.y - v3.y;
+			const y23 = v2.y - v3.y;
+			const y1p = v1.y - p.y;
+			const y2p = v2.y - p.y;
+
+			const cosa = x13 * x23 + y13 * y23;
+			const cosb = x2p * x1p + y2p * y1p;
+
+			if (cosa >= 0 && cosb >= 0) return false;
+			console.log("cosa >= 0 && cosb >= 0 : false");
+			if (cosa < 0 && cosb < 0) return true;
+			console.log("cosa < 0 && cosb < 0 : false");
+
+			const sinab = ((x13 * y23) - (x23 * y13)) * cosb + ((x2p * y1p) - (x1p * y2p)) * cosa;
+			if (sinab < 0) return true;
+			console.log("sinab < 0 : false");
+			return false;
+		}
+
+		//Step 4 Loop over each point doing the steps 5 - 7
+		for (let pointId = 0; pointId < normVerts.length; pointId++) {
+			console.log("------------------ADDING POINT TO DELAUNAY---------------");
+			//if(pointId == 4) break;
+			const nPoint = normVerts[pointId];
+			console.log(`POINT ID: ${pointId}`);
+
+			//Step 5
+			/*
+			Insert new point in triangulation. Find an existing triangle which encloses P. Delete this triangle, and form 
+			three new triangles by connecting P to each of its vertices. The net gain in total number of triangles after this stage is 2.
+			Start the seach at the triangle that was formed most recently (if the bin structure was created)
+			*/
+			let triId = -1;
+			for (let t = 0; t < triangles.length; t++) {
+				const tri = triangles[t];
+				const inside = Triangle2D.IsPointInTriangle(nPoint,
+					getVertex(tri.verts[0]), getVertex(tri.verts[1]), getVertex(tri.verts[2]));
+				if (inside) {
+					triId = t;
+					break;
+				}
+			}
+			if (triId == -1) {
+				console.log(`Error - for some reason no triangle was found for index ${pointId}!!`);
+				throw new Error("No triangle that contains point was found");
+			}
+
+			const foundTri = triangles[triId];
+
+			//Create new triangles
+			const nTri0 = newTriangle([foundTri.verts[2], foundTri.verts[0], pointId]);
+			const nTri1 = newTriangle([foundTri.verts[0], foundTri.verts[1], pointId]);
+			const nTri2 = newTriangle([foundTri.verts[1], foundTri.verts[2], pointId]);
+
+			console.log("Created 3 new triangles:");
+			console.log("Triangle 0 : ", JSON.stringify(nTri0.verts));
+			console.log("Triangle 1 : ", JSON.stringify(nTri1.verts));
+			console.log("Triangle 2 : ", JSON.stringify(nTri2.verts));
+
+			nTri0.adjacent[0] = foundTri.adjacent[2];
+			nTri0.adjacent[1] = nTri1;
+			nTri0.adjacent[2] = nTri2;
+
+			nTri1.adjacent[0] = foundTri.adjacent[0];
+			nTri1.adjacent[1] = nTri2;
+			nTri1.adjacent[2] = nTri0;
+
+			nTri2.adjacent[0] = foundTri.adjacent[1];
+			nTri2.adjacent[1] = nTri0;
+			nTri2.adjacent[2] = nTri1;
+
+			//Update adjacent triangles with newly created triangles
+			const updateTriAdjacent = (adjacent, eqTri, nTri) => {
+				console.log("update adjacent -----------------");
+				if (adjacent != null) {
+					console.log("looking on adjacent list for tri: ", JSON.stringify(adjacent.verts));
+					console.log("looking for adjacent triangle: ", JSON.stringify(eqTri.verts));
+					console.log("changing it to: ", JSON.stringify(nTri.verts));
+					for (let i = 0; i < 3; i++) {
+						if (adjacent.adjacent[i] === eqTri) {
+							adjacent.adjacent[i] = nTri;
+							return;
+						}
+					}
+					console.log(adjacent);
+					console.log("eqTri: ", eqTri);
+					console.log("nTri: ", nTri);
+					throw new Error("Triangle not found in adjacent triangle's adjacent list");
+				} else {
+					console.log("adjacent is null");
+				}
+			}
+
+			console.log("Adjacents for found triangle");
+			console.log(foundTri.adjacent[0] == null ? "null" : JSON.stringify(foundTri.adjacent[0].verts));
+			console.log(foundTri.adjacent[1] == null ? "null" : JSON.stringify(foundTri.adjacent[1].verts));
+			console.log(foundTri.adjacent[2] == null ? "null" : JSON.stringify(foundTri.adjacent[2].verts));
+
+
+			console.log("Updating adjacency on subdivided triangle:");
+			console.log("Update adjacent for new tri 0");
+			updateTriAdjacent(foundTri.adjacent[2], foundTri, nTri0);
+			console.log("Update adjacent for new tri 1");
+			updateTriAdjacent(foundTri.adjacent[0], foundTri, nTri1);
+			console.log("Update adjacent for new tri 2");
+			updateTriAdjacent(foundTri.adjacent[1], foundTri, nTri2);
+
+			const printAdjacentTriangles = (tri) => {
+				for (let i = 0; i < 3; i++) {
+					const ad = tri.adjacent[i];
+					if (ad == null) {
+						console.log(`adjacent ${i} : null`);
+					} else {
+						console.log(`adjacent ${i} : `, JSON.stringify(ad.verts));
+					}
+				}
+			}
+
+			const swapDiagonal = (triA, triB, pid) => {
+				console.log("-----------------SWAP DIAGONAL-----------------------");
+				console.log("Entered Swap Diagonal Function");
+				console.log("Tri A: ", JSON.stringify(triA.verts));
+				printAdjacentTriangles(triA);
+				console.log("Tri B: ", JSON.stringify(triB.verts));
+				printAdjacentTriangles(triB);
+
+				console.log(`Point id: ${pid}`);
+
+				//Get the vertice that is not being shared with triA
+
+				let vertExA = triA.verts.findIndex(v => v == pid);
+				let vertExB = -4;
+				for (let i = 0; i < 3; i++) {
+					if (!triA.verts.includes(triB.verts[i])) {
+						//vertExB = triB.verts[i];
+						vertExB = i;
+					}
+				}
+				if (vertExB == -4) {
+					console.log("triangle b", triB);
+					throw new Error("Excluded vertex not found on triangle B")
+				}
+
+
+				const getAdjacent = (tri, triEx, vertExId) => {
+					console.log("looking on adjacent list for tri: ", JSON.stringify(tri.verts),
+						JSON.stringify(tri.adjacent[0] == null ? "null" : tri.adjacent[0].verts),
+						JSON.stringify(tri.adjacent[1] == null ? "null" : tri.adjacent[1].verts),
+						JSON.stringify(tri.adjacent[2] == null ? "null" : tri.adjacent[2].verts));
+					console.log("excluding tri: ", JSON.stringify(triEx.verts));
+					let adjacentData = [];
+					let edges = [
+						[tri.verts[Num.ModGl(vertExId - 1, 3)], tri.verts[vertExId]],
+						[tri.verts[Num.ModGl(vertExId + 1, 3)], tri.verts[vertExId]],
+					];
+					for (let e = 0; e < 2; e++) {
+						const edge = edges[e];
+						let connectedTri = null;
+						for (let j = 0; j < 3; j++) {
+							const adA = tri.adjacent[j];
+							if (adA == null) continue;
+
+							let c = (adA.verts[0] == edge[0] && adA.verts[1] == edge[1]) ||
+								(adA.verts[1] == edge[0] && adA.verts[0] == edge[1]) ||
+								(adA.verts[1] == edge[0] && adA.verts[2] == edge[1]) ||
+								(adA.verts[2] == edge[0] && adA.verts[1] == edge[1]) ||
+								(adA.verts[2] == edge[0] && adA.verts[0] == edge[1]) ||
+								(adA.verts[0] == edge[0] && adA.verts[2] == edge[1]);
+
+							if (c) {
+								connectedTri = adA;
+								break;
+							}
+						}
+						if (connectedTri == triEx) continue;
+						adjacentData.push({
+							tri: connectedTri,
+							connEdge: edge
+						});
+					}
+					/*console.log("adjacent data ------------------------------");
+					adjacentData.forEach(ad => {
+						console.log("Tri: ", ad.tri==null? "Null" : JSON.stringify(ad.tri.verts));
+						console.log("conn edge: ", JSON.stringify(ad.connEdge));
+					})*/
+
+					return adjacentData;
+				}
+
+				let triAAdjacentData = getAdjacent(triA, triB, vertExA);
+				let triBAdjacentData = getAdjacent(triB, triA, vertExB);
+
+				let triAPrime = null;
+				let triBPrime = null;
+
+				let addToStack = [];
+				for (let i = 0; i < 2; i++) {
+					if (triAAdjacentData[0].connEdge[0] == triBAdjacentData[i].connEdge[0]) {
+						triAPrime = newTriangle([triAAdjacentData[0].connEdge[1], triAAdjacentData[0].connEdge[0], triBAdjacentData[i].connEdge[1]]);
+						let i1 = Num.ModGl(i + 1, 2);
+						triBPrime = newTriangle([triAAdjacentData[1].connEdge[1], triAAdjacentData[1].connEdge[0], triBAdjacentData[i1].connEdge[1]]);
+
+						console.log("Tri A Prime: ", JSON.stringify(triAPrime.verts));
+						console.log("Tri B Prime: ", JSON.stringify(triBPrime.verts));
+
+						triAPrime.adjacent[0] = triAAdjacentData[0].tri;
+						triAPrime.adjacent[1] = triBAdjacentData[i].tri;
+						triAPrime.adjacent[2] = triBPrime;
+
+						triBPrime.adjacent[0] = triAAdjacentData[1].tri;
+						triBPrime.adjacent[1] = triBAdjacentData[i1].tri;
+						triBPrime.adjacent[2] = triAPrime;
+
+						if (triBAdjacentData[i].tri != null) {
+							addToStack.push({
+								aTri: triBAdjacentData[i].tri,
+								pTri: triAPrime
+							});
+						}
+
+						if (triBAdjacentData[i1].tri != null) {
+							addToStack.push({
+								aTri: triBAdjacentData[i1].tri,
+								pTri: triBPrime
+							});
+						}
+
+						/*updateTriAdjacent(triAAdjacentData[0].tri, triA, triAPrime);
+						updateTriAdjacent(triBAdjacentData[i].tri, triB, triAPrime);
+
+						updateTriAdjacent(triAAdjacentData[1].tri, triA, triBPrime);
+						updateTriAdjacent(triBAdjacentData[i1].tri, triB, triBPrime);*/
+
+						break;
+					}
+				}
+				console.log("-----------------ADD TO STACK DATA-----------------------");
+				for (let index = 0; index < addToStack.length; index++) {
+					const ats = addToStack[index];
+					console.log(`Add to stack ${index} | atri: ${JSON.stringify(ats.aTri.verts)} | ptri: ${JSON.stringify(ats.pTri.verts)}`)
+				}
+				console.log("-----------------SWAP DIAGONAL END-----------------------");
+				return {
+					triAPrime: triAPrime,
+					triBPrime: triBPrime,
+					addToStack
+				}
+			}
+
+			triangles.splice(triId, 1);
+			triangles.push(nTri0);
+			triangles.push(nTri1);
+			triangles.push(nTri2);
+
+			//Step6
+			/*
+			Initialize stack. Place all the triangles adjacent to the edges oposite to P on a last-in-first-out stack.
+			(Place the triangles that were adjacent to the affected triangle into a stack)
+			*/
+			let affectedStack = [];
+			if (foundTri.adjacent[2] != null) {
+				affectedStack.push({
+					aTri: foundTri.adjacent[2],
+					pTri: nTri0
+				});
+			};
+			if (foundTri.adjacent[0] != null) {
+				affectedStack.push({
+					aTri: foundTri.adjacent[0],
+					pTri: nTri1
+				});
+			};
+			if (foundTri.adjacent[1] != null) {
+				affectedStack.push({
+					aTri: foundTri.adjacent[1],
+					pTri: nTri2
+				});
+			};
+
+			console.log("------------------TRIANGLE LIST BEFORE LOCAL UPDATE----------------");
+			const printCurrentTriangleState = () => {
+				for (let tr = 0; tr < triangles.length; tr++) {
+					const tri = triangles[tr];
+					console.log(`Triangle ${tr} | ${JSON.stringify(tri.verts)}`);
+					let adjacents = " -- | ";
+					for (let i = 0; i < 3; i++) {
+						const ad = tri.adjacent[i];
+						if (ad == null) {
+							adjacents += `Adjacent ${i} null ||`;
+						} else {
+							adjacents += `Adjacent ${i} | ${JSON.stringify(ad.verts)} ||`;
+						}
+					}
+					adjacents += " | -- ";
+					console.log(adjacents);
+				}
+			}
+			printCurrentTriangleState();
+
+			console.log("------------------SWAP STACK WHILE---------------");
+			//Step7
+			//Restore Delaynay triangulation. While the stack of triangles is not empty, execute Lawsons swapping scheme:
+			while (affectedStack.length > 0) {
+				//s1. Remove a triangle which is opposite P from the top of the stack.
+				const tris = affectedStack.pop();
+				if (tris.aTri == null) continue;
+
+				/*s2. If P is outside (or on) the circumcircle for this triangle, return to s1 (the new point is not affecting the triangle
+					so it can be safely remove from the stack). Else, the triangle containing P as a vertex and the currently popped
+					triangle form a convex quadrilateral whose diagonal is drawn in the wrong direction. Swap this diagonal so that the
+					two triangles are replaced by two new triangles an the structure of the Delaunay triangulation is locally restored.
+				*/
+				if (pointId == tris.aTri.verts[0] || pointId == tris.aTri.verts[1] || pointId == tris.aTri.verts[2]) {
+					console.log("Adjacent tri has the added point: ", `Triangle | ${JSON.stringify(tris.aTri.verts)} |`, `Point index : ${pointId}`);
+					throw new Error("Added point in adjacent triangle");
+				}
+				const circTest = circumcircleTest(nPoint, getVertex(tris.aTri.verts[0]), getVertex(tris.aTri.verts[1]), getVertex(tris.aTri.verts[2]));
+
+				if (circTest == false) {
+					continue;
+				} else {
+					console.log("---||| SWAP DIAGONAL |||---");
+					console.log("Point triangle: ", JSON.stringify(tris.pTri.verts));
+					console.log("Adjacent triangle: ", JSON.stringify(tris.aTri.verts));
+
+					let swapData = swapDiagonal(tris.pTri, tris.aTri, pointId);
+
+					triangles.push(swapData.triAPrime);
+					triangles.push(swapData.triBPrime);
+
+					affectedStack.push(...swapData.addToStack);
+
+					const aTriId = triangles.findIndex((triObj) => triObj === tris.aTri);
+					if (aTriId == -1) {
+						console.log(tris.aTri);
+						throw new Error("Index for triangle cannot be 0");
+					}
+					triangles.splice(aTriId, 1);
+
+					const pTriId = triangles.findIndex((triObj) => triObj === tris.pTri);
+					if (pTriId == -1) {
+						console.log(tris.pTri);
+						throw new Error("Index for triangle cannot be 0");
+					}
+					triangles.splice(pTriId, 1);
+
+					printCurrentTriangleState();
+				}
+				//s3. Place any triangles which are now oposite P on the stack.
+			}
+			console.log("------------------SWAP STACK WHILE END---------------");
+		}
+
+		const invertNorm = (vert) => {
+			return new Vec2(
+				(vert.x * dmax) + xmin,
+				(vert.y * dmax) + ymin
+			);
+		}
+
+		return {
+			triangles,
+			negVerts: {
+				1: invertNorm(getVertex(-1)),
+				2: invertNorm(getVertex(-2)),
+				3: invertNorm(getVertex(-3))
+			}
+		};
+	}
+
+
+	/*const ptVIndex_p1 = Num.ModGl(ptVIndex + 1, 3);
+					const ptVIndex_m1 = Num.ModGl(ptVIndex - 1, 3);
+
+					let newTriA = newTriangle(
+						[tris.pt.verts[ptVIndex], tris.pt.verts[ptVIndex_p1], tris.at.verts[atVIndex]]
+					);
+					let newTriB = newTriangle(
+						[tris.at.verts[atVIndex], tris.pt.verts[ptVIndex_m1], tris.pt.verts[ptVIndex]]
+					);
+
+					newTriA.adjacent[2] = newTriB;
+					newTriB.adjacent[2] = newTriA;
+
+					const adIdA0 = getAdjacentIndex(tris.pt.verts, tris.pt.verts[ptVIndex], tris.pt.verts[ptVIndex_p1]);
+					setAdjacentTriangles(newTriA.verts[0], newTriA.verts[1], newTriA, tris.pt.adjacent[adIdA0]);
+
+					const adIdA1 = getAdjacentIndex(tris.at.verts, tris.pt.verts[ptVIndex_p1], tris.at.verts[atVIndex]);
+					setAdjacentTriangles(newTriA.verts[1], newTriA.verts[2], newTriA, tris.at.adjacent[adIdA1]);
+
+					const adIdB0 = getAdjacentIndex(tris.at.verts, tris.at.verts[atVIndex], tris.pt.verts[ptVIndex_m1]);
+					setAdjacentTriangles(newTriB.verts[0], newTriB.verts[1], newTriB, tris.at.adjacent[adIdB0]);
+
+					const adIdB1 = getAdjacentIndex(tris.pt.verts, tris.pt.verts[ptVIndex_m1], tris.pt.verts[ptVIndex]);
+					setAdjacentTriangles(newTriB.verts[1], newTriB.verts[2], newTriB, tris.pt.adjacent[adIdB1]);
+					
+					triangles.push(newTriA);
+					triangles.push(newTriB);
+
+					console.group("Diagonal swap result")
+					console.log(`Triangle A | verts : ${JSON.stringify(newTriA.verts)}`);
+					console.log(`Triangle A | verts values: `, getVertex(newTriA.verts[0]), getVertex(newTriA.verts[1]), getVertex(newTriA.verts[2]));
+					console.log(`Triangle B | verts : ${JSON.stringify(newTriB.verts)}`);
+					console.log(`Triangle B | verts values: `, getVertex(newTriB.verts[0]), getVertex(newTriB.verts[1]), getVertex(newTriB.verts[2]));
+					console.groupEnd();
+
+					console.group("Added to affected stack");
+					if(tris.at.adjacent[adIdB0] != null){
+						console.log(`Triangle Adjacent for B | verts : ${JSON.stringify(tris.at.adjacent[adIdB0].verts)}`);
+						affectedStack.push({
+							at: tris.at.adjacent[adIdB0], pt: newTriB
+						});
+					}
+					if(tris.at.adjacent[adIdA1] != null){
+						console.log(`Triangle Adjacent for A | verts : ${JSON.stringify(tris.at.adjacent[adIdA1].verts)}`);
+						affectedStack.push({
+							at: tris.at.adjacent[adIdA1], pt: newTriA
+						});
+					}
+					console.groupEnd();
+
+					console.group("Removing Affected Triangles");
+
+					const aTriId = triangles.findIndex((triObj) => triObj === tris.at);
+					if (aTriId == -1) {
+						throw new Error(`Index for triangle cannot be -1 for triangle ${JSON.stringify(tris.aTri.verts)}`);
+					}
+					console.log(`Adjacent triangle id : ${aTriId} | ${triangles[aTriId].verts}`);
+					triangles.splice(aTriId, 1);
+
+					const pTriId = triangles.findIndex((triObj) => triObj === tris.pt);
+					if (pTriId == -1) {
+						throw new Error(`Index for triangle cannot be -1 for triangle ${JSON.stringify(tris.pTri.verts)}`);
+					}
+					console.log(`Adjacent triangle id : ${pTriId} | ${triangles[pTriId].verts}`);
+					triangles.splice(pTriId, 1);
+
+					console.groupEnd();
+
+					printCurrentTriangleState();
+					swapIterations++;
+					console.groupEnd();*/
+
+					/*trianglesStates.push(
+						[...triangles]
+					);*/

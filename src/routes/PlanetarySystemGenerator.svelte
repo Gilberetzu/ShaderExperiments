@@ -15,17 +15,12 @@
 </script>
 
 <style>
-	:global(root){
-		/*--c1: grey;
-		--c2: rgb(63, 63, 63);
-		--c3: rgb(34, 34, 34);*/
-	}
 	:global(body) {
         padding: 0px;
         margin: 0px;
     }
 	:root{
-		--controlName: "poop";
+		--controlName: "ups";
 	}
     .container {
         width: 100vw;
