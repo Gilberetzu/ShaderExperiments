@@ -35,6 +35,8 @@ export default class PolygonGenerator {
 
 		this.pixiApp.ticker.add(this.update.bind(this));
 
+		window.convexPolygon = Polygon2D.IsConvexPolygon;
+
 		{
 			this.gridContainer = new PIXI.Container();
 			this.gridGraphics = new PIXI.Graphics();
@@ -108,6 +110,9 @@ export default class PolygonGenerator {
 			this.pixiApp.stage.addChild(this.closestHitContainer);
 		}
 
+		this.debugEdgeGraphics = new PIXI.Graphics();
+		this.pixiApp.stage.addChild(this.debugEdgeGraphics);
+		
 		this.pixiApp.stage.position.set(64, canvasRect[0].height - 64);
 
 		//State variables - needs to be changed to state machine or something
@@ -542,8 +547,6 @@ export default class PolygonGenerator {
 				}
 
 				{
-					let debugEdgeGraphics = new PIXI.Graphics();
-					this.pixiApp.stage.addChild(debugEdgeGraphics);
 					const multiplier = new Vec2(1,-1);
 					
 					const wrap = (index)=>{
@@ -587,17 +590,6 @@ export default class PolygonGenerator {
 
 						const randColor = Draw.RandomColor(0.5, 0.5, 0.5);
 
-						//console.log("Data", vert1, vert1Normal, vert2, vert2Normal);
-
-						/*debugEdgeGraphics.lineStyle({
-							width: 8,
-							color: Draw.RandomColor(0.5, 0.5, 0.5)
-						});
-						
-						debugEdgeGraphics.moveTo(vert1.x, vert1.y * -1);
-						const edgeEnd = Vec2.Add(vert1, Vec2.MultScalar(vert1Normal, 4 * TRIANGLE_HEIGHT));
-						debugEdgeGraphics.lineTo(edgeEnd.x, edgeEnd.y * -1);*/
-
 						for (let k = 0; k < 15; k++) {
 							let v1 = Vec2.Add(vert1, Vec2.MultScalar(vert1Normal, (k + 0.1) * TRIANGLE_HEIGHT));
 							let v2 = Vec2.Add(vert2, Vec2.MultScalar(vert2Normal, (k + 0.1) * TRIANGLE_HEIGHT));
@@ -610,7 +602,6 @@ export default class PolygonGenerator {
 							const secSize = edgeLenght / secCount;
 							secCount = Math.max(secCount, 1);
 							
-							//debugEdgeGraphics.beginFill(randColor);
 							for (let j = 0; j < secCount; j++) {
 								let vertPos = Vec2.Add(v1, Vec2.MultScalar(edgeDir, secSize * j));
 								const valid = Polygon2D.PointInsidePolygon(vertPos, pVertices) == 0 ? false : true;
@@ -620,45 +611,29 @@ export default class PolygonGenerator {
 									}else{
 										innerVertices.push(vertPos);
 									}
-									//debugEdgeGraphics.drawCircle(vertPos.x, -vertPos.y, 12);
 								}
 							}
-							//debugEdgeGraphics.endFill();
 						}
 					}
 					//remove all the vertices near the outer ones
 
 					let drawVerticesOnDebug = (vertices, size = 12)=>{
-						debugEdgeGraphics.lineStyle({
+						this.debugEdgeGraphics.lineStyle({
 							width: 0
 						});
 						for (let i = 0; i < vertices.length; i++) {
 							const vert = vertices[i];
-							debugEdgeGraphics.beginFill(0xFFFFFF);
-							debugEdgeGraphics.drawCircle(vert.x, -vert.y, size * 1.25);
-							debugEdgeGraphics.endFill();
-							debugEdgeGraphics.beginFill(Draw.RandomColor(0.1,0.1,0.1));
-							debugEdgeGraphics.drawCircle(vert.x, -vert.y, size);
-							debugEdgeGraphics.endFill();
+							this.debugEdgeGraphics.beginFill(0xFFFFFF);
+							this.debugEdgeGraphics.drawCircle(vert.x, -vert.y, size * 1.25);
+							this.debugEdgeGraphics.endFill();
+							this.debugEdgeGraphics.beginFill(Draw.RandomColor(0.1,0.1,0.1));
+							this.debugEdgeGraphics.drawCircle(vert.x, -vert.y, size);
+							this.debugEdgeGraphics.endFill();
 						}
 					}
 
 					let prunedInnerVertices = [...outerEdgeVertices, ...innerVertices];
-					/*for (let i = 0; i < innerVertices.length; i++) {
-						const iVert = innerVertices[i];
-						let valid = true;
-						for (let j = 0; j < outerEdgeVertices.length; j++) {
-							const oVert = outerEdgeVertices[j];
-							const sqLen = Vec2.SqrLength(Vec2.Subtract(iVert, oVert));
-							if(sqLen < Math.pow(TRIANGLE_HEIGHT * 0.75, 2)){
-								valid = false;
-								break;
-							}
-						}
-						if(valid) prunedInnerVertices.push(iVert);
-					}
-
-					drawVerticesOnDebug(outerEdgeVertices, 24);*/
+					
 					this.polygonVertices.forEach(v =>{
 						v.graphics.clear();
 					});
@@ -680,7 +655,7 @@ export default class PolygonGenerator {
 								}
 							}
 						}
-						debugEdgeGraphics.clear();
+						this.debugEdgeGraphics.clear();
 						//drawVerticesOnDebug(outerEdgeVertices, 12);
 						drawVerticesOnDebug(prunedInnerVertices, 12);
 
@@ -693,7 +668,7 @@ export default class PolygonGenerator {
 							let debugPoint = delTriangles.addedPoints.map(p => {
 								return prunedInnerVertices[p];
 							});
-							debugEdgeGraphics.clear();
+							this.debugEdgeGraphics.clear();
 
 							const getVert = (index) =>{
 								if(index < 0){
@@ -711,34 +686,10 @@ export default class PolygonGenerator {
 									pVs.push(v);
 								}
 								
-								/*Draw.DrawTriangleOutline(debugEdgeGraphics, pVs[0], pVs[1], pVs[2], 6, Draw.RandomColor(), 4);
-								if(solid) Draw.DrawTriangle(debugEdgeGraphics, pVs[0], pVs[1], pVs[2], 10, Draw.RandomColor(), 4);*/
-
-								Draw.DrawTriangle(debugEdgeGraphics, pVs[0], pVs[1], pVs[2], 0, Draw.RandomColor());
+								Draw.DrawTriangleOutline(this.debugEdgeGraphics, pVs[0], pVs[1], pVs[2], 6, Draw.RandomColor(), 4);
 							}
 
-							let innerTriangles = [];
-							//Using the polygon as a mask, remove any triangles with centers outside of the polygon
-							for (let i = 0; i < delTriangles.triangles.length; i++) {
-								let tri = delTriangles.triangles[i];
-								let triVerts = [
-									getVert(tri.verts[0]),
-									getVert(tri.verts[1]),
-									getVert(tri.verts[2])
-								];
-								let triCenter = Vec2.DivScalar(Vec2.Add(triVerts[0], Vec2.Add(triVerts[1], triVerts[2])), 3);
-								//console.log(triCenter);
-								//const insidePoly = Polygon2D.PointInsidePolygon(triCenter, pVertices);
-								//if(insidePoly){
-									innerTriangles.push(tri);
-								//}
-							}
-
-							/*for (let i = 0; i < prunedInnerVertices.length; i++) {
-								const vert = prunedInnerVertices[i];
-								const offset = Vec2.RandomCircle(20);
-								prunedInnerVertices[i] = Vec2.Add(vert, offset);
-							}*/
+							let innerTriangles = delTriangles.triangles;
 
 							let centerPoints = [];
 							for (let i = 0; i < innerTriangles.length; i++) {

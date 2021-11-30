@@ -20,11 +20,11 @@ export default class Polygon2D {
 
 	static IsConvexPolygon(vertices) {
 		let verts = [];
-		if(!Polygon2D.ClockwiseOrder(vertices)){
-			for (let i = vertices.length-1; i >= 0 ; i--) {
+		if (!Polygon2D.ClockwiseOrder(vertices)) {
+			for (let i = vertices.length - 1; i >= 0; i--) {
 				verts.push(vertices[i]);
 			}
-		}else{
+		} else {
 			verts = [...vertices];
 		}
 		let convex = true;
@@ -32,9 +32,9 @@ export default class Polygon2D {
 			const prev = Num.ModGl(i - 1, verts.length);
 			const current = i;
 			const next = Num.ModGl(i + 1, verts.length);
-			
+
 			convex = convex && Polygon2D.IsConvex(verts[prev], verts[current], verts[next]);
-			if(convex == false){
+			if (convex == false) {
 				break;
 			}
 		}
@@ -114,7 +114,7 @@ export default class Polygon2D {
 	static DelaunayTriangulation(vertices, polygon) {
 		const DEBUG = true;
 
-		if(DEBUG == false){
+		if (DEBUG == false) {
 			window.consoleBackup = {};
 			//Create a backup of the logging functions
 			window.consoleBackup.log = window.console.log;
@@ -122,10 +122,10 @@ export default class Polygon2D {
 			window.consoleBackup.groupEnd = window.console.groupEnd;
 			window.consoleBackup.groupCollapsed = window.console.groupCollapsed;
 			//Change logging funtions to some empty ones
-			window.console.log = ()=>{};
-			window.console.group = ()=>{};
-			window.console.groupEnd = ()=>{};
-			window.console.groupCollapsed = ()=>{};
+			window.console.log = () => { };
+			window.console.group = () => { };
+			window.console.groupEnd = () => { };
+			window.console.groupCollapsed = () => { };
 		}
 
 		console.log(vertices.length);
@@ -165,19 +165,6 @@ export default class Polygon2D {
 			normVerts.push(nv);
 		});
 
-		console.groupCollapsed("Vertices");
-		console.group("Norm Verts");
-		normVerts.forEach((v, i) =>{
-			console.log(`nv[${i}] : (${v.x} , ${v.y})`);
-		})
-		console.groupEnd();
-		console.group("Verts");
-		normVerts.forEach((v, i) =>{
-			console.log(`v[${i}] : (${v.x} , ${v.y})`);
-		})
-		console.groupEnd();
-		console.groupEnd();
-
 		//Step2
 		/*Sort points into bins. Cover the region to be triangulated by a rectangular grid so that each 
 		rectangle (bin) contains roughly N^1/2 points. --Read more on the paper
@@ -193,7 +180,14 @@ export default class Polygon2D {
 		*/
 		const N1 = new Vec2(-1.2, -0.05); //new Vec2(-1.5, -0.5);
 		const N2 = new Vec2(2.2, -0.05); //new Vec2(2.5	, -0.5);
-		const N3 = new Vec2(0.5,1.5); //new Vec2(0.5	, 2);
+		const N3 = new Vec2(0.5, 1.5); //new Vec2(0.5	, 2);
+
+		const invertNorm = (vert) => {
+			return new Vec2(
+				(vert.x * dmax) + xmin,
+				(vert.y * dmax) + ymin
+			);
+		}
 
 		const getVertex = (index) => {
 			if (index == -1) {
@@ -209,21 +203,33 @@ export default class Polygon2D {
 				return normVerts[index];
 			}
 		}
+
+		const getVertexReal = (index) => {
+			if (index == -1) {
+				return invertNorm(N1);
+			} else if (index == -2) {
+				return invertNorm(N2);
+			} else if (index == -3) {
+				return invertNorm(N3);
+			} else {
+				return vertices[index];
+			}
+		}
 		// Whenever a vertex position is needed, this funciton should be used instead of doing the lookup directly
 		//on the vertices array, as this function gives the vertex position of the super triangle vertices
 
 		let newTriangle = (verts) => {
 			return {
 				verts,
-				adjacent: [null, null, null]				
+				adjacent: [null, null, null]
 			};
 		}
-		const getAdjacentIndex = (triVerts, e0, e1) =>{
-			if((triVerts[0] == e0 && triVerts[1] == e1) || (triVerts[1] == e0 && triVerts[0] == e1)){
+		const getAdjacentIndex = (triVerts, e0, e1) => {
+			if ((triVerts[0] == e0 && triVerts[1] == e1) || (triVerts[1] == e0 && triVerts[0] == e1)) {
 				return 0;
-			}else if((triVerts[1] == e0 && triVerts[2] == e1) || (triVerts[2] == e0 && triVerts[1] == e1)){
+			} else if ((triVerts[1] == e0 && triVerts[2] == e1) || (triVerts[2] == e0 && triVerts[1] == e1)) {
 				return 1;
-			}else if((triVerts[2] == e0 && triVerts[0] == e1) || (triVerts[0] == e0 && triVerts[2] == e1)){
+			} else if ((triVerts[2] == e0 && triVerts[0] == e1) || (triVerts[0] == e0 && triVerts[2] == e1)) {
 				return 2;
 			}
 			return -1;
@@ -244,9 +250,9 @@ export default class Polygon2D {
 		//http://gwlucastrig.github.io/Tinfour/doc/TinfourAlgorithmsAndDataElements.pdf
 
 		const circumcircleTest = (p, v1, v2, v3) => {
-			console.group("Circumcircle test");
-			console.log("Point ", JSON.stringify(p));
-			console.log("Vertices ", JSON.stringify(v1), JSON.stringify(v2), JSON.stringify(v3));
+			//console.group("Circumcircle test");
+			//console.log("Point ", JSON.stringify(p));
+			//console.log("Vertices ", JSON.stringify(v1), JSON.stringify(v2), JSON.stringify(v3));
 			//console.log("Clockwise? ", Polygon2D.ClockwiseOrder([v1, v2, v3]));
 
 			const x13 = v1.x - v3.x;
@@ -262,42 +268,42 @@ export default class Polygon2D {
 			const cosa = (x13 * x23) + (y13 * y23);
 			const cosb = (x2p * x1p) + (y2p * y1p);
 
-			console.log(`cosa ${cosa} | cosb ${cosb}`);
+			//console.log(`cosa ${cosa} | cosb ${cosb}`);
 
-			if ((cosa >= 0) && (cosb >= 0)){
-				console.log("Result false");
-				console.groupEnd();
+			if ((cosa >= 0) && (cosb >= 0)) {
+				//console.log("Result false");
+				//console.groupEnd();
 				return false;
 			}
 			//console.log("cosa >= 0 && cosb >= 0 : false");
 			if ((cosa < 0) && (cosb < 0)) {
-				console.log("Result true");
-				console.groupEnd();
+				//console.log("Result true");
+				//console.groupEnd();
 				return true;
 			}
 			//console.log("cosa < 0 && cosb < 0 : false");
 
 			const sinab = ((x13 * y23) - (x23 * y13)) * cosb + ((x2p * y1p) - (x1p * y2p)) * cosa;
-			if (sinab < 0){
-				console.log("Result true");
-				console.groupEnd();
+			if (sinab < 0) {
+				//console.log("Result true");
+				//console.groupEnd();
 				return true;
 			}
 			//console.log("sinab < 0 : false");
-			console.log("Result false");
-			console.groupEnd();
+			//console.log("Result false");
+			//console.groupEnd();
 			return false;
 		}
 
-		const setAdjacentTriangles = (e0, e1, triA, triB) =>{
-			if(triA != null){
+		const setAdjacentTriangles = (e0, e1, triA, triB) => {
+			if (triA != null) {
 				const adIdTriA = getAdjacentIndex(triA.verts, e0, e1);
-				if(adIdTriA == -1) throw Error(`Edge is not found on triangle ${JSON.stringify(triA.verts)} | edge ${e0} , ${e1}`);
+				if (adIdTriA == -1) throw Error(`Edge is not found on triangle ${JSON.stringify(triA.verts)} | edge ${e0} , ${e1}`);
 				triA.adjacent[adIdTriA] = triB;
 			}
-			if(triB != null){
+			if (triB != null) {
 				const adIdTriB = getAdjacentIndex(triB.verts, e0, e1);
-				if(adIdTriB == -1) throw Error(`Edge is not found on triangle ${JSON.stringify(triB.verts)} | edge ${e0} , ${e1}`);
+				if (adIdTriB == -1) throw Error(`Edge is not found on triangle ${JSON.stringify(triB.verts)} | edge ${e0} , ${e1}`);
 				triB.adjacent[adIdTriB] = triA;
 			}
 		}
@@ -314,7 +320,7 @@ export default class Polygon2D {
 		 * @param {Number} triAVertIndex 
 		 * @param {Number} triBVertIndex 
 		 */
-		const swapDiagonal = (triA, triB, triAVertIndex, triBVertIndex)=>{
+		const swapDiagonal = (triA, triB, triAVertIndex, triBVertIndex) => {
 			let ptVIndex = triAVertIndex;
 			let atVIndex = triBVertIndex;
 
@@ -342,18 +348,18 @@ export default class Polygon2D {
 
 			const adIdB1 = getAdjacentIndex(triA.verts, triA.verts[ptVIndex_m1], triA.verts[ptVIndex]);
 			setAdjacentTriangles(newTriB.verts[1], newTriB.verts[2], newTriB, triA.adjacent[adIdB1]);
-			
+
 			triangles.push(newTriA);
 			triangles.push(newTriB);
 
 			let affectedTriangles = [];
 
-			if(triB.adjacent[adIdB0] != null){
+			if (triB.adjacent[adIdB0] != null) {
 				affectedTriangles.push({
 					at: triB.adjacent[adIdB0], pt: newTriB
 				});
 			}
-			if(triB.adjacent[adIdA1] != null){
+			if (triB.adjacent[adIdA1] != null) {
 				affectedTriangles.push({
 					at: triB.adjacent[adIdA1], pt: newTriA
 				});
@@ -377,57 +383,26 @@ export default class Polygon2D {
 		//Ordering points into bins is optional, and it is only done to increase the performance of the algorithm
 		//Because of that it is going to be implemented in a future version of the system
 
-		let center = Vec2.Zero();
-		for (let i = 0; i < normVerts.length; i++) {
-			const v = normVerts[i];
-			center = Vec2.Add(center, v);
-		}
-		center = Vec2.DivScalar(center, normVerts.length);
 		let currentOrder = [];
 		for (let i = 0; i < normVerts.length; i++) {
 			currentOrder.push({
 				index: i,
-				distance: Vec2.SqrLength(Vec2.Subtract(normVerts[i], center))
+				distance: (Math.random() + Vec2.Length(normVerts[i]) * Math.random())/2
 			});
 		};
 		currentOrder.sort((a, b) => {
 			return a.distance - b.distance;
 		});
 
-		/*let currentOrder = [];
-		const n = Math.pow(normVerts.length, 1/4);
-		console.log("n", n);
-		const nyMax = ymax / dmax;
-		const nxMax = xmax / dmax;
-		for (let i = 0; i < normVerts.length; i++) {
-			const v = normVerts[i];
-			
-			const j = Math.round(0.99 * n * v.y / nyMax);
-			const k = Math.round(0.99 * n * v.x / nxMax);
-			let b;
-			if(j%2 == 0){
-				b = i * n + j + 1;
-			}else{
-				b = (i + 1) * n - j;
-			}
-
-			currentOrder.push({
-				index: i,
-				bin: b
-			});
-		};
-		currentOrder.sort((a,b)=>b.bin - a.bin);*/
-		
 		let error = false;
-		let orderIndex = 0;
 		//Step 4 Loop over each point doing the steps 5 - 7
-		while(currentOrder.length > 0){
-		//for (let orderIndex = 0; orderIndex < currentOrder.length; orderIndex++) {
+		for (let orderIndex = 0; orderIndex < currentOrder.length; orderIndex++) {
 			/*trianglesStates.push(
 				[...triangles]
 			);*/
-			if(error) break;
+			if (error) break;
 			//if(roId >= 20) break;
+
 			let pointId = currentOrder[orderIndex].index;
 			console.group(`ADDING POINT TO DELAUNAY - ID ${pointId}`);
 			addedPoints.push(pointId);
@@ -447,19 +422,12 @@ export default class Polygon2D {
 				const inside = Triangle2D.IsPointInTriangle(nPoint,
 					getVertex(tri.verts[0]), getVertex(tri.verts[1]), getVertex(tri.verts[2]));
 				if (inside) {
-					if(insideTriCount == 0) triId = t;
+					if (insideTriCount == 0) triId = t;
 					trianglesIds.push(t);
 					insideTriCount++;
 				}
 			}
-			/*console.log(`Point is inside ${insideTriCount} triangles`);
-			console.group("Inside triangles");
-			for (let i = 0; i < trianglesIds.length; i++) {
-				const id = trianglesIds[i];
-				const tri = triangles[triId];
-				console.log(`Triangle ${i} | verts: ${JSON.stringify(tri.verts)}`);
-			}
-			console.groupEnd();*/
+			console.assert(insideTriCount <= 1, "The point is inside multiple triangles");
 			if (triId == -1) {
 				console.log(`Error - for some reason no triangle was found for index ${pointId}!!`);
 				throw new Error("No triangle that contains point was found");
@@ -479,7 +447,7 @@ export default class Polygon2D {
 			setAdjacentTriangles(nTri0.verts[1], nTri0.verts[2], nTri0, nTri1);
 			setAdjacentTriangles(nTri0.verts[2], nTri0.verts[0], nTri0, nTri2);
 			setAdjacentTriangles(nTri1.verts[1], nTri1.verts[2], nTri1, nTri2);
-			
+
 			//TODO: ADJACENCY LIST OF TRIANGLES IS NOT BEING UPDATED ON TRIANGLE foundTri
 
 			//Step6
@@ -488,9 +456,9 @@ export default class Polygon2D {
 			(Place the triangles that were adjacent to the affected triangle into a stack)
 			*/
 			let affectedStack = [
-				{at: foundTri.adjacent[2], pt: nTri0},
-				{at: foundTri.adjacent[0], pt: nTri1},
-				{at: foundTri.adjacent[1], pt: nTri2}
+				{ at: foundTri.adjacent[2], pt: nTri0 },
+				{ at: foundTri.adjacent[0], pt: nTri1 },
+				{ at: foundTri.adjacent[1], pt: nTri2 }
 			];
 
 			triangles.splice(triId, 1);
@@ -501,11 +469,11 @@ export default class Polygon2D {
 			//Step7
 			//Restore Delaynay triangulation. While the stack of triangles is not empty, execute Lawsons swapping scheme:
 			let swapIterations = 0;
-			
+
 			while (affectedStack.length > 0) {
 				//s1. Remove a triangle which is opposite P from the top of the stack.
 				const tris = affectedStack.pop();
-				if (tris.at == null) {swapIterations++; console.groupEnd(); continue;}
+				if (tris.at == null) { swapIterations++; console.groupEnd(); continue; }
 
 				/*s2. If P is outside (or on) the circumcircle for this triangle, return to s1 (the new point is not affecting the triangle
 					so it can be safely remove from the stack). Else, the triangle containing P as a vertex and the currently popped
@@ -519,19 +487,19 @@ export default class Polygon2D {
 					break;
 					//throw new Error("Added point in adjacent triangle");
 				}
-				
+
 				const fvId = tris.at.verts.findIndex((v) => !tris.pt.verts.includes(v));
-				if(fvId == -1) throw new Error("Far vertex not found");
+				if (fvId == -1) throw new Error("Far vertex not found");
 				const fvId_m1 = Num.ModGl(fvId - 1, 3);
 				const fvId_p1 = Num.ModGl(fvId + 1, 3);
 
-				console.log(`Index order for circumcircle test | N1 : ${fvId_m1} | N2 : ${fvId_p1} | N3 : ${fvId}`);
-				console.log("Vertices values: ", getVertex(tris.at.verts[fvId_m1]), getVertex(tris.at.verts[fvId_p1]), getVertex(tris.at.verts[fvId]));
+				/*console.log(`Index order for circumcircle test | N1 : ${fvId_m1} | N2 : ${fvId_p1} | N3 : ${fvId}`);
+				console.log("Vertices values: ", getVertex(tris.at.verts[fvId_m1]), getVertex(tris.at.verts[fvId_p1]), getVertex(tris.at.verts[fvId]));*/
 
 				let convexQuad = Polygon2D.IsConvexPolygon([
-					getVertex(tris.at.verts[fvId_m1]), 
-					getVertex(tris.at.verts[fvId]), 
-					getVertex(tris.at.verts[fvId_p1]), 
+					getVertex(tris.at.verts[fvId_m1]),
+					getVertex(tris.at.verts[fvId]),
+					getVertex(tris.at.verts[fvId_p1]),
 					nPoint]);
 
 				const circTest = circumcircleTest(nPoint, getVertex(tris.at.verts[fvId_m1]), getVertex(tris.at.verts[fvId_p1]), getVertex(tris.at.verts[fvId]));
@@ -552,15 +520,123 @@ export default class Polygon2D {
 
 		//Now the polygon is triangulated, the problem is that all the points are only locally triangulated,
 		//which means that there is no global consistency, lets try to mitage that
-
-		const invertNorm = (vert) => {
-			return new Vec2(
-				(vert.x * dmax) + xmin,
-				(vert.y * dmax) + ymin
-			);
+		const removeAdjacent = (e0, e1, adi, tri) => {
+			const edge0 = [tri.verts[e0], tri.verts[e1]];
+			const adjacent0 = tri.adjacent[adi];
+			if (adjacent0 != null) {
+				const adIndex = getAdjacentIndex(adjacent0.verts, edge0[0], edge0[1]);
+				adjacent0.adjacent[adIndex] = null;
+			}
 		}
 
-		if(DEBUG == false){
+		let innerTriangles = [];
+		//Using the polygon as a mask, remove any triangles with centers outside of the polygon
+		for (let i = 0; i < triangles.length; i++) {
+			let tri = triangles[i];
+			let triVerts = [
+				getVertexReal(tri.verts[0]),
+				getVertexReal(tri.verts[1]),
+				getVertexReal(tri.verts[2])
+			];
+			let triCenter = Vec2.DivScalar(Vec2.Add(triVerts[0], Vec2.Add(triVerts[1], triVerts[2])), 3);
+			const insidePoly = Polygon2D.PointInsidePolygon(triCenter, polygon);
+			if (insidePoly) {
+				innerTriangles.push(tri);
+			} else {
+				//Remove polygon from list
+				removeAdjacent(0, 1, 0, tri);
+				removeAdjacent(1, 2, 1, tri);
+				removeAdjacent(2, 0, 2, tri);
+			}
+		}
+		
+		const hasDegenerateAngle = (angles) => {
+			const extremeAngle = angles.findIndex((a) => 
+				(a < Num.DegToRad(5) || a > Num.DegToRad(175) || isNaN(a))
+			);
+			return extremeAngle != -1;
+		}
+
+		const getDegenerateCount = ()=>{
+			let degenerateTriangleCount = 0;
+			for (let it = 0; it < innerTriangles.length; it++) {
+				const tri = innerTriangles[it];
+				const innerAngles = Triangle2D.InternalAngles(
+					getVertexReal(tri.verts[0]),
+					getVertexReal(tri.verts[1]),
+					getVertexReal(tri.verts[2]));
+				if (hasDegenerateAngle(innerAngles)) {
+					degenerateTriangleCount += 1;
+				}
+			}
+			return degenerateTriangleCount;
+		}
+
+		console.log("Degenerate triangle count before : ", getDegenerateCount());
+
+		console.groupCollapsed("Remove While");
+		while (true) {
+			let stopLoop = true;
+			console.group("While Iter");
+			for (let it = 0; it < innerTriangles.length; it++) {
+				const tri = innerTriangles[it];
+				const innerAngles = Triangle2D.InternalAngles(
+					getVertexReal(tri.verts[0]),
+					getVertexReal(tri.verts[1]),
+					getVertexReal(tri.verts[2]));
+
+				if (hasDegenerateAngle(innerAngles)) {
+					const sameTriangles = (triA, triB) => {
+						if(triA == null || triB == null){
+							return false;
+						}else{
+							const index = triB.verts.findIndex(v => !triA.verts.includes(v));
+							return index == -1;
+						}
+					}
+
+					console.assert(sameTriangles(tri, tri.adjacent[0]) || sameTriangles(tri, tri.adjacent[1]), sameTriangles(tri, tri.adjacent[2]), 
+					"It is its own adjacent triangle");
+
+					if((tri.adjacent[0] == null || tri.adjacent[1] == null || tri.adjacent[2] == null)){
+						innerTriangles.splice(it, 1);
+						removeAdjacent(0, 1, 0, tri);
+						removeAdjacent(1, 2, 1, tri);
+						removeAdjacent(2, 0, 2, tri);
+						stopLoop = false;
+						break;
+					}
+				}
+			}
+			console.groupEnd();
+
+			if(stopLoop) break;
+		}
+		console.groupEnd();
+
+		console.group("Left triangle extreme");
+		let degenerateTriangles = [];
+		for (let it = 0; it < innerTriangles.length; it++) {
+			const tri = innerTriangles[it];
+			const innerAngles = Triangle2D.InternalAngles(
+				getVertexReal(tri.verts[0]),
+				getVertexReal(tri.verts[1]),
+				getVertexReal(tri.verts[2]));
+			if (hasDegenerateAngle(innerAngles)) {
+				degenerateTriangles.push(tri);
+				if(tri.adjacent[0] != null) degenerateTriangles.push(tri.adjacent[0]);
+				if(tri.adjacent[1] != null) degenerateTriangles.push(tri.adjacent[1]);
+				if(tri.adjacent[2] != null) degenerateTriangles.push(tri.adjacent[2]);
+			}
+		}
+		console.groupEnd();
+
+		console.log("Degenerate triangle count : ", getDegenerateCount());
+		//Add code that 
+
+		console.log("Degenerate triangle count : ", getDegenerateCount());
+
+		if (DEBUG == false) {
 			//Revert console loggging functions
 			window.console.log = window.consoleBackup.log;
 			window.console.group = window.consoleBackup.group;
@@ -569,7 +645,7 @@ export default class Polygon2D {
 		}
 
 		return {
-			triangles,
+			triangles: innerTriangles,//degenerateTriangles,
 			addedPoints,
 			negVerts: {
 				1: invertNorm(getVertex(-1)),
