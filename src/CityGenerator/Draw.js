@@ -2,7 +2,7 @@ import Triangle2D from "./Geometry/Triangle2D";
 import Vec2 from "./Math/Vec2";
 
 export default class Draw {
-	static DrawDashLine(graphic, from, to, size, width, color) {
+	static DashLine(graphic, from, to, size, width, color) {
 		let relativeToPos = Vec2.Subtract(to, from);
 		let length = Vec2.Length(relativeToPos);
 
@@ -62,19 +62,23 @@ export default class Draw {
 		}
 	}
 
+	static HexColor(R, G, B){
+		return Math.floor(R * 255) << 16 | Math.floor(G * 255) << 8 | Math.floor(B * 255);
+	}
+
 	static RandomColor(minR = 0, minG = 0, minB = 0){
 		const randR = Math.random();
-		let R = Math.floor((minR < randR ? randR : minR) * 255);
+		let R = minR < randR ? randR : minR;
 		const randG = Math.random();
-		let G = Math.floor((minG < randG ? randG : minG) * 255);
+		let G = minG < randG ? randG : minG;
 		const randB = Math.random();
-		let B = Math.floor((minB < randB ? randB : minB) * 255);
+		let B = minB < randB ? randB : minB;
 
-		let color = R | G << 8 | B << 16;
+		let color = Draw.HexColor(R, G, B);
 		return color;
 	}
 
-	static DrawTriangleOutline(graphic, p0, p1, p2, pushDistance, color, lineWidth){
+	static TriangleOutline(graphic, p0, p1, p2, pushDistance, color, lineWidth){
 		let pushedTris = pushDistance > 1e-7 ? Triangle2D.PushVertices(p0, p1, p2, pushDistance) : [p0, p1, p2];
 		graphic.lineStyle(lineWidth, color);
 
@@ -84,11 +88,17 @@ export default class Draw {
 		graphic.lineTo(pushedTris[0].x, pushedTris[0].y);
 	}
 
-	static DrawTriangle(graphic, p0, p1, p2, pushDistance, color){
+	static Triangle(graphic, p0, p1, p2, pushDistance, color){
 		let pushedTris = pushDistance > 1e-7 ? Triangle2D.PushVertices(p0, p1, p2, pushDistance) : [p0, p1, p2];
-
+		graphic.lineStyle(0);
 		graphic.beginFill(color);
 		graphic.drawPolygon(pushedTris);
 		graphic.endFill();
 	}
+
+	/*static TriangleSubdiv(graphic, p0, p1, p2, pushDistance, color){
+		let midP01 = Vec2.DivScalar(Vec2.Add(p0, p1), 2);
+		let midP12 = Vec2.DivScalar(Vec2.Add(p1, p2), 2);
+		let midP20 = Vec2.DivScalar(Vec2.Add(p2, p0), 2);
+	}*/
 }

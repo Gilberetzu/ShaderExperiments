@@ -259,7 +259,7 @@ export default class PolygonGenerator {
 
 		for (let i = 0; i < triangles.length; i++) {
 			let tri = triangles[i];
-			Draw.DrawTriangle(triGraphic, tri.p0, tri.p1, tri.p2, 2, Draw.RandomColor());
+			Draw.Triangle(triGraphic, tri.p0, tri.p1, tri.p2, 2, Draw.RandomColor());
 		}
 	}
 
@@ -354,7 +354,7 @@ export default class PolygonGenerator {
 			this.newEdgeContainer.position.set(lastVertexPos.x, lastVertexPos.y);
 			
 			this.newEdgeGraphics.clear();
-			Draw.DrawDashLine(this.newEdgeGraphics, Vec2.Zero(), Vec2.Subtract(pos, lastVertexPos), new Vec2(48,24), 8, 0xffffff); 
+			Draw.DashLine(this.newEdgeGraphics, Vec2.Zero(), Vec2.Subtract(pos, lastVertexPos), new Vec2(48,24), 8, 0xffffff); 
 		}else{
 			this.newEdgeGraphics.clear();
 		}

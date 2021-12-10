@@ -143,6 +143,13 @@ export default class Vec2 {
 		} 
 	}
 
+	/**
+	 * 
+	 * @param {Number} angle Radian
+	 * @param {Vec2} v 
+	 * @param {Vec2} vRes 
+	 * @returns 
+	 */
 	static Rotate(angle, v, vRes = null){
 		if(vRes == null){
 			vRes = Vec2.Zero();
@@ -162,5 +169,19 @@ export default class Vec2 {
 			rad * Math.cos(angle),
 			rad * Math.sin(angle)
 		);
+	}
+
+	static RandomUnitVec(){
+		let theta = Math.random() * 2 * Math.PI;
+        return new Vec2(Math.cos(theta), Math.sin(theta));
+	}
+
+	static Floor(v,vRes = null){
+		if(vRes == null){
+			vRes = Vec2.Zero();
+		}
+		vRes.x = Math.floor(v.x);
+		vRes.y = Math.floor(v.y);
+		return vRes;
 	}
 }

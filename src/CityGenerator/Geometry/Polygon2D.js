@@ -41,6 +41,30 @@ export default class Polygon2D {
 		return convex;
 	}
 
+	static GetBoundingBox(vertices) {
+		let vert = vertices[0];
+		let maxX = vert.x; let minX = vert.x; let maxY = vert.y; let minY = vert.y;
+
+		for (let i = 1; i < vertices.length; i++) {
+			const v = vertices[i];
+			if (v.x > maxX) maxX = v.x;
+			if (v.x < minX) minX = v.x;
+			if (v.y > maxY) maxY = v.y;
+			if (v.y < minY) minY = v.y;
+		}
+
+		return {
+			maxX,
+			maxY,
+			minX,
+			minY,
+
+			position: new Vec2(minX, minY),
+			width: Math.abs(maxX - minX),
+			height: Math.abs(maxY - minY)
+		}
+	}
+
 	/**
 	 * Returns true if the vertices are in a clockwise order
 	 * @param {Array.<Vec2>} vertices 
@@ -447,8 +471,6 @@ export default class Polygon2D {
 			setAdjacentTriangles(nTri0.verts[1], nTri0.verts[2], nTri0, nTri1);
 			setAdjacentTriangles(nTri0.verts[2], nTri0.verts[0], nTri0, nTri2);
 			setAdjacentTriangles(nTri1.verts[1], nTri1.verts[2], nTri1, nTri2);
-
-			//TODO: ADJACENCY LIST OF TRIANGLES IS NOT BEING UPDATED ON TRIANGLE foundTri
 
 			//Step6
 			/*

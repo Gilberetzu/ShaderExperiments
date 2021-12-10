@@ -24,7 +24,7 @@ export default class Ray2D{
 			hitInfo.t2 = t2;
 		}
 
-		if(t2 >= 0 && t2 <= 1){
+		if(t2 >= 0 && t2 <= 1 && t1 >= 0){
 			return true;
 		}else{
 			return false;

@@ -4,7 +4,7 @@ export default class Triangle2D{
 	static Area(p0, p1, p2){
 		let v1 = Vec2.Subtract(p1, p0);
 		let v2 = Vec2.Subtract(p2, p0);
-		return Vec2.Cross(v1, v2) / 2;
+		return Math.abs(Vec2.Cross(v1, v2) / 2);
 	}
 
 	/**
