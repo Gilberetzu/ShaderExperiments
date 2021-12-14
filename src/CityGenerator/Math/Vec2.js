@@ -1,3 +1,5 @@
+import Num from "./Num";
+
 export default class Vec2 {
 	constructor(x, y) {
 		this.x = x;
@@ -182,6 +184,15 @@ export default class Vec2 {
 		}
 		vRes.x = Math.floor(v.x);
 		vRes.y = Math.floor(v.y);
+		return vRes;
+	}
+
+	static Lerp(v1, v2, t, vRes = null){
+		if(vRes == null){
+			vRes = Vec2.Zero();
+		}
+		vRes.x = Num.Lerp(v1.x, v2.x, t);
+		vRes.y = Num.Lerp(v1.y, v2.y, t);
 		return vRes;
 	}
 }

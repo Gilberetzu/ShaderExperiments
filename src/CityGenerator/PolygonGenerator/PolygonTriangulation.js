@@ -92,18 +92,18 @@ class Triangle {
 		return Vec2.DivScalar(Vec2.Add(this.verts[0].pos, Vec2.Add(this.verts[1].pos, this.verts[2].pos)), 3);
 	}
 
-	angleSquashiness(target, extreme){
+	angleSquashiness(target, extreme) {
 		const iAngles = Triangle2D.InternalAngles(this.verts[0].pos, this.verts[1].pos, this.verts[2].pos);
 		const minAngle = iAngles.sort((a, b) => a - b)[0];
 
 		return Num.ClampedInverseLerp(Num.DegToRad(target), Num.DegToRad(extreme), minAngle);
 	}
 
-	area(){
+	area() {
 		return Triangle2D.Area(this.verts[0].pos, this.verts[1].pos, this.verts[2].pos);
 	}
 
-	areaSquashiness(target, extreme){
+	areaSquashiness(target, extreme) {
 		const currentArea = this.area();
 		return Num.Clamp(Math.abs(Num.InverseLerp(target, extreme, currentArea)), 0, 1);
 	}
@@ -136,16 +136,20 @@ export default class PolygonTriangulation {
 
 		this.graphics = new PIXI.Graphics();
 		this.pixiApp.stage.addChild(this.graphics);
+
+		this.noiseGraphics = new PIXI.Graphics();
+		this.pixiApp.stage.addChild(this.noiseGraphics);
+
 		this.relaxCount = 0;
 
-		this.triConnectionColor = Draw.HexColor(0.2,0.2,1);
-		this.edgeConnectionColor = Draw.RandomColor(0.3,0.5,0.5);
+		this.triConnectionColor = Draw.HexColor(0.2, 0.2, 1);
+		this.edgeConnectionColor = Draw.RandomColor(0.3, 0.5, 0.5);
 
-		this.relaxMultiplier = 0.05;
-		this.relaxOuterMultiplier = 0.1;
+		this.relaxMultiplier = 0.06;
+		this.relaxOuterMultiplier = 0.1;// 0.5;
 
-		this.squashedMultiplier = 8;
-		this.unsquashedMultiplier = -2;
+		this.squashedMultiplier = 1;
+		this.unsquashedMultiplier = 0.1;
 
 		this.perlinTexture = null;
 
@@ -290,7 +294,7 @@ export default class PolygonTriangulation {
 
 			const center = Vec2.DivScalar(Vec2.Add(vert0, Vec2.Add(vert1, vert2)), 3);
 
-			Draw.Triangle(this.graphics, vert0, vert1, vert2, 0, tri.color);
+			Draw.Triangle(this.graphics, vert0, vert1, vert2, 0.25, tri.color);
 
 			if (drawCenter) {
 				this.graphics.lineStyle({
@@ -302,11 +306,11 @@ export default class PolygonTriangulation {
 			}
 
 			let count0 = 0;
-			tri.verts.forEach(vert =>{
-				if(vert.state == 0) count0++;
+			tri.verts.forEach(vert => {
+				if (vert.state == 0) count0++;
 			});
 
-			if(count0 != 0 && count0 != 3){
+			if (count0 != 0 && count0 != 3) {
 				this.graphics.lineStyle({
 					width: 8,
 					color: this.triConnectionColor,
@@ -314,18 +318,18 @@ export default class PolygonTriangulation {
 				});
 
 				let pIndex = -1;
-				if(count0 == 1){
+				if (count0 == 1) {
 					pIndex = tri.verts.findIndex(v => v.state == 0);
-				}else{
+				} else {
 					pIndex = tri.verts.findIndex(v => v.state == 1);
 				}
 
 				const pIndex_m1 = Num.ModGl(pIndex - 1, 3);
 				const pIndex_p1 = Num.ModGl(pIndex + 1, 3);
-	
+
 				const p0 = Vec2.DivScalar(Vec2.Add(tri.verts[pIndex_m1].pos, tri.verts[pIndex].pos), 2);
 				const p1 = Vec2.DivScalar(Vec2.Add(tri.verts[pIndex_p1].pos, tri.verts[pIndex].pos), 2);
-	
+
 				this.graphics.moveTo(p0.x, -p0.y);
 				this.graphics.lineTo(p1.x, -p1.y);
 
@@ -357,7 +361,7 @@ export default class PolygonTriangulation {
 			this.graphics.lineStyle({
 				width: 0
 			});
-			this.graphics.beginFill(vert.state == 0 ? Draw.HexColor(0,0,0) : Draw.HexColor(1,1,1));
+			this.graphics.beginFill(vert.state == 0 ? Draw.HexColor(0, 0, 0) : Draw.HexColor(1, 1, 1));
 			this.graphics.drawCircle(vert.pos.x, -vert.pos.y, 4);
 			this.graphics.endFill();
 		})
@@ -573,8 +577,8 @@ export default class PolygonTriangulation {
 			const triAdNext = ct.adjacent[adNext];
 			const triAdPrev = ct.adjacent[adPrev];
 
-			triAdNext.setAdjacent(ct.verts[adNext], ct.verts[Num.ModGl(adNext + 1, 3)], triAdPrev);
-			triAdPrev.setAdjacent(ct.verts[adPrev], ct.verts[Num.ModGl(adPrev + 1, 3)], triAdNext);
+			if (triAdNext != null) triAdNext.setAdjacent(ct.verts[adNext], ct.verts[Num.ModGl(adNext + 1, 3)], triAdPrev);
+			if (triAdPrev != null) triAdPrev.setAdjacent(ct.verts[adPrev], ct.verts[Num.ModGl(adPrev + 1, 3)], triAdNext);
 		});
 
 		e1.connectedTriangles.forEach(ct => {
@@ -624,7 +628,7 @@ export default class PolygonTriangulation {
 		}
 	}
 
-	randomlyCollapseEdges(){
+	randomlyCollapseEdges() {
 		const targetAngle = 50;
 		const extremeAngle = 30;
 
@@ -632,45 +636,44 @@ export default class PolygonTriangulation {
 		let checkedTrianglesCount = 0;
 		let loopCount = 0;
 		let innerTriangleCount = 0;
-		
+
 		this.triangles.forEach(tri => {
-			if(!tri.hasOuterVertex()) innerTriangleCount++;
+			if (!tri.hasOuterVertex()) innerTriangleCount++;
 		});
-		let maxCollapses = innerTriangleCount * 0.1;
+		let maxCollapses = Math.floor(innerTriangleCount * 0.1);
 
 		console.log("Triangle count: ", this.triangles.length, " Inner triangle count: ", innerTriangleCount, " Max triangle collapse count: ", maxCollapses);
 
-		while(true){
+		while (true) {
 			const tri = this.triangles[triIndex];
 			let collapsedEdge = false;
 			const triOuter = tri.hasOuterVertex();
-			if(!triOuter){ //Only collapse inner triangles
+			if (!triOuter) { //Only collapse inner triangles
 				let angSquash = tri.angleSquashiness(targetAngle, extremeAngle);
 				//console.log("Tri squash:", angSquash);
-				if(angSquash < 0.5){ //Only collapse triangles that are not squashed
+				if (angSquash < 0.5) { //Only collapse triangles that are not squashed
 					const randOffset = Math.floor(Math.random() * 2.99);
 					for (let adIndex = 0; adIndex < tri.adjacent.length; adIndex++) {
-						const adRandIndex = Num.ModGl(adIndex + randOffset, 3); 
+						const adRandIndex = Num.ModGl(adIndex + randOffset, 3);
 						const triAd = tri.adjacent[adRandIndex]; // If the triangle does not hace any outer vertices then there are no null adjacents
-						if(!triAd.hasOuterVertex()){ //Only collapse inner triangles
+						if (!triAd.hasOuterVertex()) { //Only collapse inner triangles
 							let adAngSquash = triAd.angleSquashiness(targetAngle, extremeAngle);
 							//console.log("Adjacent squash:", adAngSquash);
-							if(adAngSquash < 0.5){ //Only collapse triangles that are not squashed
+							if (adAngSquash < 0.5) { //Only collapse triangles that are not squashed
 								//Check the number of triangles that are going to be connected to the resulting vertices
 								const count0 = (tri.verts[adRandIndex].connectedTriangles.length - 2) + (tri.verts[Num.ModGl(adRandIndex + 1, 3)].connectedTriangles.length - 2);
 								const count1 = tri.verts[Num.ModGl(adRandIndex + 2, 3)].connectedTriangles.length - 1;
 								const adTriEdgeIndex = triAd.getAdjacentIndex(tri.verts[adRandIndex], tri.verts[Num.ModGl(adRandIndex + 1, 3)]);
 								const count2 = triAd.verts[Num.ModGl(adTriEdgeIndex + 2, 3)].connectedTriangles.length - 1;
-								
-								if(count0 <= 8 && count0 > 4 && 
-								   count1 > 4 && count1 <= 7 && 
-								   count2 > 4 && count2 <= 7)
-								{//Check if collapsing the edge is not going to cause any problems
+
+								if (count0 <= 8 && count0 > 4 &&
+									count1 > 4 && count1 <= 7 &&
+									count2 > 4 && count2 <= 7) {//Check if collapsing the edge is not going to cause any problems
 									const rand = Math.random();
-									if(rand < 0.35){ //Adding some randomness to the triangles that are collapse
+									if (rand < 0.75) { //Adding some randomness to the triangles that are collapse
 										//console.log("Counts: ", count0, count1, count2)
 										this.collapseEdge(
-											tri.verts[adRandIndex], 
+											tri.verts[adRandIndex],
 											tri.verts[Num.ModGl(adRandIndex + 1, 3)]
 										);
 										collapsedEdge = true;
@@ -682,27 +685,27 @@ export default class PolygonTriangulation {
 					}
 				}
 			}
-			if(collapsedEdge){
+			if (collapsedEdge) {
 				triIndex = Math.floor(Math.random() * this.triangles.length - 0.01);
 				checkedTrianglesCount = 0;
 				let ilegalVert = false;
 				for (let vi = 0; vi < this.vertices.length; vi++) {
 					const vert = this.vertices[vi];
-					if(!vert.outer){
-						if(vert.connectedTriangles.length == 3 || vert.connectedTriangles.length == 4){
+					if (!vert.outer) {
+						if (vert.connectedTriangles.length == 3 || vert.connectedTriangles.length == 4) {
 							console.log(vert);
 							this.problematicVertices.push(vert);
 							ilegalVert = true;
 						}
 					}
 				}
-				if(ilegalVert) break;
+				if (ilegalVert) break;
 				loopCount++;
-				if(loopCount > maxCollapses) break;
-			}else{
+				if (loopCount > maxCollapses) break;
+			} else {
 				triIndex = Num.ModGl(triIndex + 1, this.triangles.length);
 				checkedTrianglesCount++;
-				if(checkedTrianglesCount >= this.triangles.length){
+				if (checkedTrianglesCount >= this.triangles.length) {
 					console.log("Collapse count: ", loopCount);
 					break;
 				}
@@ -710,7 +713,7 @@ export default class PolygonTriangulation {
 		}
 	}
 
-	setTriangleRelaxationForce(tri, mult, distFromCenter){
+	setTriangleRelaxationForce(tri, mult, distFromCenter) {
 		let v0 = tri.verts[0].pos;
 		let v1 = tri.verts[1].pos;
 		let v2 = tri.verts[2].pos;
@@ -766,92 +769,139 @@ export default class PolygonTriangulation {
 		);
 	}
 
-	relaxTriangles(desiredArea, distFromCenter){
-		for (let stepIndex = 0; stepIndex < 32; stepIndex++) {
+	relaxTriangles(desiredArea, distFromCenter) {
+		for (let stepIndex = 0; stepIndex < 8; stepIndex++) {
 			//Generate relaxation force from triangles;
 			this.triangles.forEach(tri => {
-				const angleS = tri.angleSquashiness(55, 25);
-				const areaS = tri.areaSquashiness(desiredArea, desiredArea/2);
-	
+				const angleS = Math.pow(tri.angleSquashiness(55, 25), 2);
+				const areaS = Math.pow(tri.areaSquashiness(desiredArea, desiredArea / 2), 2);
+
 				const maxSquash = Math.max(angleS, areaS);
 				const squishiness = Num.Lerp(this.unsquashedMultiplier, this.squashedMultiplier, maxSquash);// Math.pow(maxSquash, 4);
-				
-				tri.color = Draw.HexColor(
-					Num.Lerp(0, 1, angleS),
-					Num.Lerp(1, 0, angleS),0
-				);
-	
+
+				tri.color = maxSquash > 0.2 ? 
+					Draw.HexColor( 	areaS > angleS ? Num.Lerp(0, 1, areaS) : 0, 
+									areaS < angleS ? Num.Lerp(0, 1, angleS) : 0,
+									0) :
+					Draw.HexColor(0.5,0.5,0.5);
+
 				this.setTriangleRelaxationForce(tri, squishiness, distFromCenter);
 			});
-	
+
 			this.vertices.forEach(vert => {
-				const mult = this.relaxMultiplier * (vert.outer ? this.relaxOuterMultiplier : 1) 
-					* Num.Lerp(0.5, 1, Num.ClampedInverseLerp(8, 5, vert.connectedTriangles.length));
-				
+				const mult = this.relaxMultiplier * (vert.outer ? this.relaxOuterMultiplier : 1);
+					//* Num.Lerp(0.5, 1, Num.ClampedInverseLerp(7, 5, vert.connectedTriangles.length));
+
 				Vec2.Add(Vec2.MultScalar(vert.relaxationForce, mult), vert.pos, vert.pos);
-	
+
 				vert.relaxationForce.x = 0;
 				vert.relaxationForce.y = 0;
 			});
 		}
 	}
 
-	removeSquashedTriangles(desiredArea){
+	removeSquashedOuterTriangles(desiredArea){
 		let triIndex = 0;
 		let collapseCount = 0;
-		let maxCollapse = 8;
-
-		let possibleCollapse = [];
-		while(true){
+		let maxCollapse = 1;
+		while (true) {
+			let collapsedEdge = false;
 			const tri = this.triangles[triIndex];
-			
 			const angleS = tri.angleSquashiness(55, 25);
-			const areaS = tri.areaSquashiness(desiredArea, desiredArea/2);
-			const squashiness =angleS;// Math.max(angleS, areaS);
-
-			if(squashiness > 0.5){ //should be removed
-				const nullAdjacentId = tri.adjacent.findIndex(adTri => adTri == null);
-				
+			const squashiness = angleS;
+			if (squashiness > 0.5) { //should be removed
+				let nullAdjacentTriangleId = tri.adjacent.findIndex(adTri => adTri == null);
 				let edgeLengths = new Array(3);
 				for (let i = 0; i < 3; i++) {
 					const i0 = i;
 					const i1 = Num.ModGl(i + 1, 3);
 					const len = Vec2.SqrLength(Vec2.Subtract(tri.verts[i0].pos, tri.verts[i1].pos));
-					edgeLengths.push({
+					edgeLengths[i] = {
 						index: i0,
 						len: len
-					});
+					};
 				}
-				edgeLengths.sort((a,b)=>a.len - b.len);
+				edgeLengths.sort((a, b) => a.len - b.len);
 
-				if(nullAdjacentId != -1){
-					
-					if(edgeLengths[0].index == nullAdjacentId){
-						possibleCollapse.push({
-							e0: tri.verts[nullAdjacentId],
-							e1: tri.verts[Num.ModGl(nullAdjacentId + 1, 3)],
-							sq: squashiness
-						});
-						//console.log("added to possible collapse");
+				if (nullAdjacentTriangleId != -1) {
+					if (edgeLengths[0].index == nullAdjacentTriangleId) {
+						this.collapseEdge(tri.verts[edgeLengths[0].index], tri.verts[Num.ModGl(edgeLengths[0].index + 1, 3)]);
 					}
-				}else{
+				}
+			}
+			if(collapsedEdge){
+				triIndex = 0;
+				collapseCount++;
+				if(collapseCount >= maxCollapse) break;
+			}else{
+				triIndex++;
+				if (triIndex >= this.triangles.length) {
+					break;
+				}
+			}
+		}
+		return collapseCount;
+	}
+
+	removeSquashedTriangles(desiredArea) {
+		let triIndex = 0;
+		let collapseCount = 0;
+		let maxCollapse = 1;
+
+		let possibleCollapse = [];
+		while (true) {
+			const tri = this.triangles[triIndex];
+
+			const angleS = Math.pow(tri.angleSquashiness(55, 25), 2);
+			const areaS = Math.pow(tri.areaSquashiness(desiredArea, desiredArea / 2), 2);
+			const maxSquash = Math.max(angleS, areaS);
+			
+			/*const areaS = tri.areaSquashiness(desiredArea, desiredArea / 2);
+			const angleS = tri.angleSquashiness(55, 35);
+			const squashiness = Math.max(angleS, areaS);*/
+
+			if (maxSquash > 0.2) { //should be removed
+				let nullAdjacentTriangleId = tri.adjacent.findIndex(adTri => adTri == null);
+				let edgeLengths = new Array(3);
+				for (let i = 0; i < 3; i++) {
+					const i0 = i;
+					const i1 = Num.ModGl(i + 1, 3);
+					const len = Vec2.SqrLength(Vec2.Subtract(tri.verts[i0].pos, tri.verts[i1].pos));
+					edgeLengths[i] = {
+						index: i0,
+						len: len
+					};
+				}
+				edgeLengths.sort((a, b) => a.len - b.len);
+				
+				if (nullAdjacentTriangleId == -1) {
 					for (let ei = 0; ei < 3; ei++) {
 						const edgeIndex = edgeLengths[ei].index;
 						const triAd = tri.adjacent[edgeIndex];
 
-						const count0 = (tri.verts[edgeIndex].connectedTriangles.length - 2) + (tri.verts[Num.ModGl(edgeIndex + 1, 3)].connectedTriangles.length - 2);
-						const count1 = tri.verts[Num.ModGl(edgeIndex + 2, 3)].connectedTriangles.length - 1;
-						const adTriEdgeIndex = triAd.getAdjacentIndex(tri.verts[edgeIndex], tri.verts[Num.ModGl(edgeIndex + 1, 3)]);
-						const count2 = triAd.verts[Num.ModGl(adTriEdgeIndex + 2, 3)].connectedTriangles.length - 1;
+						const v0 = tri.verts[edgeIndex];
+						const v2 = tri.verts[Num.ModGl(edgeIndex + 1, 3)];
+						const v1 = tri.verts[Num.ModGl(edgeIndex + 2, 3)];
 						
-						if(count0 <= 8 && count0 > 4 && 
-							count1 > 4 && count1 <= 8 && 
-							count2 > 4 && count2 <= 8)
+
+						const count0 = (v0.outer || v2.outer) ? -1 : (v0.connectedTriangles.length - 2) + (v2.connectedTriangles.length - 2);
+						const count1 = v1.connectedTriangles.length - 1;
+						let count2 = -1;
+						if (triAd != null) {
+							const adTriEdgeIndex = triAd.getAdjacentIndex(tri.verts[edgeIndex], tri.verts[Num.ModGl(edgeIndex + 1, 3)]);
+							const v3 = triAd.verts[Num.ModGl(adTriEdgeIndex + 2, 3)];
+							count2 = v3.connectedTriangles.length - 1;
+						}
+
+						if (((	count0 > 4 && count0 <= 8) || count0 == -1) 	&&
+								count1 > 4 && count1 <= 8 						&&
+							((	count2 > 4 && count2 <= 8) || count2 == -1))
 						{//Check if collapsing the edge is not going to cause any problems
 							possibleCollapse.push({
-								e0: tri.verts[edgeIndex],
-								e1: tri.verts[Num.ModGl(edgeIndex + 1, 3)],
-								sq: squashiness
+								e0: v0,
+								e1: v2,
+								sq: maxSquash,
+								len: edgeLengths[ei].len
 							});
 							break;
 						}
@@ -860,31 +910,191 @@ export default class PolygonTriangulation {
 			}
 
 			triIndex++;
-			if(triIndex >= this.triangles.length){
-				//console.log("possible collapse length", possibleCollapse.length);
-				if(possibleCollapse.length > 0){
-					let randIndex = Math.floor(Math.random() * (possibleCollapse.length - 0.01));
-					possibleCollapse.sort((a,b) => a.sq - b.sq);
-					this.collapseEdge(possibleCollapse[randIndex].e0, possibleCollapse[randIndex].e1);
+			if (triIndex >= this.triangles.length) {
+				if (possibleCollapse.length > 0) {
+					possibleCollapse.sort((a, b) => a.len - b.len);
+					this.collapseEdge(possibleCollapse[0].e0, possibleCollapse[0].e1);
 					collapseCount++;
 					triIndex = 0;
 					possibleCollapse.splice(0);
-					
-					this.averageEdgeLength = this.averageEdgeLength * (1 + this.triangleAreaContribution);
+
+					this.averageEdgeLength = this.averageEdgeLength * (1 + this.triangleAreaContribution * 1.25);
 
 					this.desiredArea = Math.sqrt(3) * Math.pow(this.averageEdgeLength, 2) / 4;
 					this.distFromCenter = (this.averageEdgeLength / 2) / Math.sin(Num.DegToRad(60));
-					
-					if(collapseCount >= maxCollapse){
-						//console.log("Max");
+
+					if (collapseCount >= maxCollapse) {
 						break;
 					}
-				}else{
+				} else {
 					break;
 				}
 			}
 		}
 		return collapseCount;
+	}
+
+	connectOuterVertices(v0, v1){}
+
+	collapseOctagons() {
+		let vertIndex = 0;
+		while (true) {
+			let collapsedEdge = false;
+			const vert = this.vertices[vertIndex];
+			if (!vert.outer && vert.connectedTriangles.length == 8) {
+				let possibleEdgesCollapse = [];
+				for (let i = 0; i < vert.connectedTriangles.length; i++) {
+					const tri = vert.connectedTriangles[i];
+					const vIndex = tri.verts.findIndex(v => v == vert);
+
+					const edgeIndex = Num.ModGl(vIndex + 1, 3);
+					const triAd = tri.adjacent[edgeIndex];
+
+					/*
+					curren tri
+					   1
+					   /\
+					  /  \
+					0/____\2
+					 \    /
+					  \  /
+					   \/
+					   3
+					adjacent tri
+					*/
+
+					if (triAd == null) { //If it is null, then it is an outer edge so it is safe to remove it
+						const v0 = tri.verts[edgeIndex];
+						const v2 = tri.verts[Num.ModGl(edgeIndex + 1, 3)];
+
+						possibleEdgesCollapse.push({
+							e0: v0,
+							e1: v2,
+							len: Vec2.SqrLength(Vec2.Subtract(v0.pos, v2.pos))
+						});
+					} else {
+						const v0 = tri.verts[edgeIndex];
+						const v2 = tri.verts[Num.ModGl(edgeIndex + 1, 3)];
+						const v1 = tri.verts[Num.ModGl(edgeIndex + 2, 3)];
+						const adTriEdgeIndex = triAd.getAdjacentIndex(tri.verts[edgeIndex], tri.verts[Num.ModGl(edgeIndex + 1, 3)]);
+						const v3 = triAd.verts[Num.ModGl(adTriEdgeIndex + 2, 3)];
+
+						const count0 = /*v0.outer ? -1 : */(v0.connectedTriangles.length - 2) + (v2.connectedTriangles.length - 2);
+						const count1 = v1.connectedTriangles.length - 1;
+						const count2 = v3.oute ? -1 : v3.connectedTriangles.length - 1;
+
+						if (((count0 < 8 && count0 > 4) || count0 == -1) && (count1 > 4 && count1 < 8) && ((count2 > 4 && count2 < 8) || count2 == -1)) {
+							possibleEdgesCollapse.push({
+								e0: v0,
+								e1: v2,
+								len: Vec2.SqrLength(Vec2.Subtract(v0.pos, v2.pos))
+							});
+						}
+					}
+				}
+
+				if (possibleEdgesCollapse.length > 0) {
+					possibleEdgesCollapse.sort((a, b) => a.len - b.len);
+					let edgeToCollapse = possibleEdgesCollapse[0];
+					this.collapseEdge(edgeToCollapse.e0, edgeToCollapse.e1);
+					collapsedEdge = true;
+				}
+			}
+
+			if (collapsedEdge) {
+				vertIndex = 0;
+			} else {
+				vertIndex++;
+				if (vertIndex >= this.vertices.length) break;
+			}
+		}
+	}
+
+	collapseProblematicConfigurations() {
+		let triIndex = 0;
+		while (true) {
+			let restart = false;
+			const tri = this.triangles[triIndex];
+			let connectionCount = [
+				{
+					count: tri.verts[0].connectedTriangles.length,
+					vert: tri.verts[0]
+				},
+				{
+					count: tri.verts[1].connectedTriangles.length,
+					vert: tri.verts[1]
+				},
+				{
+					count: tri.verts[2].connectedTriangles.length,
+					vert: tri.verts[2]
+				}
+			]
+
+			const v0 = tri.verts[0];
+			const v1 = tri.verts[1];
+			const v2 = tri.verts[2];
+
+			connectionCount.sort((a, b) => a.count - b.count);
+
+			if (!v0.outer && !v1.outer && !v2.outer) {
+				if ((connectionCount[0].count == 5 && connectionCount[1].count == 5 && connectionCount[2].count == 5) ||
+					(connectionCount[0].count == 5 && connectionCount[1].count == 5 && connectionCount[2].count == 6))
+				{
+					this.collapseEdge(v0, v1);
+					this.collapseEdge(v0, v2);
+					
+					v0.state = 1;
+					v1.state = 1;
+					v2.state = 1;
+					
+					restart = true;
+				}
+				else if (connectionCount[0].count == 5 && connectionCount[1].count == 5)
+				{
+					this.collapseEdge(connectionCount[0].vert, connectionCount[1].vert);
+					
+					connectionCount[0].vert.state = 1;
+					connectionCount[1].vert.state = 1;
+					
+					restart = true;
+				}
+				else if (connectionCount[0].count == 4){
+					this.collapseEdge(connectionCount[0].vert, connectionCount[1].vert);
+
+					connectionCount[0].vert.state = 1;
+					connectionCount[1].vert.state = 1;
+
+					restart = true;
+				}
+			}
+
+			if(restart){
+				triIndex = 0;
+			}else{
+				triIndex++;
+				if (triIndex >= this.triangles.length) break;
+			}
+		}
+	}
+
+	updateAverageEdgeLength(){
+		this.averageEdgeLength = 0;
+		let count = 0;
+
+		this.triangles.forEach(tri => {
+			for (let i = 0; i < 3; i++) {
+				const e0i = i;
+				const e1i = Num.ModGl(i + 1, 3);
+
+				const vert0 = tri.verts[e0i];
+				const vert1 = tri.verts[e1i];
+
+				const len = Vec2.Length(Vec2.Subtract(vert0.pos, vert1.pos));
+				this.averageEdgeLength += len;
+				count++;
+			}
+		});
+		this.averageEdgeLength = this.averageEdgeLength / count;
 	}
 
 	startTriangulation() {
@@ -894,15 +1104,17 @@ export default class PolygonTriangulation {
 		const noiset1 = performance.now();
 		console.log("Noise generation took: ", noiset1 - noiset0);
 
-		this.graphics.lineStyle({
-			width: 0
-		});
-		for (let i = 0; i < 128; i++) {
-			for (let j = 0; j < 128; j++) {
-				const noise = this.perlinTexture.getNearest(new Vec2(i/127, j/127));
-				this.graphics.beginFill(Draw.HexColor(Math.abs(noise), 0, 0));
-				this.graphics.drawRect(i * 4, j * 4, 4, 4);
-				this.graphics.endFill();	
+		{
+			this.noiseGraphics.lineStyle({
+				width: 0
+			});
+			for (let i = 0; i < 128; i++) {
+				for (let j = 0; j < 128; j++) {
+					const noise = this.perlinTexture.getNearest(new Vec2(i / 127, j / 127));
+					this.noiseGraphics.beginFill(Draw.HexColor(Math.abs(noise), 0, 0));
+					this.noiseGraphics.drawRect(i * 4, j * 4, 4, 4);
+					this.noiseGraphics.endFill();
+				}
 			}
 		}
 
@@ -916,46 +1128,33 @@ export default class PolygonTriangulation {
 		this.CreateTriangleAdjacentList();
 		this.removeSingleAdjacentTriangle();
 		this.updateOuterOnVertices();
+
 		this.moveVerticesToEdges();
 		this.collapseOuterCloseEdges();
 		this.randomlyCollapseEdges();
 
+		//this.collapseOctagons();
+		this.collapseProblematicConfigurations();
+
 		const t1 = performance.now();
 
-		console.log(`Triangle count start ${triCountStart} | end ${this.triangles.length}`);
 		console.log("Time to triangulation: ", t1 - t0);
 
 		console.log("Test clampped", Num.ClampedInverseLerp(Num.DegToRad(50), Num.DegToRad(35), Num.DegToRad(1)));
-		
+
 		this.drawTriangles(false);
 		this.drawVertices();
 		this.problematicVertices.forEach(vert => {
 			this.drawVertex(vert);
 		});
 
-		this.averageEdgeLength = 0;
-		let count = 0;
+		this.updateAverageEdgeLength();
 
-		this.triangles.forEach(tri => {
-			for (let i = 0; i < 3; i++) {
-				const e0i = i;
-				const e1i = Num.ModGl(i + 1, 3);
-				
-				const vert0 = tri.verts[e0i];
-				const vert1 = tri.verts[e1i];
-
-				const len = Vec2.Length(Vec2.Subtract(vert0.pos, vert1.pos));
-				this.averageEdgeLength += len;
-				count++;
-			}
-		});
-		
 		this.triangleAreaContribution = 1 / this.triangles.length;
-		this.averageEdgeLength = this.averageEdgeLength / count;
 		this.desiredArea = Math.sqrt(3) * Math.pow(this.averageEdgeLength, 2) / 4;
 		this.distFromCenter = (this.averageEdgeLength / 2) / Math.sin(Num.DegToRad(60));
 
-		console.log("avg edge lenght:",this.averageEdgeLength, "desired area: ", this.desiredArea, "distance from center:", this.distFromCenter);
+		console.log("avg edge lenght:", this.averageEdgeLength, "desired area: ", this.desiredArea, "distance from center:", this.distFromCenter);
 		console.log("triangle area contribution : ", this.triangleAreaContribution);
 		//Set vertex state
 		{
@@ -978,62 +1177,103 @@ export default class PolygonTriangulation {
 			this.vertices.forEach(vert => {
 				const offset = Vec2.MultComp(Vec2.Subtract(vert.pos, position), new Vec2(1 / width, 1 / height));
 				const noiseVal = this.perlinTexture.getNearest(offset);
-				vert.state = noiseVal > 0 ? 1 : 0;
-			})
+				vert.state = vert.outer ? 0 : noiseVal > 0 ? 1 : 0;
+			});
 		}
 
 		this.relaxCount = 0;
 		let measureRelaxation = false;
-		const relaxationTicker = ()=>{
+		let angleSquashAverage = {
+			initial: 0,
+			current: 0,
+		}
+		let zeroCount = 0;
+		const relaxationTicker = () => {
 			const rt0 = performance.now();
 			this.relaxTriangles(this.desiredArea, this.distFromCenter);
 			const rt1 = performance.now();
 
-			if(this.relaxCount > 60*1.5){
-				if(!measureRelaxation){
+			//console.log("Relaxation time taken : ", rt1 - rt0);
+
+			if (this.relaxCount > 60 * 1.5) {
+				if (!measureRelaxation) {
 					measureRelaxation = true;
 					let squahsAverage = 0;
 					this.triangles.forEach(tri => {
-						squahsAverage += tri.angleSquashiness(55,25);
+						squahsAverage += tri.angleSquashiness(55, 25);
 					});
 					squahsAverage /= this.triangles.length;
+					angleSquashAverage.initial = squahsAverage;
+					
 					console.log("Current sqashiness average: ", squahsAverage);
 				}
 			}
-			let collapseCount = -1;
-			if(this.relaxCount != 0 && this.relaxCount > 60*2 && Num.ModGl(this.relaxCount, 50) == 0){
-				collapseCount = this.removeSquashedTriangles(this.desiredArea);
+			
+			const cst0 = performance.now();
+			if (this.relaxCount != 0 && this.relaxCount > 60 * 1 && Num.ModGl(this.relaxCount, 10) == 0) {
+				let collapseCount = this.removeSquashedOuterTriangles(this.desiredArea) + this.removeSquashedTriangles(this.desiredArea);
+				if(collapseCount == 0){
+					console.log("Current count 0, zero count: ", zeroCount);
+					zeroCount += 1;
+				}else{
+					zeroCount = 0;
+				}
+				{
+					let squahsAverage = 0;
+					this.triangles.forEach(tri => {
+						squahsAverage += tri.angleSquashiness(55, 25);
+					});
+					squahsAverage /= this.triangles.length;
+					angleSquashAverage.current = squahsAverage;
+
+					if(this.relaxCount > 60 * 2){
+						if(angleSquashAverage.current > angleSquashAverage.initial){					
+							console.log("Exit - target angle squash");
+							zeroCount = 2;
+						}else if(angleSquashAverage.current < angleSquashAverage.initial * 0.8){
+							zeroCount += 1;
+						}
+					}
+				}
 			}
+			const cst1 = performance.now();
+			//console.log("Relaxation time taken : ", cst1 - cst0);
 
 			//console.log("Relaxation took: ", rt1 - rt0);
 			this.relaxCount++;
-			if((collapseCount == 0 && this.relaxCount > 60*3) || this.relaxCount > 60*20){
+			if ((zeroCount >= 2 && this.relaxCount > 60 * 2) || this.relaxCount > 60 * 10) {
+				if(this.relaxCount > 60 * 20){
+					console.log("Time limit hit");
+				}
 				let squahsAverage = 0;
 				this.triangles.forEach(tri => {
-					squahsAverage += tri.angleSquashiness(55,25);
+					squahsAverage += tri.angleSquashiness(55, 25);
 				});
 				squahsAverage /= this.triangles.length;
 				console.log("Current sqashiness average: ", squahsAverage);
 
 				this.pixiApp.ticker.remove(relaxationTicker);
 				console.log("Relaxation Finished!!");
+
+				this.triangles.forEach(tri => {tri.color = Draw.HexColor(0.25,0.75,0.5)});
+
+				console.log(`Triangle count start ${triCountStart} | end ${this.triangles.length}`);
+
+				this.updateAverageEdgeLength();
+				window.CityGenerator.addGenerationSpace(this.vertices, this.triangles, this.averageEdgeLength);
 			}
+
+			const drawt0 = performance.now();
 			this.graphics.clear();
 			this.drawTriangles(false);
-			//this.drawVertices();
+			this.drawVertices();
+			const drawt1 = performance.now();
+			//console.log("Drawing time taken : ", drawt1 - drawt0);
 		}
-		
-		setTimeout(()=>{
+
+		setTimeout(() => {
 			console.log("Relaxation ticker added");
 			this.pixiApp.ticker.add(relaxationTicker);
 		}, 500);
 	}
 }
-
-//There needs to be support for the following operations
-// Collapsing edges (which would require the removal of 1 or 2 triangles and a vertex)
-// Collapsing a triangle (which would require the removal its 3 adjacent triangles and 2 vertices)
-// Extra information about the triangles and vertices used is required.
-// For triangles Vertices, Color (for debuging purposes), an array of references to the vertices extra data, and an array of adjacent triangles?
-// For vertices extra data if the vertex is outer, a reference to the vertex vec2 object, the connected triangles
-// Some way to compute what are going to be the new number of connections for the affected vertices
