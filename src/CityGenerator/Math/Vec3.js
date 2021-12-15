@@ -1,3 +1,5 @@
+import Num from "./Num";
+
 export default class Vec3{
 	constructor(x, y, z){
 		this.x = x;
@@ -5,8 +7,16 @@ export default class Vec3{
 		this.z = z;
 	}
 
-	static Zero(){
-		return new Vec3(0,0,0);
+	static Zero(vRes = null){
+		if(vRes == null){
+			vRes = new Vec3(0,0,0);
+			return vRes;
+		}else{
+			vRes.x = 0;
+			vRes.y = 0;
+			vRes.z = 0;
+			return vRes;
+		}
 	}
 
 	static Cross(v1, v2, vRes = null){
@@ -65,28 +75,28 @@ export default class Vec3{
 		return vRes;
 	}
 
-	static MultScalar(v1, s, vRes = null){
-		const z1 = v1.z == undefined ? 0 : v1.z;
+	static MultScalar(v, s, vRes = null){
+		const z = v.z == undefined ? 0 : v.z;
 
 		if(vRes == null){
 			vRes = Vec3.Zero();
 		}
-		vRes.x = v1.x	*	s;
-		vRes.y = v1.y 	* 	s;
-		vRes.z = z1 	* 	s; 
+		vRes.x = v.x	*	s;
+		vRes.y = v.y 	* 	s;
+		vRes.z = z 	* 	s; 
 
 		return vRes;
 	}
 
-	static DivScalar(v1, s, vRes = null){
-		const z1 = v1.z == undefined ? 0 : v1.z;
+	static DivScalar(v, s, vRes = null){
+		const z = v.z == undefined ? 0 : v.z;
 
 		if(vRes == null){
 			vRes = Vec3.Zero();
 		}
-		vRes.x = v1.x	/	s;
-		vRes.y = v1.y 	/ 	s;
-		vRes.z = z1 	/ 	s; 
+		vRes.x = v.x	/	s;
+		vRes.y = v.y 	/ 	s;
+		vRes.z = z 	/ 	s; 
 
 		return vRes;
 	}
@@ -130,6 +140,20 @@ export default class Vec3{
 		vRes.y = v.y / len;
 		vRes.z = z / len;
 
+		return vRes;
+	}
+
+	static Lerp(v1, v2, t, vRes = null){
+		const z1 = v1.z == undefined ? 0 : v1.z;
+		const z2 = v2.z == undefined ? 0 : v2.z;
+
+		if(vRes == null){
+			vRes = Vec2.Zero();
+		}
+
+		vRes.x = Num.Lerp(v1.x, v2.x, t);
+		vRes.y = Num.Lerp(v1.y, v2.y, t);
+		vRes.z = Num.Lerp(z1, z2, t);
 		return vRes;
 	}
 }

@@ -12,61 +12,65 @@ const maxVerticalLayers = 8;
 export default class GenerationSpace{
 	constructor(vertices, triangles, edgeAverageLenght){
 		this.vertices = vertices.map(vert => {
-			let polygon = [];
+			let polyCollider = [];
 			if(!vert.outer){
-				let edges = vert.connectedTriangles.map(tri => {
+				let edgeTri = vert.connectedTriangles.map(tri => {
 					const vIndex = tri.verts.findIndex(v => v == vert);
 					if(vIndex == -1){
 						throw new Error("Vertex not found on connected triangle");
 					}else{
-						return [tri.verts[Num.ModGl(vIndex + 1, 3)], tri.verts[Num.ModGl(vIndex + 2, 3)]];
+						return {
+							edge: [tri.verts[Num.ModGl(vIndex + 1, 3)], tri.verts[Num.ModGl(vIndex + 2, 3)]],
+							tri: tri
+						};
 					}
 				});
-				let polygonVerts = [edges[0][0], edges[0][1]];
-				edges.splice(0, 1);
-				while(edges.length > 1){
-					for (let i = 0; i < edges.length; i++) {
-						const edge = edges[i];
-						if(edge[0] == polygonVerts[polygonVerts.length - 1]){
-							polygonVerts.push(edge[1]);
-							edges.splice(i, 1);
+				let orderedEdges = [
+					{
+						edgeTri: edgeTri[0],
+						tvert: edgeTri[0].edge[1]
+					}
+				];
+				edgeTri.splice(0, 1);
+				while(edgeTri.length > 0){
+					const tvert = orderedEdges[orderedEdges.length - 1].tvert;
+
+					let foundEdge = false;
+					for (let i = 0; i < edgeTri.length; i++) {
+						const edgeT = edgeTri[i];
+						const edge = edgeT.edge;
+						if(edge[0] == tvert){
+							orderedEdges.push({
+								edgeTri: edgeT,
+								tvert: edge[1]
+							});
+							edgeTri.splice(i, 1);
+							foundEdge = true;
 							break;
-						}else if(edge[1] == polygonVerts[polygonVerts.length - 1]){
-							polygonVerts.push(edge[0]);
-							edges.splice(i, 1);
+						}else if(edge[1] == tvert){
+							orderedEdges.push({
+								edgeTri: edgeT,
+								tvert: edge[0]
+							});
+							edgeTri.splice(i, 1);
+							foundEdge = true;
 							break;
 						}
 					}
+					if(!foundEdge) throw new Error("Following edge not found");
 				}
-				polygon = polygonVerts.map(pvert => {
-					return vertices.findIndex(v => v == pvert);
-				});
+
+				for (let i = 0; i < orderedEdges.length; i++) {
+					const oEdge = orderedEdges[i];
+					const triCanvasCenter = oEdge.edgeTri.tri.getCenter();
+					polyCollider.push(Vec2.MultScalar(triCanvasCenter, 1/edgeAverageLenght));
+				}
 			}
 			return {
 				pos: Vec2.MultScalar(vert.pos, 1/edgeAverageLenght),
 				outer: vert.outer,
-				polygon,
-				polygonCollider: []
+				polygonCollider: polyCollider
 			};
-		});
-
-		this.vertices.forEach(vert => {
-			if(!vert.outer){
-				//fill polygon collider with positions
-				let polygonCollider = vert.polygon.map(pvert => {
-					return this.vertices[pvert].pos;
-				});
-				const isClockwise = Polygon2D.ClockwiseOrder(polygonCollider);
-				if(!isClockwise){
-					polygonCollider.reverse();
-				}
-				for (let i = 0; i < polygonCollider.length; i++) {
-					const pVec = polygonCollider[i];
-					const toCenter = Vec2.Subtract(vert.pos, pVec);
-					Vec2.DivScalar(toCenter, 2, toCenter);
-					vert.polygonCollider.push(Vec2.Add(pVec, toCenter));
-				}
-			}
 		});
 
 		this.triangles = triangles.map(tri => {
@@ -84,6 +88,58 @@ export default class GenerationSpace{
 				stateLayer[j] = 0;
 			}
 			this.vertStateLayers.push(stateLayer);
+		};
+	}
+
+	//Relative to the vert position
+	generateVertPositionColorBuffer(vertIndex){
+		const vert = this.vertices[vertIndex];
+		const position = [];
+		const color = [];
+
+		for (let i = 0; i < 8; i++) {
+			if(i < vert.polygonCollider.length){
+				const i0 = i;
+				const i1 = Num.ModGl(i + 1, vert.polygonCollider.length);
+
+				const secColor = new THREE.Color(Draw.HexColor(Math.random(), Math.random(), 0.1));
+				
+				const v0 = Vec2.Zero(); //vert.pos;
+				const v1 = Vec2.MultScalar(Vec2.Subtract(vert.polygonCollider[i0], vert.pos), 1.05);//vert.polygonCollider[i0];
+				const v2 = Vec2.MultScalar(Vec2.Subtract(vert.polygonCollider[i1], vert.pos), 1.05);//vert.polygonCollider[i1];
+
+				//Bottom
+				position.push(v2.y, -0.05, v2.x);
+				position.push(v1.y, -0.05, v1.x);
+				position.push(v0.y, -0.05, v0.x);
+
+				//Side panel
+				position.push(v1.y, -0.05, v1.x);
+				position.push(v2.y, -0.05, v2.x);
+				position.push(v1.y, 1.05, v1.x);
+
+				position.push(v2.y, -0.05, v2.x);
+				position.push(v2.y, 1.05, v2.x);
+				position.push(v1.y, 1.05, v1.x);
+
+				//Top
+				position.push(v0.y, 1.05, v0.x);
+				position.push(v1.y, 1.05, v1.x);
+				position.push(v2.y, 1.05, v2.x);
+
+				for (let i = 0; i < 12; i++) {
+					color.push(secColor.r, secColor.g, secColor.b, 0.5);
+				}
+			}else{
+				for (let i = 0; i < 12; i++) {
+					position.push(0, 0, 0);
+					color.push(0, 0, 0, 1);
+				}
+			}
+		}
+		return {
+			position: position,
+			color: color
 		};
 	}
 
@@ -106,6 +162,25 @@ export default class GenerationSpace{
 
 		let positions = [];
 		let colors = [];
+
+		/*this.vertices.forEach(vert => {
+			const newColor = new THREE.Color(Draw.HexColor(Math.random(), 0.25,0.25));
+			const centerPos = vert.pos;
+			for (let i = 0; i < vert.polygonCollider.length; i++) {
+				const i0 = i;
+				const i1 = Num.ModGl(i+1, vert.polygonCollider.length);
+
+				positions.push(centerPos.y, 0, centerPos.x);
+				positions.push(vert.polygonCollider[i0].y, 0, vert.polygonCollider[i0].x);
+				positions.push(vert.polygonCollider[i1].y, 0, vert.polygonCollider[i1].x);
+
+				colors.push(newColor.r, newColor.g, newColor.b, 1);
+				colors.push(newColor.r, newColor.g, newColor.b, 1);
+				colors.push(newColor.r, newColor.g, newColor.b, 1);
+			}
+		})*/
+
+		const TriColor = new THREE.Color(0xff683b);
 		this.triangles.forEach(tri => {
 			const v0 = this.vertices[tri[0]].pos;
 			const v1 = this.vertices[tri[1]].pos;
@@ -117,10 +192,10 @@ export default class GenerationSpace{
 			positions.push(pushedVerts[1].y, 0, pushedVerts[1].x);
 			positions.push(pushedVerts[2].y, 0, pushedVerts[2].x);
 
-			const newColor = new THREE.Color(Draw.RandomColor(0.3,0.3,0.3));
-			colors.push(newColor.r, newColor.g, newColor.b, 1);
-			colors.push(newColor.r, newColor.g, newColor.b, 1);
-			colors.push(newColor.r, newColor.g, newColor.b, 1);
+			
+			colors.push(TriColor.r, TriColor.g, TriColor.b, 1);
+			colors.push(TriColor.r, TriColor.g, TriColor.b, 1);
+			colors.push(TriColor.r, TriColor.g, TriColor.b, 1);
 			
 		});
 
@@ -136,5 +211,17 @@ export default class GenerationSpace{
 
 		const triangleMesh = new THREE.Mesh( triangleGeometry, triangleMaterial );
 		scene.add( triangleMesh );
+	}
+
+	getVertCollisionIndex(pos){
+		for (let i = 0; i < this.vertices.length; i++) {
+			const vert = this.vertices[i];
+			if(!vert.outer){
+				if(Polygon2D.PointInsidePolygon(pos, vert.polygonCollider)){
+					return i;
+				}
+			}
+		}
+		return -1;
 	}
 }
