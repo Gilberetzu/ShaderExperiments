@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import ModelManager from './ModelManager';
 import Draw from '../Draw';
 import Num from '../Math/Num';
 import Vec2 from '../Math/Vec2';
@@ -47,13 +48,15 @@ export default class BuildingGenerator{
 		const mouseRayTestGeom = new THREE.BoxGeometry(0.5, 0.5, 0.5, 1, 1, 1);
 		const mouseRayTestMat = new THREE.MeshBasicMaterial({color: Draw.HexColor(0.5,0.5,1.0)});
 		this.mouseRayTestMesh = new THREE.Mesh(mouseRayTestGeom, mouseRayTestMat);
-		this.spacePlane = new THREE.Plane(new THREE.Vector3(0,1,0));
+
 		this.mouseRayMeshTargetPos = Vec3.Zero();
 		this.scene.add(this.mouseRayTestMesh);
 
 		this.hoveredVertex = {
 			spaceIndex: 0,
-			vertIndex: -1
+			layerIndex: -1,
+			vertIndex: -1,
+			adjacentIndex: -1
 		};
 
 		this.hoveredPositionBuffer = new THREE.Float32BufferAttribute(new Float32Array( 12 * 8 * 3 ) , 3);
@@ -69,6 +72,9 @@ export default class BuildingGenerator{
 		
 		this.hoveredMesh = new THREE.Mesh(this.hoveredGeometryBuffer, this.hoveredMaterial);
 		this.scene.add(this.hoveredMesh);
+
+		this.canEditSpace = true;
+		this.modelManager = new ModelManager();
 	}
 
 	systemUpdate(time){
@@ -129,7 +135,7 @@ export default class BuildingGenerator{
 			const forward = Vec3.Normalize(new Vec3(rotToSpace.x, 0, rotToSpace.z));
 			const right = Vec3.Cross(forward, new Vec3(0,1,0));
 			
-			const movSpeed = (inputStore.keyboard["ShiftLeft"] ? 2.5 : 1) * dt * 2 / 1000;
+			const movSpeed = (inputStore.keyboard["ShiftLeft"] ? 4 : 1) * dt * 2 / 1000;
 
 			const movementVec = Vec3.Add(
 				new Vec3(0, movSpeed * movementInput.y, 0),
@@ -144,13 +150,30 @@ export default class BuildingGenerator{
 			this.cameraChange = true;
 		}
 
-		if(this.cameraChange){
-			Vec3.Copy(this.cameraPosition, this.camera.position);
-			const lookAtPos = Vec3.Add(this.cameraPosition, rotToSpace);
+		if(Math.abs(inputStore.mouse.scrollDelta.y) > 0.001){
+			const movSpeed = - Math.sign(inputStore.mouse.scrollDelta.y) * (inputStore.keyboard["ShiftLeft"] ? 4 : 1) * dt * 0.02;
+			Vec3.Add(Vec3.MultScalar(rotToSpace, movSpeed ), this.cameraPosition, this.cameraPosition);
+			this.cameraChange = true;
+		}
+
+		//if(this.cameraChange){
+			Vec3.Lerp(this.camera.position, this.cameraPosition, 0.5, this.camera.position);
+			const lookAtPos = Vec3.Add(this.camera.position, rotToSpace);
 			this.camera.lookAt(lookAtPos.x, lookAtPos.y, lookAtPos.z);
 			
 			this.cameraChange = false;
-		}
+		//}
+	}
+
+	updateHoveredGeometryBuffer(){
+		const geomBuffers = 
+				this.generationSpaces[this.hoveredVertex.spaceIndex].generateVertPositionColorBuffer(
+					this.hoveredVertex.layerIndex, this.hoveredVertex.vertIndex, this.hoveredVertex.adjacentIndex);
+			
+		this.hoveredPositionBuffer.copyArray(geomBuffers.position);
+		this.hoveredPositionBuffer.needsUpdate = true;
+		this.hoveredColorBuffer.copyArray(geomBuffers.color);
+		this.hoveredColorBuffer.needsUpdate = true;
 	}
 
 	rayFromCameraToSpace(inputStore){
@@ -160,52 +183,48 @@ export default class BuildingGenerator{
 		mousePos.y =  - ( mousePos.y / this.size.height ) * 2 + 1;
 
 		this.mouseRaycaster.setFromCamera(mousePos, this.camera);
-		let intersectionPosition = new THREE.Vector3(0,0,0);
-		this.mouseRaycaster.ray.intersectPlane(this.spacePlane, intersectionPosition);
 
-		if(intersectionPosition != null){
-			if(this.generationSpaces.length > 0){
-				const collisionIndex = this.generationSpaces[0].getVertCollisionIndex(new Vec2(intersectionPosition.z, intersectionPosition.x));
-				if(collisionIndex == -1){
-					Vec3.Copy(intersectionPosition, this.mouseRayMeshTargetPos);
+		if(this.generationSpaces.length > 0){
+			const hitData = this.generationSpaces[0].raycastToSpace(this.mouseRaycaster.ray);
+			//console.log(hitData);
+			if(hitData.layerIndex == -1){
+				Vec3.Zero(this.mouseRayMeshTargetPos);
 
-					if(this.hoveredVertex.vertIndex != -1){
-						Vec3.Zero(this.hoveredMesh.position);
-						for (let i = 0; i < this.hoveredPositionBuffer.array.length; i++) {
-							this.hoveredPositionBuffer.array[i] = 0;
-						}
-						for (let i = 0; i < this.hoveredColorBuffer.array.length; i++) {
-							this.hoveredPositionBuffer.array[i] = 0;
-						}
-						this.hoveredPositionBuffer.needsUpdate = true;
-						this.hoveredColorBuffer.needsUpdate = true;
-
-						this.hoveredVertex.vertIndex = -1;
+				if(this.hoveredVertex.layerIndex != -1){
+					Vec3.Zero(this.hoveredMesh.position);
+					for (let i = 0; i < this.hoveredPositionBuffer.array.length; i++) {
+						this.hoveredPositionBuffer.array[i] = 0;
 					}
-				}else if(this.hoveredVertex.vertIndex != collisionIndex){
-					this.hoveredVertex.spaceIndex = 0;
-					this.hoveredVertex.vertIndex = collisionIndex;
-
-					const geomBuffers = this.generationSpaces[this.hoveredVertex.spaceIndex].generateVertPositionColorBuffer(this.hoveredVertex.vertIndex);
-					
-					this.hoveredPositionBuffer.copyArray(geomBuffers.position);
+					for (let i = 0; i < this.hoveredColorBuffer.array.length; i++) {
+						this.hoveredPositionBuffer.array[i] = 0;
+					}
 					this.hoveredPositionBuffer.needsUpdate = true;
-					this.hoveredColorBuffer.copyArray(geomBuffers.color);
 					this.hoveredColorBuffer.needsUpdate = true;
 
-					const vertPos = this.generationSpaces[this.hoveredVertex.spaceIndex].vertices[this.hoveredVertex.vertIndex].pos;
-
-					this.hoveredMesh.position.z = vertPos.x;
-					this.hoveredMesh.position.x = vertPos.y;
-					this.hoveredMesh.position.y = 0.01;
-					
-					this.mouseRayMeshTargetPos.z = vertPos.x;
-					this.mouseRayMeshTargetPos.x = vertPos.y;
-					this.mouseRayMeshTargetPos.y = 0.5;
+					this.hoveredVertex.spaceIndex = 0;
+					this.hoveredVertex.layerIndex = hitData.layerIndex;
+					this.hoveredVertex.vertIndex = hitData.vertIndex;
+					this.hoveredVertex.adjacentIndex = hitData.adjacentIndex;
 				}
+			}else if(this.hoveredVertex.layerIndex != hitData.layerIndex || this.hoveredVertex.vertIndex != hitData.vertIndex || this.hoveredVertex.adjacentIndex != hitData.adjacentIndex){
+				this.hoveredVertex.spaceIndex = 0;
+				this.hoveredVertex.layerIndex = hitData.layerIndex;
+				this.hoveredVertex.vertIndex = hitData.vertIndex;
+				this.hoveredVertex.adjacentIndex = hitData.adjacentIndex;
+
+				this.updateHoveredGeometryBuffer();
+
+				const vertPos = 
+					this.generationSpaces[this.hoveredVertex.spaceIndex].vertices[this.hoveredVertex.vertIndex].pos;
+
+				this.hoveredMesh.position.z = vertPos.x;
+				this.hoveredMesh.position.x = vertPos.y;
+				this.hoveredMesh.position.y = this.hoveredVertex.layerIndex;
+				
+				this.mouseRayMeshTargetPos.z = vertPos.x;
+				this.mouseRayMeshTargetPos.x = vertPos.y;
+				this.mouseRayMeshTargetPos.y = this.hoveredVertex.layerIndex + 0.5;
 			}
-		}else{
-			Vec3.Zero(this.mouseRayMeshTargetPos);
 		}
 
 		Vec3.Lerp(this.mouseRayTestMesh.position, this.mouseRayMeshTargetPos, 0.2, this.mouseRayTestMesh.position);
@@ -221,5 +240,14 @@ export default class BuildingGenerator{
 		let inputStore = window.CityGenerator.input;
 		this.cameraMovementAndRotation(inputStore, dt);
 		this.rayFromCameraToSpace(inputStore);
+
+		if(inputStore.mouse.buttons[0] && this.canEditSpace && this.hoveredVertex.layerIndex != -1){
+			this.generationSpaces[this.hoveredVertex.spaceIndex].setVertStateToBuilding(this.hoveredVertex);
+			this.updateHoveredGeometryBuffer();
+			this.generationSpaces[this.hoveredVertex.spaceIndex].updateSpaceGeometry(this.modelManager);
+			this.canEditSpace = false;
+		}else if(!inputStore.mouse.buttons[0] && !this.canEditSpace){
+			this.canEditSpace = true;
+		}
 	}
 }

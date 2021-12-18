@@ -156,4 +156,11 @@ export default class Vec3{
 		vRes.z = Num.Lerp(z1, z2, t);
 		return vRes;
 	}
+
+	static Dot(v1, v2){
+		const z1 = v1.z == undefined ? 0 : v1.z;
+		const z2 = v2.z == undefined ? 0 : v2.z;
+
+		return v1.x * v2.x + v1.y * v2.y + z1 * z2;
+	}
 }

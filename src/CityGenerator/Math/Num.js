@@ -8,8 +8,8 @@ export default class Num{
 	static ModGl(a, b){
 		return a - b * Math.floor(a / b);
 	}
-	static Clamp(v, min, max){
-		return Math.max(min, Math.min(max, v));
+	static Clamp(a, min, max){
+		return Math.max(min, Math.min(max, a));
 	}
 	static InverseLerp(a, b, t)
 	{

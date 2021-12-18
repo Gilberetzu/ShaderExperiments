@@ -4,7 +4,6 @@
 
 <script>
     import { onMount } from 'svelte';
-	import BuildingGenerator from "../CityGenerator/PolygonGenerator/BuildingGenerator";
 
     let pixiSpaceCanvas;
     let threeSpaceCanvas;
@@ -49,6 +48,10 @@
             await import('../CityGenerator/PolygonGenerator/UICanvas')
         ).default;
 
+		let BuildingGenerator = (
+            await import('../CityGenerator/PolygonGenerator/BuildingGenerator')
+        ).default;
+
         window.CityGenerator = {
             input: input,
 			getContainerSize: ()=>{
@@ -76,7 +79,8 @@
 			}else{
 				pixiSpace.systemUpdate(time);
 			}
-			
+			input.mouse.scrollDelta.x = 0;
+			input.mouse.scrollDelta.y = 0;
 			requestAnimationFrame(systemUpdate);
 		}
 		systemUpdate(performance.now());
@@ -84,6 +88,7 @@
 </script>
 
 <svelte:window
+	on:contextmenu={(e)=>{e.preventDefault();}}
     on:mousedown={(e) => {
 		e.preventDefault();
         input.mouse.buttons[e.button] = true;
@@ -93,6 +98,7 @@
         updateMousePosition(e);
     }}
     on:mouseup={(e) => {
+		e.preventDefault();
         input.mouse.buttons[e.button] = false;
         updateMousePosition(e);
     }}
@@ -107,6 +113,12 @@
 			e.preventDefault();
 			input.keyboard[e.code] = false;
 		}
+	}}
+	on:wheel={(e) => {
+		//e.preventDefault();
+		input.mouse.scrollDelta.x = e.deltaX;
+		input.mouse.scrollDelta.y = e.deltaY;
+		//console.log(input.mouse.scrollDelta);
 	}}
 />
 
