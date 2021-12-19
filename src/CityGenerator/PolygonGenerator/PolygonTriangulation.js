@@ -157,6 +157,8 @@ export default class PolygonTriangulation {
 		this.distanceFromCenter = 0;
 		this.averageEdgeLength = 0;
 		this.triangleAreaContribution = 0;
+
+		this.relaxingTriangles = false;
 	}
 
 	generateTriangleGrid() {
@@ -1098,6 +1100,7 @@ export default class PolygonTriangulation {
 	}
 
 	startTriangulation() {
+		this.relaxingTriangles = true;
 		this.graphics.clear();
 		const noiset0 = performance.now();
 		this.perlinTexture = new PerlinNoise(128, 8);
@@ -1258,6 +1261,8 @@ export default class PolygonTriangulation {
 				this.triangles.forEach(tri => {tri.color = Draw.HexColor(0.25,0.75,0.5)});
 
 				console.log(`Triangle count start ${triCountStart} | end ${this.triangles.length}`);
+
+				this.relaxingTriangles = false;
 
 				this.updateAverageEdgeLength();
 				window.CityGenerator.addGenerationSpace(this.vertices, this.triangles, this.averageEdgeLength);

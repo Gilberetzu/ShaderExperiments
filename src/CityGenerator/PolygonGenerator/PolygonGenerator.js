@@ -569,7 +569,9 @@ export default class PolygonGenerator {
 				if(this.polygonTriangulator == null){
 					this.polygonTriangulator = new PolygonTriangulation(pVertices, TRIANGLE_EDGE, this.pixiApp);
 				}
-				this.polygonTriangulator.startTriangulation();
+				if(this.polygonTriangulator.relaxingTriangles == false){
+					this.polygonTriangulator.startTriangulation();
+				}
 
 				this.polygonVertices.forEach(pv => pv.graphics.clear());
 			} else {
