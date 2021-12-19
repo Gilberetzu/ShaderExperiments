@@ -137,11 +137,10 @@ export default class GenerationSpace{
 	}
 
 	//Relative to the vert position
-	generateVertPositionColorBuffer(layerIndex, vertIndex, adjacentIndex){
+	generateVertPositionColorBuffer(layerIndex, vertIndex, adjacent){
 		const vert = this.vertices[vertIndex];
 		const position = [];
 		const color = [];
-		const adIndex = vert.adjacentVertices.findIndex(adV => adV == adjacentIndex);
 
 		const redColor = new THREE.Color(1,0.3,0.3);
 		const whiteColor = new THREE.Color(1,1,1);
@@ -156,27 +155,27 @@ export default class GenerationSpace{
 							  this.vertStateLayers[layerIndex + 1].stateLayer[vertIndex] == VERT_STATE.BUILDING	? 2 :
 							  3;
 
-				const secColor = adIndex == i ? redColor : whiteColor;
+				const secColor = adjacent ? redColor : whiteColor;
 
-				const height = (state == 0 || state == 1) ? 0.55 : 1.05;
+				const height = 0.55;//(state == 0 || state == 1) ? 0.55 : 1.05;
 				
 				const v0 = Vec2.Zero(); //vert.pos;
 				const v1 = Vec2.MultScalar(Vec2.Subtract(vert.polygonCollider[i0], vert.pos), 1.1);
 				const v2 = Vec2.MultScalar(Vec2.Subtract(vert.polygonCollider[i1], vert.pos), 1.1);
 
 				//Bottom
-				position.push(v0.y, -0.05, v0.x);
-				position.push(v1.y, -0.05, v1.x);
-				position.push(v2.y, -0.05, v2.x);
+				position.push(v0.y, -height, v0.x);
+				position.push(v1.y, -height, v1.x);
+				position.push(v2.y, -height, v2.x);
 
 				//Side panel
 				position.push(v1.y, height, v1.x);
-				position.push(v2.y, -0.05, v2.x);
-				position.push(v1.y, -0.05, v1.x);				
+				position.push(v2.y, -height, v2.x);
+				position.push(v1.y, -height, v1.x);				
 
 				position.push(v1.y, height, v1.x);
 				position.push(v2.y, height, v2.x);
-				position.push(v2.y, -0.05, v2.x);
+				position.push(v2.y, -height, v2.x);
 
 				for (let i = 0; i < 9; i++) {
 					const midColor = state == 0 ? redColor : secColor;
@@ -266,6 +265,25 @@ export default class GenerationSpace{
 		scene.add( this.spaceMesh );
 	}
 
+	rayToPolygonPlane(planeHeight, ray, layerIndex, predicate){
+		const plane = new THREE.Plane(new THREE.Vector3(0,1,0), planeHeight);
+		const planeIntersection = new THREE.Vector3(0,0,0);
+		ray.intersectPlane(plane, planeIntersection);
+		if(planeIntersection != null){
+			const stateLayer = this.vertStateLayers[layerIndex].stateLayer;
+			const pos2d = new Vec2(planeIntersection.z, planeIntersection.x);
+			for (let vertIndex = 0; vertIndex < this.vertices.length; vertIndex++) {
+				const vert = this.vertices[vertIndex];
+				if(!vert.outer && predicate(stateLayer[vertIndex])){
+					if(Polygon2D.PointInsidePolygon(pos2d, vert.polygonCollider)){
+						return vertIndex;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
 	/**
 	 * 
 	 * @param {THREE.Ray} ray 
@@ -282,6 +300,84 @@ export default class GenerationSpace{
 		const ray2d = len2d > 0.001 ? new Ray2D( ray2dOrigin, Vec2.Normalize(ray2dDir)) : null;
 		if(dotVertical < 0){
 			for (let layerIndex = currentLayer; layerIndex >= 0; layerIndex--) {
+				//Check top part of the vertex
+				const planeHeight = -layerIndex - 0.5;
+				const vertIndex = this.rayToPolygonPlane(planeHeight, ray, layerIndex, 
+					(state)=>{return state != VERT_STATE.AIR && state != VERT_STATE.WATER;})
+				if(vertIndex != -1){
+					return {
+						layerIndex,
+						vertIndex: vertIndex,
+						adjacentIndex: -1
+					};
+				}
+
+				//Check sides of vertex
+				if(ray2d != null){
+					const layerIndex1 = layerIndex + 1;
+					const layer = this.vertStateLayers[layerIndex];
+					if(layer.inUse){
+						let minDistance = -1;
+						let hitData = {
+							vertIndex: -1,
+							adjacentIndex: -1
+						}
+						//Collide with all the polygon faces in 2d space
+						for (let vertIndex = 0; vertIndex < this.vertices.length; vertIndex++) {
+							if(layer.stateLayer[vertIndex] == VERT_STATE.BUILDING)
+							{
+								const vert = this.vertices[vertIndex];
+								const polyCollider = vert.polygonCollider;
+								const adjacentVertices = vert.adjacentVertices;
+								for (let pIndex = 0; pIndex < polyCollider.length; pIndex++) {
+									const i0 = pIndex;
+									const i1 = Num.ModGl(pIndex + 1, polyCollider.length);
+									
+									const adVertIndex = adjacentVertices[i0];
+									if(layer.stateLayer[adVertIndex] != VERT_STATE.BUILDING){
+										const edge = {a: polyCollider[i0], b: polyCollider[i1]}
+										let hitInfo = {};
+										if(Ray2D.RayLineIntersect(ray2d, edge, hitInfo)){
+											if(minDistance == -1 || hitInfo.t1 < minDistance ){
+												const hitPosition3d = Vec3.Add(Vec3.MultScalar(ray.direction, hitInfo.t1 / len2d), ray.origin);
+												if(hitPosition3d.y >= layerIndex - 0.5 && hitPosition3d.y < layerIndex + 0.5){
+													minDistance = hitInfo.t1,
+													hitData.vertIndex = vertIndex;
+													hitData.adjacentIndex = adVertIndex;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						//Check if the collision is valid in 3d space
+						if(minDistance != -1){
+							return {
+								layerIndex,
+								vertIndex: hitData.vertIndex,
+								adjacentIndex: hitData.adjacentIndex
+							}
+						}
+					}
+				}
+
+				if(layerIndex == 0){
+					const planeHeight = 0.0;
+					const vertIndex = this.rayToPolygonPlane(planeHeight, ray, 0, 
+						(state)=>{return state != VERT_STATE.AIR;})
+					if(vertIndex != -1){
+						return {
+							layerIndex,
+							vertIndex: vertIndex,
+							adjacentIndex: -1
+						};
+					}
+				}
+
+				 
+			}
+			/*for (let layerIndex = currentLayer; layerIndex >= 0; layerIndex--) {
 				const layer = this.vertStateLayers[layerIndex];
 				//Check collision in layer section
 				if(ray2d != null){
@@ -326,17 +422,11 @@ export default class GenerationSpace{
 							}
 							//Check if the collision is valid in 3d space
 							if(minDistance != -1){
-								//const hitPosition3d = Vec3.Add(Vec3.MultScalar(ray.direction, minDistance / len2d), ray.origin);
-								//if(hitPosition3d.y >= layerIndex && hitPosition3d.y < layerIndex + 1){
-									//console.log("Found collision, height", hitPosition3d.y, "Layer index: ", layerIndex);
-									//console.log("Collision data: ", layerIndex, hitData.vertIndex, hitData.adjacentIndex)
-									//Valid hit
-									return {
-										layerIndex,
-										vertIndex: hitData.vertIndex,
-										adjacentIndex: hitData.adjacentIndex
-									}
-								//}
+								return {
+									layerIndex,
+									vertIndex: hitData.vertIndex,
+									adjacentIndex: hitData.adjacentIndex
+								}
 							}
 						}
 					}
@@ -344,7 +434,7 @@ export default class GenerationSpace{
 
 				//If a valid hit on the section was not found, then try finding a valid collision on the floor
 				//Check collision in layer floor
-				if(layerIndex < maxVerticalLayers - 1){
+				if(layerIndex < maxVerticalLayers - 2){
 					plane.constant = -layerIndex;
 					const planeIntersection = new THREE.Vector3(0,0,0);
 					ray.intersectPlane(plane, planeIntersection);
@@ -367,7 +457,7 @@ export default class GenerationSpace{
 					}
 				}
 				
-			}
+			}*/
 		}
 
 		return {
@@ -379,11 +469,12 @@ export default class GenerationSpace{
 
 	changeInstanceScaleColor(layerIndex, vertIndex){
 		const vert = this.vertices[vertIndex];
+		const state = this.vertStateLayers[layerIndex].stateLayer[vertIndex];
 		const instanceMatrix = new THREE.Matrix4();
 		instanceMatrix.setPosition(vert.pos.y, layerIndex, vert.pos.x);
-		instanceMatrix.scale(new THREE.Vector3(1,1,1).multiplyScalar(VERT_STATE[VERT_STATE.BUILDING].scale));
+		instanceMatrix.scale(new THREE.Vector3(1,1,1).multiplyScalar(VERT_STATE[state].scale));
 		this.vertLayersInstancedMeshes[layerIndex].setMatrixAt(vertIndex, instanceMatrix);
-		this.vertLayersInstancedMeshes[layerIndex].setColorAt(vertIndex, VERT_STATE[VERT_STATE.BUILDING].color);
+		this.vertLayersInstancedMeshes[layerIndex].setColorAt(vertIndex, VERT_STATE[state].color);
 
 		this.vertLayersInstancedMeshes[layerIndex].instanceMatrix.needsUpdate = true;
 		this.vertLayersInstancedMeshes[layerIndex].instanceColor.needsUpdate = true;
@@ -394,13 +485,24 @@ export default class GenerationSpace{
 			const changeVertIndex = hitInfo.adjacentIndex == -1 ? hitInfo.vertIndex : hitInfo.adjacentIndex;
 			if(!this.vertices[changeVertIndex].outer){
 				let layerIndex = hitInfo.layerIndex;
-				if(this.vertStateLayers[layerIndex].stateLayer[changeVertIndex] == VERT_STATE.BUILDING){
+				if(this.vertStateLayers[layerIndex].stateLayer[changeVertIndex] == VERT_STATE.BUILDING && hitInfo.layerIndex < maxVerticalLayers - 2){
 					layerIndex++;
 				}
 
 				this.vertStateLayers[layerIndex].stateLayer[changeVertIndex] = VERT_STATE.BUILDING;
 				this.changeInstanceScaleColor(layerIndex, changeVertIndex);
 				this.vertStateLayers[layerIndex].inUse = true;
+			}
+		}
+	}
+
+	clearVertState(hitInfo){
+		if(hitInfo.layerIndex != -1 && hitInfo.vertIndex != -1){
+			const changeVertIndex = hitInfo.vertIndex;
+			if(!this.vertices[changeVertIndex].outer){
+				let layerIndex = hitInfo.layerIndex;
+				this.vertStateLayers[layerIndex].stateLayer[changeVertIndex] = layerIndex == 0 ? VERT_STATE.WATER : VERT_STATE.AIR;
+				this.changeInstanceScaleColor(layerIndex, changeVertIndex);
 			}
 		}
 	}

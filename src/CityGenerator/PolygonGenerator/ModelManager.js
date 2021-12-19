@@ -11,11 +11,13 @@ const relativeVecs = {
 		base: new Vec2(0,	 vertMaxDist),
 		v1: new Vec2(-0.5, 	-vertMaxDist),
 		v2: new Vec2(0.5, 	-vertMaxDist),
+		dir: new Vec2(0, 1)
 	},
 	close: {
 		base: new Vec2(0,0),
 		v1: new Vec2(-0.5,	vertMaxDist),
 		v2: new Vec2(0.5,	vertMaxDist),
+		dir: new Vec2(0, -1)
 	}
 }
 
@@ -293,6 +295,9 @@ export default class ModelManager{
 		const v1 = reflect ? bVerts.v2 : bVerts.v1;
 		const v2 = reflect ? bVerts.v1 : bVerts.v2;
 		const det = (v2.y * v1.x) + (-v2.x * v1.y);
+		const dir = bVerts.dir;
+
+		const center = Vec2.DivScalar(Vec2.Add(v1, v2), 3);
 
 		const barycentricPositions = [];
 		for (let i = 0; i < positionAttribute.count; i++) {
@@ -304,6 +309,10 @@ export default class ModelManager{
 			);
 			
 			let relativePos = new Vec2(v.x - basePos.x, v.z - basePos.y);
+			/*let fromcenter = Vec2.Normalize(Vec2.Subtract(relativePos, center));
+			let dotDir = Vec2.Dot(fromcenter, dir);
+			Vec2.MultScalar(fromcenter, -0.01 * dotDir, fromcenter);
+			Vec2.Add(fromcenter, relativePos, relativePos);*/
 			let weights = new Vec2(
 				(v2.y * relativePos.x - v2.x * relativePos.y)/det,
 				(-v1.y * relativePos.x + v1.x * relativePos.y)/det

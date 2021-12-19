@@ -16,6 +16,7 @@ void main() {
 
 	float heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
 	float materialIndex = floor(fUV.x * 8.0);
+	float intensity = floor(fUV.y * 8.0) / 7.0;
 	vec3 color = vec3(0.0, 0.0, 0.0); //* heightGradient;
 	if(materialIndex <= 0.01){
 		color = vec3(0.3,0.3,0.35);
@@ -34,6 +35,6 @@ void main() {
 	}else{
 		color = vec3(0.85,0.8,0.9);
 	}
-	color *= heightGradient;
+	color *= heightGradient * intensity;
 	gl_FragColor = vec4(color.xyz, 1.0);
 }

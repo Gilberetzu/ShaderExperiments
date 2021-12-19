@@ -168,7 +168,8 @@ export default class BuildingGenerator{
 	updateHoveredGeometryBuffer(){
 		const geomBuffers = 
 				this.generationSpaces[this.hoveredVertex.spaceIndex].generateVertPositionColorBuffer(
-					this.hoveredVertex.layerIndex, this.hoveredVertex.vertIndex, this.hoveredVertex.adjacentIndex);
+					this.hoveredVertex.layerIndex, this.hoveredVertex.adjacentIndex != -1 ? this.hoveredVertex.adjacentIndex : this.hoveredVertex.vertIndex,
+					this.hoveredVertex.adjacentIndex != -1);
 			
 		this.hoveredPositionBuffer.copyArray(geomBuffers.position);
 		this.hoveredPositionBuffer.needsUpdate = true;
@@ -214,8 +215,10 @@ export default class BuildingGenerator{
 
 				this.updateHoveredGeometryBuffer();
 
+				const vertIndex = hitData.adjacentIndex != -1 ? hitData.adjacentIndex : hitData.vertIndex;
+
 				const vertPos = 
-					this.generationSpaces[this.hoveredVertex.spaceIndex].vertices[this.hoveredVertex.vertIndex].pos;
+					this.generationSpaces[this.hoveredVertex.spaceIndex].vertices[vertIndex].pos;
 
 				this.hoveredMesh.position.z = vertPos.x;
 				this.hoveredMesh.position.x = vertPos.y;
@@ -241,12 +244,16 @@ export default class BuildingGenerator{
 		this.cameraMovementAndRotation(inputStore, dt);
 		this.rayFromCameraToSpace(inputStore);
 
-		if(inputStore.mouse.buttons[0] && this.canEditSpace && this.hoveredVertex.layerIndex != -1){
+		if(inputStore.mouse.buttons[2] && this.canEditSpace && this.hoveredVertex.layerIndex != -1){
+			this.generationSpaces[this.hoveredVertex.spaceIndex].clearVertState(this.hoveredVertex);
+			this.generationSpaces[this.hoveredVertex.spaceIndex].updateSpaceGeometry(this.modelManager);
+			this.canEditSpace = false;
+		}else if(inputStore.mouse.buttons[0] && this.canEditSpace && this.hoveredVertex.layerIndex != -1){
 			this.generationSpaces[this.hoveredVertex.spaceIndex].setVertStateToBuilding(this.hoveredVertex);
 			this.updateHoveredGeometryBuffer();
 			this.generationSpaces[this.hoveredVertex.spaceIndex].updateSpaceGeometry(this.modelManager);
 			this.canEditSpace = false;
-		}else if(!inputStore.mouse.buttons[0] && !this.canEditSpace){
+		}else if(!inputStore.mouse.buttons[2] && !inputStore.mouse.buttons[0] && !this.canEditSpace){
 			this.canEditSpace = true;
 		}
 	}
