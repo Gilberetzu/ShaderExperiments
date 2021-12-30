@@ -153,6 +153,8 @@ export default class PolygonTriangulation {
 
 		this.perlinTexture = null;
 
+		this.centerPosition = Vec2.Zero();
+
 		this.desiredArea = 0;
 		this.distanceFromCenter = 0;
 		this.averageEdgeLength = 0;
@@ -774,7 +776,8 @@ export default class PolygonTriangulation {
 	relaxTriangles(desiredArea, distFromCenter) {
 		for (let stepIndex = 0; stepIndex < 8; stepIndex++) {
 			//Generate relaxation force from triangles;
-			this.triangles.forEach(tri => {
+			for (let triIndex = 0; triIndex < this.triangles.length; triIndex++) {
+				const tri = this.triangles[triIndex];
 				const angleS = Math.pow(tri.angleSquashiness(55, 25), 2);
 				const areaS = Math.pow(tri.areaSquashiness(desiredArea, desiredArea / 2), 2);
 
@@ -788,9 +791,10 @@ export default class PolygonTriangulation {
 					Draw.HexColor(0.5,0.5,0.5);
 
 				this.setTriangleRelaxationForce(tri, squishiness, distFromCenter);
-			});
+			}
 
-			this.vertices.forEach(vert => {
+			for (let vertIndex = 0; vertIndex < this.vertices.length; vertIndex++) {
+				const vert = this.vertices[vertIndex];
 				const mult = this.relaxMultiplier * (vert.outer ? this.relaxOuterMultiplier : 1);
 					//* Num.Lerp(0.5, 1, Num.ClampedInverseLerp(7, 5, vert.connectedTriangles.length));
 
@@ -798,7 +802,7 @@ export default class PolygonTriangulation {
 
 				vert.relaxationForce.x = 0;
 				vert.relaxationForce.y = 0;
-			});
+			}
 		}
 	}
 
@@ -943,7 +947,7 @@ export default class PolygonTriangulation {
 		while (true) {
 			let collapsedEdge = false;
 			const vert = this.vertices[vertIndex];
-			if (!vert.outer && vert.connectedTriangles.length == 8) {
+			if (!vert.outer && (vert.connectedTriangles.length == 8)) {
 				let possibleEdgesCollapse = [];
 				for (let i = 0; i < vert.connectedTriangles.length; i++) {
 					const tri = vert.connectedTriangles[i];
@@ -1119,6 +1123,24 @@ export default class PolygonTriangulation {
 					this.noiseGraphics.endFill();
 				}
 			}
+
+			/*for (let i = 0; i < 128; i++) {
+				for (let j = 0; j < 128; j++) {
+					const noise = this.perlinTexture.getNearest(new Vec2(i / 127, j / 127));
+					this.noiseGraphics.beginFill(Draw.HexColor(Math.abs(noise), 0, 0));
+					this.noiseGraphics.drawRect((i + 128.25) * 4, j * 4, 4, 4);
+					this.noiseGraphics.endFill();
+				}
+			}
+
+			for (let i = 0; i < 128; i++) {
+				for (let j = 0; j < 128; j++) {
+					const noise = this.perlinTexture.getNearest(new Vec2(i / 127, j / 127));
+					this.noiseGraphics.beginFill(Draw.HexColor(Math.abs(noise), 0, 0));
+					this.noiseGraphics.drawRect(i * 4, (j + 128.25) * 4, 4, 4);
+					this.noiseGraphics.endFill();
+				}
+			}*/
 		}
 
 		const t0 = performance.now();
@@ -1136,7 +1158,7 @@ export default class PolygonTriangulation {
 		this.collapseOuterCloseEdges();
 		this.randomlyCollapseEdges();
 
-		//this.collapseOctagons();
+		this.collapseOctagons();
 		this.collapseProblematicConfigurations();
 
 		const t1 = performance.now();
@@ -1265,7 +1287,14 @@ export default class PolygonTriangulation {
 				this.relaxingTriangles = false;
 
 				this.updateAverageEdgeLength();
-				window.CityGenerator.addGenerationSpace(this.vertices, this.triangles, this.averageEdgeLength);
+
+				this.centerPosition = Vec2.Zero();
+				this.vertices.forEach(vert => {
+					Vec2.Add(vert.pos, this.centerPosition, this.centerPosition);
+				});
+				Vec2.DivScalar(this.centerPosition, this.vertices.length, this.centerPosition);
+
+				window.CityGenerator.addGenerationSpace(this);
 			}
 
 			const drawt0 = performance.now();

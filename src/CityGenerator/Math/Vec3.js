@@ -148,7 +148,7 @@ export default class Vec3{
 		const z2 = v2.z == undefined ? 0 : v2.z;
 
 		if(vRes == null){
-			vRes = Vec2.Zero();
+			vRes = Vec3.Zero();
 		}
 
 		vRes.x = Num.Lerp(v1.x, v2.x, t);
@@ -162,5 +162,15 @@ export default class Vec3{
 		const z2 = v2.z == undefined ? 0 : v2.z;
 
 		return v1.x * v2.x + v1.y * v2.y + z1 * z2;
+	}
+
+	static Random(vRes = null){
+		if(vRes == null){
+			vRes = Vec3.Zero();
+		}
+		vRes.x = Math.random();
+		vRes.y = Math.random();
+		vRes.z = Math.random();
+		return vRes;
 	}
 }

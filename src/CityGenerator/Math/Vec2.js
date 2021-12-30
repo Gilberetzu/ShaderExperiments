@@ -173,6 +173,15 @@ export default class Vec2 {
 		);
 	}
 
+	static RandomNormal(){
+		const angle = Math.random() * Math.PI * 2;
+
+		return new Vec2(
+			Math.cos(angle),
+			Math.sin(angle)
+		);
+	}
+
 	static RandomUnitVec(){
 		let theta = Math.random() * 2 * Math.PI;
         return new Vec2(Math.cos(theta), Math.sin(theta));

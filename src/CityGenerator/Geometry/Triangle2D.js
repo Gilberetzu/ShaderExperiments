@@ -47,7 +47,8 @@ export default class Triangle2D{
 		let pushVertexIn = (v, nv, pv)=>{
 			let n1 = Vec2.Normalize(Vec2.Subtract(pv, v));
 			let n2 = Vec2.Normalize(Vec2.Subtract(nv, v));
-			let n = Vec2.MultScalar(Vec2.Add(n1, n2), distance);
+			let pn = Vec2.Normalize(Vec2.Add(n1, n2));
+			let n = Vec2.MultScalar(pn, distance);
 			return Vec2.Add(n, v);
 		}
 

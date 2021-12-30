@@ -1,5 +1,6 @@
 import Num from "./Num";
 import Vec2 from "./Vec2";
+import * as THREE from 'three';
 
 export default class PerlinNoise{
 	constructor(textureSize, vecSpaceSize){
@@ -13,8 +14,18 @@ export default class PerlinNoise{
 		this.randomVecs = [];
 		for (let i = 0; i < this.vecSpaceSize; i++) {
 			let row = [];
-			for (let j = 0; j < this.vecSpaceSize; j++) {
-				row.push(Vec2.RandomUnitVec());
+			if(i == this.vecSpaceSize - 1){
+				this.randomVecs[0].forEach(rv => {
+					row.push(rv);
+				})
+			}else{
+				for (let j = 0; j < this.vecSpaceSize; j++) {
+					if(j == this.vecSpaceSize - 1){
+						row.push(row[0]);
+					}else{
+						row.push(Vec2.RandomUnitVec());
+					}
+				}
 			}
 			this.randomVecs.push(row);
 		}
@@ -48,17 +59,29 @@ export default class PerlinNoise{
 			}
 			this.noiseTexture.push(row);
 		}
-		//console.log(this.noiseTexture);
 	}
 
 	dotVecSpace(point, corner){
 		const offset = Vec2.Subtract(point, corner);
-		const randVec = this.randomVecs[Num.ModGl(corner.x, 8)][Num.ModGl(corner.y, 8)];
+		const randVec = this.randomVecs[Num.ModGl(corner.x, this.vecSpaceSize)][Num.ModGl(corner.y, this.vecSpaceSize)];
 		return Vec2.Dot(offset, randVec);
 	}
 
 	getNearest(point){
 		let pixel = Vec2.Floor(Vec2.MultScalar(point, this.texSize - 1));
 		return this.noiseTexture[pixel.x][pixel.y];
+	}
+
+	generateDataTexture(){
+		const noiseData = new Float32Array(this.texSize*this.texSize);
+		for (let j = 0; j < this.texSize; j++) {
+			for (let i = 0; i < this.texSize; i++) {
+				const index = i + j*this.texSize;
+				noiseData[index] = this.noiseTexture[j][i];
+			}
+		}
+		const noiseDataTex = new THREE.DataTexture(noiseData, this.texSize, this.texSize, THREE.RedFormat, THREE.FloatType, THREE.UVMapping, THREE.RepeatWrapping,
+			THREE.RepeatWrapping, THREE.LinearFilter, THREE.LinearFilter);
+		return noiseDataTex;
 	}
 }

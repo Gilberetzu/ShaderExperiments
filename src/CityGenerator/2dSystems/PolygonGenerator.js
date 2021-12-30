@@ -332,13 +332,13 @@ export default class PolygonGenerator {
 	 * @param {import("../types").Input} inputStore 
 	 */
 	doPanning(inputStore) {
-		if (!this.panning && inputStore.mouse.buttons[1]) {
+		if (!this.panning && inputStore.mouse.buttons[2]) {
 			this.mousePosStartPanning = Vec2.Copy(inputStore.mouse.position);
 			this.stagePosStartPanning = Vec2.Copy(this.pixiApp.stage.position);
 			this.panning = true;
 		}
 
-		if (!inputStore.mouse.buttons[1]) {
+		if (!inputStore.mouse.buttons[2]) {
 			this.panning = false;
 		}
 

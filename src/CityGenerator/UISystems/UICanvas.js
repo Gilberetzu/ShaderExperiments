@@ -1,12 +1,14 @@
 import * as PIXI from 'pixi.js'
 import Draw from '../Draw';
 import Vec2 from '../Math/Vec2';
+import VerticalGroup from './VerticalGroup';
+import PixiButton,{ButtonStyle} from './Button';
 
 export default class UICanvas{
 	/**
 	 * @param {HTMLCanvasElement} canvasHTMLElement 
 	 */
-	constructor(canvasHTMLElement){
+	constructor(canvasHTMLElement, startSystem){
 		
 		{//Stop shared ticker
 			let ticker = PIXI.Ticker.shared;
@@ -14,29 +16,32 @@ export default class UICanvas{
  			ticker.stop();
 		}
 		
-		let size = window.CityGenerator.getContainerSize();
+		this.size = window.CityGenerator.getContainerSize();
 		
 		this.pixiApp = new PIXI.Application({
-			width: size.width,
-			height: size.height,
-			backgroundColor: 0x001020,
+			width: this.size.width,
+			height: this.size.height,
+			backgroundColor: 0x000000,
 			backgroundAlpha: 0,
 			view: canvasHTMLElement,
 			antialias: true,
 			autoStart: false
 		});
 
+		this.pixiApp.stage.sortableChildren = true;
+
 		this.pixiApp.ticker.add(this.update.bind(this));
 
 		this.cursorContainer = new PIXI.Container();
 		this.cursorGraphic = new PIXI.Graphics();
 
+		this.cursorContainer.zIndex = 1000;
 		this.cursorContainer.addChild(this.cursorGraphic);
 		this.pixiApp.stage.addChild(this.cursorContainer);
 
 		this.cursorDetailContainer = new PIXI.Container();
 		this.cursorDetailGraphic = new PIXI.Graphics();
-
+		this.cursorDetailContainer.zIndex = 999;
 		this.cursorDetailContainer.addChild(this.cursorDetailGraphic);
 		this.pixiApp.stage.addChild(this.cursorDetailContainer);
 
@@ -50,6 +55,44 @@ export default class UICanvas{
 		window.CityGenerator.UICanvas = {
 			setDetailPosition: this.setDetailPosition.bind(this)
 		};
+
+		this.logoContainer = null;
+		this.createLogo(startSystem);
+		this.UIElements = [this.logoContainer];
+	}
+	
+	addUIElement(createElement){
+		this.UIElements.push(createElement(this.pixiApp.stage));
+	}
+
+	createLogo(startSystem){
+		this.logoContainer = new VerticalGroup(this.pixiApp.stage, Draw.HexColor(0.05,0.05,0.2), new Vec2(60,60), 0, Draw.HexColor(0.1,0.3,0.5), 30);
+		const primaryText = new PIXI.Text('Tower Builder', new PIXI.TextStyle({ fontFamily: 'Bubblegum Sans', fontSize: 100, fill:0xffffff }));
+		const secondaryText = new PIXI.Text('A tower building toy game inspired by Townscaper', 
+			new PIXI.TextStyle({ fontFamily: 'Bubblegum Sans', fontSize: 35, align: 'center', fill:0xffffff }));
+		const byMe = new PIXI.Text('By Euri Herasme', 
+			new PIXI.TextStyle({ fontFamily: 'Bubblegum Sans', fontSize: 25, align: 'center', fill:0xffffff }));
+
+		this.logoContainer.addElement(null,primaryText, 0);
+		this.logoContainer.addElement(null,secondaryText, 15);
+		this.logoContainer.addElement(null,byMe, 15);
+
+		const logoButton = new PixiButton("START", 
+			new ButtonStyle(10, 20, new Vec2(50, 8), 
+				Draw.HexColor(0.05,0.3,0.6), 
+				Draw.HexColor(0.3,0.5,1.0), 
+				Draw.HexColor(1,1,1), 
+				Draw.HexColor(0.9,0.9,0.9)),
+			()=>{
+				startSystem(),
+				this.pixiApp.stage.removeChild(this.logoContainer.container);
+				const index = this.UIElements.findIndex((uiElem)=> uiElem === this.logoContainer);
+				this.UIElements.splice(index, 1);
+			});
+
+		this.logoContainer.addElement(logoButton, logoButton.container, 20);
+
+		this.logoContainer.container.position.set(this.size.width / 2, this.size.height / 2 - this.logoContainer.container.height / 2)
 	}
 
 	drawNormalDetail(){
@@ -117,5 +160,9 @@ export default class UICanvas{
 			Vec2.Lerp(this.cursorDetailContainer.position, newDetailPos, 0.2, this.cursorDetailContainer.position);
 			this.useExternal = false;
 		}
+
+		this.UIElements.forEach(uiElem =>{
+			uiElem.update(dt);
+		});
 	}
 }
