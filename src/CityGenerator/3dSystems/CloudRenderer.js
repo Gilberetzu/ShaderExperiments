@@ -261,17 +261,17 @@ export default class CloudRenderer{
 	}
 
 	render(renderer, postProcessCamera){
-		if (spector) {
+		if (window.spector) {
 			spector.setMarker("Render Cloud");
 		}
 		renderer.setRenderTarget(this.cloudRenderTexture, undefined, 0);
 		renderer.clear(true, true);
 		renderer.render(this.cloudRenderMesh, postProcessCamera);
-		if (spector) {
+		if (window.spector) {
 			spector.clearMarker();
 		}
 
-		if (spector) {
+		if (window.spector) {
 			spector.setMarker("First Blur");
 		}
 		
@@ -282,7 +282,7 @@ export default class CloudRenderer{
 		this.cloudBlurShaderMaterial.needsUpdate = true;
 		renderer.render(this.cloudBlurRenderMesh, postProcessCamera);
 		
-		if (spector) {
+		if (window.spector) {
 			spector.clearMarker();
 		}
 
@@ -312,7 +312,7 @@ export default class CloudRenderer{
 		this.cloudBlurShaderMaterial.needsUpdate = true;
 		renderer.render(this.cloudBlurRenderMesh, postProcessCamera);
 
-		if (spector) {
+		if (window.spector) {
 			spector.setMarker("Final Upsample");
 		}
 
@@ -322,11 +322,11 @@ export default class CloudRenderer{
 		this.cloudUpsampleShaderMaterial.needsUpdate = true;
 		renderer.render(this.cloudUpsampleRenderMesh, postProcessCamera);
 
-		if (spector) {
+		if (window.spector) {
 			spector.clearMarker();
 		}
 
-		if (spector) {
+		if (window.spector) {
 			spector.setMarker("Kawase Blur");
 		}
 		renderer.setRenderTarget(this.cloudKawaseTexture);
@@ -334,7 +334,7 @@ export default class CloudRenderer{
 		this.kawaseBlurShaderMaterial.needsUpdate = true;
 		renderer.render(this.kawaseBlurRenderMesh, postProcessCamera);
 
-		if (spector) {
+		if (window.spector) {
 			spector.clearMarker();
 		}
 	}

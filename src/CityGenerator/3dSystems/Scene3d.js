@@ -310,7 +310,7 @@ export default class Scene3d{
 	}
 
 	render(){
-		if (spector) {
+		if (window.spector) {
 			spector.setMarker("Render Scene");
 		}
 		
@@ -318,21 +318,21 @@ export default class Scene3d{
 		this.renderer.clear(true, true);
 		this.renderer.render(this.scene, this.cameraController.camera);
 
-		if (spector) {
+		if (window.spector) {
 			spector.clearMarker();
 		}
 
 		this.cloudRenderer.render(this.renderer, this.postProcessCamera);
 		this.cloudRenderer.mergeColorCloud(this.renderer, this.postProcessCamera, this.colorCloudMergeTexture);
 
-		if (spector) {
+		if (window.spector) {
 			spector.setMarker("Render outline and scene");
 		}
 		this.renderer.setRenderTarget(null);
 		this.renderer.clear(true, true);
 		this.renderer.render(this.postProcessMesh, this.postProcessCamera);
 
-		if (spector) {
+		if (window.spector) {
 			spector.clearMarker();
 		}
 	}

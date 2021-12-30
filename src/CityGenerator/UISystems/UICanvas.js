@@ -74,8 +74,9 @@ export default class UICanvas{
 			new PIXI.TextStyle({ fontFamily: 'Bubblegum Sans', fontSize: 25, align: 'center', fill:0xffffff }));
 
 		this.logoContainer.addElement(null,primaryText, 0);
-		this.logoContainer.addElement(null,secondaryText, 15);
-		this.logoContainer.addElement(null,byMe, 15);
+		this.logoContainer.addElement(null,byMe, 0);
+		this.logoContainer.addElement(null,secondaryText, 25);
+		
 
 		const logoButton = new PixiButton("START", 
 			new ButtonStyle(10, 20, new Vec2(50, 8), 
