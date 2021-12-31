@@ -30,10 +30,10 @@ export default class PerlinNoise{
 			this.randomVecs.push(row);
 		}
 
-		console.log(this.randomVecs)
+		//console.log(this.randomVecs)
 
 		const texelSize = (this.vecSpaceSize - 1) / (this.texSize - 1);
-		console.log(texelSize);
+		//console.log(texelSize);
 		this.noiseTexture = [];
 		for (let i = 0; i < this.texSize; i++) {
 			let row = [];

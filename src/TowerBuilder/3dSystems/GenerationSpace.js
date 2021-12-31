@@ -841,7 +841,7 @@ export default class GenerationSpace{
 	}
 
 	generateGrassInstancedMeshes(flowerGeometryBuffer){
-		console.log("Generate instance mesh");
+		//console.log("Generate instance mesh");
 		this.grassBladeMesh = new THREE.InstancedMesh(this.grassBladeGeometry(), this.grassMaterial, this.currentGrassCount);
 		this.grassFlowersMesh = new THREE.InstancedMesh(flowerGeometryBuffer, this.grassMaterial, this.currentGrassCount);
 

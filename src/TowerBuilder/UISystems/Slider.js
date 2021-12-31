@@ -85,7 +85,6 @@ export default class Slider{
 			if(inputStore.mouse.buttons[0]){
 				inputStore.mouse.buttons[0] = false;
 				this.value = Num.Lerp(this.min, this.max, Num.InverseLerp(boundingBox.min.x, boundingBox.max.x, mousePos.x));
-				this.callback(this.value);
 			}
 			this.drawActive();
 		}else{

@@ -532,7 +532,7 @@ export default class ModelManager {
 		}
 	}
 	finishedLoading() {
-		console.log(this.models);
+		//console.log(this.models);
 	}
 	loadModel(index) {
 		const modelDef = modelDefinition[this.modelKeys[index]];

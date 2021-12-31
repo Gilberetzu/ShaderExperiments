@@ -710,7 +710,7 @@ export default class PolygonTriangulation {
 				triIndex = Num.ModGl(triIndex + 1, this.triangles.length);
 				checkedTrianglesCount++;
 				if (checkedTrianglesCount >= this.triangles.length) {
-					console.log("Collapse count: ", loopCount);
+					//console.log("Collapse count: ", loopCount);
 					break;
 				}
 			}
@@ -1109,7 +1109,7 @@ export default class PolygonTriangulation {
 		const noiset0 = performance.now();
 		this.perlinTexture = new PerlinNoise(128, 8);
 		const noiset1 = performance.now();
-		console.log("Noise generation took: ", noiset1 - noiset0);
+		//console.log("Noise generation took: ", noiset1 - noiset0);
 
 		{
 			this.noiseGraphics.lineStyle({
@@ -1163,9 +1163,9 @@ export default class PolygonTriangulation {
 
 		const t1 = performance.now();
 
-		console.log("Time to triangulation: ", t1 - t0);
+		//console.log("Time to triangulation: ", t1 - t0);
 
-		console.log("Test clampped", Num.ClampedInverseLerp(Num.DegToRad(50), Num.DegToRad(35), Num.DegToRad(1)));
+		//console.log("Test clampped", Num.ClampedInverseLerp(Num.DegToRad(50), Num.DegToRad(35), Num.DegToRad(1)));
 
 		this.drawTriangles(false);
 		this.drawVertices();
@@ -1179,8 +1179,8 @@ export default class PolygonTriangulation {
 		this.desiredArea = Math.sqrt(3) * Math.pow(this.averageEdgeLength, 2) / 4;
 		this.distFromCenter = (this.averageEdgeLength / 2) / Math.sin(Num.DegToRad(60));
 
-		console.log("avg edge lenght:", this.averageEdgeLength, "desired area: ", this.desiredArea, "distance from center:", this.distFromCenter);
-		console.log("triangle area contribution : ", this.triangleAreaContribution);
+		//console.log("avg edge lenght:", this.averageEdgeLength, "desired area: ", this.desiredArea, "distance from center:", this.distFromCenter);
+		//console.log("triangle area contribution : ", this.triangleAreaContribution);
 		//Set vertex state
 		{
 			let vert = this.vertices[0].pos;
