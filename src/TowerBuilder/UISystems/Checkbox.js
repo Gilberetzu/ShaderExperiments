@@ -84,7 +84,7 @@ export default class Checkbox{
 	update(dt){
 		const pos = this.container.getGlobalPosition();
 
-		let inputStore = /** @type {import("../types").Input} */ (window.CityGenerator.input);
+		let inputStore = /** @type {import("../types").Input} */ (window.TowerBuilder.input);
 		const mousePos = inputStore.mouse.position;
 
 		const boundingBox = {

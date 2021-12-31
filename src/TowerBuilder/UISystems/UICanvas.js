@@ -4,6 +4,8 @@ import Vec2 from '../Math/Vec2';
 import VerticalGroup from './VerticalGroup';
 import PixiButton,{ButtonStyle} from './Button';
 
+import { commonStyles } from './Styles';
+
 export default class UICanvas{
 	/**
 	 * @param {HTMLCanvasElement} canvasHTMLElement 
@@ -16,7 +18,7 @@ export default class UICanvas{
  			ticker.stop();
 		}
 		
-		this.size = window.CityGenerator.getContainerSize();
+		this.size = window.TowerBuilder.getContainerSize();
 		
 		this.pixiApp = new PIXI.Application({
 			width: this.size.width,
@@ -52,7 +54,7 @@ export default class UICanvas{
 		this.externalDetailPosition = Vec2.Zero();
 		this.useExternal = false;
 
-		window.CityGenerator.UICanvas = {
+		window.TowerBuilder.UICanvas = {
 			setDetailPosition: this.setDetailPosition.bind(this)
 		};
 
@@ -66,7 +68,7 @@ export default class UICanvas{
 	}
 
 	createLogo(startSystem){
-		this.logoContainer = new VerticalGroup(this.pixiApp.stage, Draw.HexColor(0.05,0.05,0.2), new Vec2(60,60), 0, Draw.HexColor(0.1,0.3,0.5), 30);
+		this.logoContainer = new VerticalGroup(this.pixiApp.stage, commonStyles.verticalGroupBG, new Vec2(60,60), 0, Draw.HexColor(0.1,0.3,0.5), 30);
 		const primaryText = new PIXI.Text('Tower Builder', new PIXI.TextStyle({ fontFamily: 'Bubblegum Sans', fontSize: 100, fill:0xffffff }));
 		const secondaryText = new PIXI.Text('A tower building toy game inspired by Townscaper', 
 			new PIXI.TextStyle({ fontFamily: 'Bubblegum Sans', fontSize: 35, align: 'center', fill:0xffffff }));
@@ -79,11 +81,7 @@ export default class UICanvas{
 		
 
 		const logoButton = new PixiButton("START", 
-			new ButtonStyle(10, 20, new Vec2(50, 8), 
-				Draw.HexColor(0.05,0.3,0.6), 
-				Draw.HexColor(0.3,0.5,1.0), 
-				Draw.HexColor(1,1,1), 
-				Draw.HexColor(0.9,0.9,0.9)),
+		commonStyles.baseButton,
 			()=>{
 				startSystem(),
 				this.pixiApp.stage.removeChild(this.logoContainer.container);
@@ -146,7 +144,7 @@ export default class UICanvas{
 	}
 
 	update(dt){
-		let inputStore = /** @type {import("../types").Input} */ (window.CityGenerator.input);
+		let inputStore = /** @type {import("../types").Input} */ (window.TowerBuilder.input);
 		let pos = inputStore.mouse.position;
 		this.cursorContainer.position.set(pos.x, pos.y);
 

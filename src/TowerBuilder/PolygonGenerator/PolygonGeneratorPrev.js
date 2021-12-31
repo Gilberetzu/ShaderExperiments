@@ -264,7 +264,7 @@ export default class PolygonGenerator {
 	}
 
 	update(dt) {
-		let inputStore = /** @type {import("../types").Input} */ (window.CityGenerator.input);
+		let inputStore = /** @type {import("../types").Input} */ (window.TowerBuilder.input);
 		//Panning state
 
 		this.doPanning(inputStore);

@@ -16,12 +16,18 @@ import TestPSVertexShader from 		"../Shaders/TestPostProcess/VertexShader.glsl?r
 import VerticalGroup from '../UISystems/VerticalGroup';
 
 import Checkbox, {CheckboxStyle} from '../UISystems/Checkbox';
+import PixiButton, { ButtonStyle } from '../UISystems/Button';
+import { commonStyles } from '../UISystems/Styles';
+import CollapsableSection from '../UISystems/CollapsableSection';
+import Slider from '../UISystems/Slider';
 
 export default class Scene3d{
 	constructor(canvasHTMLElement){
-		this.size = window.CityGenerator.getContainerSize();
+		this.size = window.TowerBuilder.getContainerSize();
 		this.scene = new THREE.Scene();
 		this.scene.background = new THREE.Color( Draw.HexColor(0.05,0.05,0.1) );
+		
+		this.saveNextRender = false;
 
 		this.renderer = new THREE.WebGLRenderer({
 			canvas: canvasHTMLElement,
@@ -161,18 +167,34 @@ export default class Scene3d{
 	}
 
 	enter3dScene(){
-		window.CityGenerator.addUIElement((container)=>{
-			const checkStyle = new CheckboxStyle(20, 20, 5, 
-				Draw.HexColor(1,0.2,0.4),
-				Draw.HexColor(1,1,1),
-				Draw.HexColor(1,0.2,0.4),
-				Draw.HexColor(1,1,1));
-			const options = new VerticalGroup(container, Draw.HexColor(0.1,0.1,0.1), new Vec2(25,10), 0, 0x000000, 5);
+		console.log("add called");
+		window.TowerBuilder.addUIElement((container)=>{
+			const options = new CollapsableSection("Options",container, Draw.HexColor(0.1,0.1,0.1), new Vec2(25,10), 0, 0x000000, 5);
 			
-			const normalCheck = new Checkbox("Normal", checkStyle, (state)=>{}, true);
-			const outlineCheck = new Checkbox("Only outlines", checkStyle, (state)=>{}, false);
-			const colorCheck = new Checkbox("Only color", checkStyle, (state)=>{}, false);
-			const filmicCheck = new Checkbox("Filmic", checkStyle, (state)=>{}, false);
+			const normalCheck = new Checkbox("Normal", commonStyles.baseCheckbox, (state)=>{}, true);
+			const outlineCheck = new Checkbox("Only outlines", commonStyles.baseCheckbox, (state)=>{}, false);
+			const colorCheck = new Checkbox("Only color", commonStyles.baseCheckbox, (state)=>{}, false);
+			const outlineWB = new Checkbox("Only Outline WB", commonStyles.baseCheckbox, (state)=>{}, false);
+			const outlineBW = new Checkbox("Only Outline BW", commonStyles.baseCheckbox, (state)=>{}, false);
+			
+			const saveRender = new PixiButton("Render", commonStyles.baseButton, ()=>{
+				this.saveNextRender = true;
+			});
+
+			const sliderTest = new Slider(0.0,-1.0,1.0,(v)=>{
+				this.cloudRenderer.cloudRenderMaterial.uniforms.cloudCoverage.value = v;
+			}, 100, "Cloud coverage");
+
+			const resetOptions = new PixiButton("Reset", commonStyles.baseButton, ()=>{
+				this.cloudRenderer.cloudRenderMaterial.uniforms.cloudCoverage.value = 0.0;
+				sliderTest.value = 0.0;
+				outlineCheck.state = false;
+				colorCheck.state = false;
+				outlineBW.state = false;
+				outlineWB.state = false;
+				normalCheck.state = true;
+				this.postPRocessMaterial.uniforms.outputState.value = 0;
+			});
 
 			normalCheck.callback = (state)=>{
 				if(!state){
@@ -182,7 +204,8 @@ export default class Scene3d{
 					this.postPRocessMaterial.uniforms.outputState.value = 0;
 					outlineCheck.state = false;
 					colorCheck.state = false;
-					filmicCheck.state = false;
+					outlineBW.state = false;
+					outlineWB.state = false;
 				}
 			}
 
@@ -194,7 +217,8 @@ export default class Scene3d{
 					this.postPRocessMaterial.uniforms.outputState.value = 1;
 					normalCheck.state = false;
 					colorCheck.state = false;
-					filmicCheck.state = false;
+					outlineBW.state = false;
+					outlineWB.state = false;
 				}
 			}
 
@@ -206,11 +230,12 @@ export default class Scene3d{
 					this.postPRocessMaterial.uniforms.outputState.value = 2;
 					normalCheck.state = false;
 					outlineCheck.state = false;
-					filmicCheck.state = false;
+					outlineBW.state = false;
+					outlineWB.state = false;
 				}
 			}
 
-			filmicCheck.callback = (state)=>{
+			outlineWB.callback = (state)=>{
 				if(!state){
 					this.postPRocessMaterial.uniforms.outputState.value = 0;
 					normalCheck.state = true;
@@ -219,15 +244,32 @@ export default class Scene3d{
 					normalCheck.state = false;
 					outlineCheck.state = false;
 					colorCheck.state = false;
+					outlineBW.state = false;
+				}
+			}
+
+			outlineBW.callback = (state)=>{
+				if(!state){
+					this.postPRocessMaterial.uniforms.outputState.value = 0;
+					normalCheck.state = true;
+				}else{
+					this.postPRocessMaterial.uniforms.outputState.value = 4;
+					normalCheck.state = false;
+					outlineCheck.state = false;
+					colorCheck.state = false;
+					outlineWB.state = false;
 				}
 			}
 			
 			options.addElement(normalCheck, normalCheck.container, 0);
 			options.addElement(outlineCheck, outlineCheck.container, 10);
 			options.addElement(colorCheck, colorCheck.container, 10);
-			options.addElement(filmicCheck, filmicCheck.container, 10);
-
-			options.container.position.set(options.container.width/2 + 10, options.bgPadding.y / 2 + 10);
+			options.addElement(outlineWB, outlineWB.container, 10);
+			options.addElement(outlineBW, outlineBW.container, 10);
+			options.addElement(saveRender, saveRender.container, 20);
+			options.addElement(sliderTest, sliderTest.container, 10);
+			options.addElement(resetOptions, resetOptions.container, 10);
+			options.sectionContainer.position.set(options.container.width/2 + 10, options.bgPadding.y / 2 + 10);
 			return options;
 		});
 	}
@@ -245,6 +287,9 @@ export default class Scene3d{
 			},
 			cloudTime:{
 				value: null
+			},
+			cloudCoverage:{
+				value: null
 			}
 		};
 		this.updateCloudUniforms(cloudUniforms);
@@ -256,6 +301,7 @@ export default class Scene3d{
 		uniforms.cloudBoundsMin.value = this.cloudRenderer.cloudRenderMaterial.uniforms.boundsMin.value;
 		uniforms.cloudBoundsMax.value = this.cloudRenderer.cloudRenderMaterial.uniforms.boundsMax.value;
 		uniforms.cloudTime.value = this.cloudRenderer.cloudRenderMaterial.uniforms.time.value;
+		uniforms.cloudCoverage.value = this.cloudRenderer.cloudRenderMaterial.uniforms.cloudCoverage.value;
 	}
 
 	getDirectionalLightUniforms(){
@@ -292,7 +338,7 @@ export default class Scene3d{
 	update(dt){
 		Vec3.Copy(this.cameraController.camera.position, this.bgMesh.position);
 		this.backgroundMaterial.uniforms.lightDirection.value = this.lightController.getLightDirection();
-		let inputStore = window.CityGenerator.input;
+		let inputStore = window.TowerBuilder.input;
 		this.cameraController.cameraMovementAndRotation(inputStore, dt);
 		this.lightController.followCamera(this.cameraController.camera);
 
@@ -334,6 +380,11 @@ export default class Scene3d{
 
 		if (window.spector) {
 			spector.clearMarker();
+		}
+
+		if(this.saveNextRender){
+			this.saveNextRender = false;
+			window.TowerBuilder.saveThreeRender();
 		}
 	}
 }

@@ -809,7 +809,7 @@ export default class PolygonTriangulation {
 	removeSquashedOuterTriangles(desiredArea){
 		let triIndex = 0;
 		let collapseCount = 0;
-		let maxCollapse = 1;
+		let maxCollapse = Num.Lerp(1, 6, Num.ClampedInverseLerp(1000, 3000, this.triangles.length));
 		while (true) {
 			let collapsedEdge = false;
 			const tri = this.triangles[triIndex];
@@ -1294,7 +1294,7 @@ export default class PolygonTriangulation {
 				});
 				Vec2.DivScalar(this.centerPosition, this.vertices.length, this.centerPosition);
 
-				window.CityGenerator.addGenerationSpace(this);
+				window.TowerBuilder.addGenerationSpace(this);
 			}
 
 			const drawt0 = performance.now();

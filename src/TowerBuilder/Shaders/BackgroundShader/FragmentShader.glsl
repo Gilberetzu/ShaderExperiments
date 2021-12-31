@@ -20,8 +20,9 @@ void main() {
 	float gradient = clamp(dot(norm, vec3(0,1,0)), 0.0, 1.0);
 	vec3 bgColor = mix(seaColor, skyColor, gradient);
 
-	float sun = clamp(InvLerp(-0.997, -0.995,dot(norm, lightDirection)), 0.0, 1.0);
-	float sunOuter = clamp(InvLerp(-0.995, -0.985,dot(norm, lightDirection)), 0.0, 1.0);
+	float sun = clamp(InvLerp(-0.997, -0.990,dot(norm, lightDirection)), 0.0, 1.0);
+	float sunOuter = clamp(InvLerp(-0.995, -0.980,dot(norm, lightDirection)), 0.0, 1.0);
+	sun = sin(sun * 1.57);
 	sunOuter = sin(sunOuter * 1.57);
 
 	bgColor = mix(vec3(1,1,1), mix(sunColor, bgColor, sunOuter), sun);

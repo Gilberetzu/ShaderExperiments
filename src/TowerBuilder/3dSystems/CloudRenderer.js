@@ -26,7 +26,7 @@ export default class CloudRenderer{
 
 		this.voronoiNoise = new VoronoiNoise3D(renderer, postProcessGeometry, postProcessCamera);
 
-		this.size = window.CityGenerator.getContainerSize();
+		this.size = window.TowerBuilder.getContainerSize();
 		
 		this.cloudTextureBlur1 = new THREE.WebGLRenderTarget(this.size.width/2, this.size.height/2, {
 			depthBuffer: false,
@@ -153,6 +153,9 @@ export default class CloudRenderer{
 					value: this.voronoiNoise.texture
 				},
 				time:{
+					value: 0
+				},
+				cloudCoverage:{
 					value: 0
 				}
 			}

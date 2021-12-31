@@ -30,6 +30,8 @@ uniform vec3 lightDirection;
 uniform float scatteringConstant;
 uniform sampler2D shapeNoise;
 
+uniform float cloudCoverage;
+
 uniform float time;
 
 float InvLerp(float a, float b, float v){
@@ -121,11 +123,12 @@ float sceneDensity(vec3 pointCheck){
 	float zMask = 1.0 - abs((clamp(InvLerp(boundsMin.z, boundsMax.z, pointCheck.z), 0.0, 1.0) - 0.5)*2.0);
 	zMask = sin(saturate(InvLerp(0.05,0.5,zMask)) * 1.57);
 	
-	float shapeSample = texture2D( shapeNoise, pointCheck.xz * 0.025 + time * vec2(0.02,0.02)).x * 2.0;
+	float shapeSample = texture2D( shapeNoise, pointCheck.xz * 0.025 + time * vec2(0.02,0.02)).x;
+	shapeSample = InvLerp(cloudCoverage, 1.0, shapeSample) * 2.0;
 	
 	if(shapeSample > 0.0){
 		float voronoiSample = texture(voronoiTex, pointCheck * 0.1).r * 0.2 + texture(voronoiTex, pointCheck * 0.25).r * 0.25;
-		shapeSample = shapeSample - (1.0 - heightRamp * xMask * zMask) - voronoiSample;
+		shapeSample = shapeSample - (1.0 - heightRamp * xMask * zMask * mix(1.0, 2.0, clamp(-cloudCoverage, 0.0,1.0))) - voronoiSample;
 	}
 	
 	return shapeSample;
@@ -200,7 +203,7 @@ void main() {
 		bool rayHitBox = rayInfo.y > 0.0;
 		if(rayHitBox){
 			
-			float lightIntensity = 1.0;
+			float lightIntensity = 0.0;
 			float sunDensitySamples = 0.0;
 			
 			vec3 pointCheck;
@@ -239,10 +242,11 @@ void main() {
 				if(pointDensity > 0.0){
 					//stepSizeMultInterpolator < 0.8
 					float densityToSun = densityTowardsSun(pointCheck);
+					//lightIntensity += exp(-densityToSun * 0.5) * exp(-densityOverCameraRay * 0.5);
 					sunDensitySamples += (densityToSun * pointDensity * stepSize) * 1.0;
 				}
 
-				if(sunDensitySamples > 1.0){
+				if(densityOverCameraRay > 1.0){
 					break;
 				}
 
@@ -253,11 +257,11 @@ void main() {
 				currentDistance += stepSize;
 			}
 
-			float beerLaw = exp(-sunDensitySamples * 0.5);
-			float powderLaw = 1.0;// 1.0 - exp(-densityOverCameraRay * 2.0);
+			float beerLaw = exp(-sunDensitySamples * 0.3);
+			//float powderLaw = 1.0;// 1.0 - exp(-densityOverCameraRay * 2.0);
 			
-			float lightEnergy = beerLaw + clamp(henyeyLaw * 1.0, 0.0, 1.0) * exp(-densityOverCameraRay * 0.5);
-			//lightEnergy *= densityOverCameraRay;
+			float lightEnergy = beerLaw * exp(-densityOverCameraRay * 0.25) + clamp(henyeyLaw * 1.0, 0.0, 1.0) * exp(-densityOverCameraRay * 0.5);
+			//float lightEnergy = lightIntensity;
 
 			//lightEnergy = clamp(lightEnergy, 0.0, 1.0);
 			vec3 lightColor = vec3(0.8, 0.9, 0.9);
@@ -267,7 +271,7 @@ void main() {
 			//vec3 darkColor = vec3(0.0,1.0,0.0);
 
 			vec3 cColor = mix(darkColor,lightColor,lightEnergy);
-			cloudColor = vec4(cColor,clamp(densityOverCameraRay, 0.0, 1.0));
+			cloudColor = vec4(cColor,clamp(densityOverCameraRay * 2.0, 0.0, 1.0));
 
 			//float isoSurfaceLight = dot(isoNormal, lightDirection);
 			//cloudColor = vec4(mix(darkColor,lightColor,isoSurfaceLight), isoSurface);

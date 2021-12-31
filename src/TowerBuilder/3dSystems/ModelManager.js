@@ -4,7 +4,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import * as THREE from 'three';
 import Vec3 from "../Math/Vec3";
 
-const basePath = "CityGenerator/BuildingParts/";
+const basePath = "TowerBuilder/BuildingParts/";
 
 const vertMaxDist = 0.866025; //0.866025
 const relativeVecs = {

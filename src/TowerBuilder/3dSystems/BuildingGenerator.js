@@ -135,7 +135,7 @@ export default class BuildingGenerator{
 	}
 
 	update(dt){
-		let inputStore = window.CityGenerator.input;
+		let inputStore = window.TowerBuilder.input;
 		this.rayFromCameraToSpace(inputStore);
 
 		if(inputStore.mouse.buttons[2] && this.canEditSpace && this.hoveredVertex.layerIndex != -1){

@@ -10,6 +10,8 @@
     import { fade } from 'svelte/transition';
     import { sineOut } from "svelte/easing";
 
+	export let initialDelay = 500;
+
     let linkList = [
         {
             icon: Artstation,
@@ -46,7 +48,7 @@
 
 <div class="container">
     {#each linkList as {icon, link, name}, index}
-        <div class="iconContainer" in:fade={{delay: 500 + index * 100, duration: 300, easing: sineOut}}>
+        <div class="iconContainer" in:fade={{delay: initialDelay + index * 100, duration: 300, easing: sineOut}}>
             <a name={name} href={link}>
                 <svelte:component this={icon} />
             </a>

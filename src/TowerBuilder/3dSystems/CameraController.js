@@ -5,7 +5,7 @@ import Vec2 from '../Math/Vec2';
 
 export default class CameraController{
 	constructor(scene){
-		this.size = window.CityGenerator.getContainerSize();
+		this.size = window.TowerBuilder.getContainerSize();
 		this.camera = new THREE.PerspectiveCamera( 75, this.size.width / this.size.height, 0.1, 500 );
 
 		this.cameraPosition = new Vec3(2,2,2);
@@ -29,13 +29,13 @@ export default class CameraController{
 			if(inputStore.mouse.buttons[1] || (inputStore.mouse.buttons[0] && inputStore.keyboard.ControlLeft)){
 				//console.log("Start Rotating");
 				this.rotatingCamera = true;
-				//const size = window.CityGenerator.getContainerSize();
+				//const size = window.TowerBuilder.getContainerSize();
 				this.mousePosRotStart = Vec2.Copy(inputStore.mouse.position);
 				this.cameraRotationStart = Vec3.Copy(this.cameraRotation);
 			}
 		}else{
 			if(inputStore.mouse.buttons[1] || (inputStore.mouse.buttons[0] && inputStore.keyboard.ControlLeft)){
-				window.CityGenerator.UICanvas.setDetailPosition(this.mousePosRotStart);
+				window.TowerBuilder.UICanvas.setDetailPosition(this.mousePosRotStart);
 
 				const currentPos = Vec2.Copy(inputStore.mouse.position);
 				const posDelta = Vec2.Subtract(currentPos, this.mousePosRotStart);
@@ -75,7 +75,7 @@ export default class CameraController{
 			}
 		}else{
 			if(inputStore.mouse.buttons[2] && inputStore.keyboard.ControlLeft && !(inputStore.mouse.buttons[0] || inputStore.mouse.buttons[1])){
-				window.CityGenerator.UICanvas.setDetailPosition(this.mousePosPanStart);
+				window.TowerBuilder.UICanvas.setDetailPosition(this.mousePosPanStart);
 				const currentPos = Vec2.Copy(inputStore.mouse.position);
 				const posDelta = Vec2.Subtract(currentPos, this.mousePosPanStart);
 

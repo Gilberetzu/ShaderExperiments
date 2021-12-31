@@ -1,7 +1,7 @@
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import * as THREE from 'three';
 
-const basePath = "CityGenerator/ExtraProps/";
+const basePath = "TowerBuilder/ExtraProps/";
 
 export default class ExtraPropLoader{
 	constructor(){

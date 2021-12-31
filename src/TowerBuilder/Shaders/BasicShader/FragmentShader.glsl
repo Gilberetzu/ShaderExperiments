@@ -1,7 +1,6 @@
 varying vec2 fUV;
 varying vec3 fPosition;
 varying vec3 fNormal;
-varying float movementMag;
 varying mat4 modelMatrixFrag;
 
 uniform sampler2D directionalShadowMap;
@@ -20,6 +19,8 @@ uniform vec3 cloudBoundsMin;
 uniform vec3 cloudBoundsMax;
 uniform vec3 lightDirection;
 uniform float cloudTime;
+
+uniform float cloudCoverage;
 
 float saturate(float a){
 	return clamp(a, 0.0,1.0);
@@ -50,6 +51,8 @@ float getCloudShadow(vec3 positionWS){
 	if(rayHitInfo.y > 0.0){
 		vec3 hitPosition = positionWS.xyz + (-lightDirection) * rayHitInfo.x;
 		cloudSample = texture2D( cloudShapeTex, hitPosition.xz * 0.025 + cloudTime * vec2(0.02,0.02)).x;
+		cloudSample = InvLerp(cloudCoverage, 1.0, cloudSample);
+		float maskMultiplier = mix(1.0, 2.0, clamp(-cloudCoverage, 0.0,1.0));
 
 		float xMask = 1.0 - abs((clamp(InvLerp(cloudBoundsMin.x, cloudBoundsMax.x, hitPosition.x), 0.0, 1.0) - 0.5)*2.0);
 		xMask = sin(saturate(InvLerp(0.05,0.5,xMask)) * 1.57);
@@ -57,7 +60,7 @@ float getCloudShadow(vec3 positionWS){
 		float zMask = 1.0 - abs((clamp(InvLerp(cloudBoundsMin.z, cloudBoundsMax.z, hitPosition.z), 0.0, 1.0) - 0.5)*2.0);
 		zMask = sin(saturate(InvLerp(0.05,0.5,zMask)) * 1.57);
 
-		cloudSample = clamp(cloudSample* 1.5 - (1.0 - xMask * zMask), 0.0, 1.0);
+		cloudSample = clamp(cloudSample* 1.5 - (1.0 - xMask * zMask * maskMultiplier), 0.0, 1.0);
 	}
 	return cloudSample;
 }
@@ -120,26 +123,54 @@ float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, floa
 }
 
 void main() {
+	vec3 direction = normalize(vec3(1,1,1));
 	vec4 positionWS = modelMatrixFrag * vec4(fPosition, 1.0);
 	vec4 shadowCoord = directionalShadowMatrix * (positionWS + vec4(fNormal.xyz * 0.05, 0.0));
-	float shadow = getShadow( directionalShadowMap, directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, shadowCoord );
 
-	vec3 color = vec3(0,0,0);
-	float material = fUV.x * 8.0;
-	if(material < 1.0){
-		color = vec3(0.2,0.30,0.15) * mix(1.0, 1.25, fUV.y);
-	}else if(material > 5.0 && material < 6.0){
-		color = vec3(1.0,0.256,0.09) * mix(0.5, 1.0, sqrt(clamp(material - 5.0, 0.0, 1.0)));
-	}else if(material > 6.0){
-		color = vec3(0.85,0.1,0.1) * mix(0.5, 1.0, (material - 6.0) / 2.0);
+	float light = dot(fNormal, direction);
+
+	float heightGradient = 1.0;
+	float materialIndex = floor(fUV.x * 8.0);
+	float intensity = floor(fUV.y * 8.0) / 7.0;
+	vec3 color = vec3(0.0, 0.0, 0.0); //* heightGradient;
+	if(materialIndex <= 0.01){
+		color = vec3(0.3,0.3,0.35);
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
+	}else if(materialIndex <= 1.01){
+		color = vec3(0.2,0.30,0.15);
+	}else if(materialIndex <= 2.01){
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y * 2.0, 0.0, 1.0));
+		float height = clamp(fPosition.y * 2.0, 0.0, 1.0) * 5.0;
+		height = mod(height, 1.0);
+		color = height < 0.1 ? vec3(0.1,0.15,0.25) : vec3(0.2,0.3,0.45);
+	}else if(materialIndex <= 3.01){
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
+		color = vec3(0.2,0.2,1.0);
+	}else if(materialIndex <= 4.01){
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
+		float height = fPosition.y * 8.0;
+		vec3 tangent = cross(vec3(0.0,1.0,0.0), fNormal);
+		//vec3 xzPos = vec3(fPosition.x, 0.0, fPosition.z);
+		float vertical = mod(dot(tangent, fPosition) * 5.0 + (fract(height / 2.0) < 0.5 ? 0.5 : 0.0), 1.0);
+		vec3 baseColor = vec3(0.6,1.0,1.0);
+		float lines = clamp(step(mod(height, 1.0), 0.1) + step(vertical, 0.1), 0.0, 1.0);
+		color = lines > 0.5 ? baseColor * 0.9 : baseColor;
+	}else if(materialIndex <= 5.01){
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
+		color = vec3(0.6,1.0,1.0) * 0.75;
+	}else if(materialIndex <= 6.01){
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
+		color = vec3(0.65,0.35,0.35);
+	}else{
+		heightGradient = mix(0.4, 1.0, clamp(fPosition.y / 7.0, 0.0, 1.0));
+		color = vec3(0.85,0.8,0.9);
 	}
-	float highlight = 1.0 - clamp(movementMag / 0.2, 0.0, 1.0);
-	highlight *= fUV.y;
-	color *= mix(1.0, 1.5, highlight);
+	color *= intensity * ( (materialIndex >= 0.99 && materialIndex <= 1.01) ? 1.0 : heightGradient);
+	
+	float shadow = getShadow( directionalShadowMap, directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, shadowCoord );
 
 	float shadowIntensity = mix(0.6, 1.0, saturate(step(0.5, shadow) - step(0.3, getCloudShadow(positionWS.xyz))));
 	vec3 shadowColor = mix(vec3(0.1,0.1,0.35), vec3(1.0), saturate(shadowIntensity));
 	color *= shadowColor;
-
 	gl_FragColor = vec4(color, 1.0);
 }

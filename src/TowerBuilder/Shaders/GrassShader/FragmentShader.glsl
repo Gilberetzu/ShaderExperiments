@@ -1,16 +1,12 @@
 varying vec2 fUV;
 varying vec3 fPosition;
 varying vec3 fNormal;
+varying float movementMag;
 varying mat4 modelMatrixFrag;
-
-uniform sampler2D cloudShapeTex;
-uniform vec3 cloudBoundsMin;
-uniform vec3 cloudBoundsMax;
-uniform vec3 lightDirection;
-uniform float cloudTime;
 
 uniform sampler2D directionalShadowMap;
 uniform mat4 directionalShadowMatrix;
+//varying vec4 vDirectionalShadowCoord;
 struct DirectionalLightShadow {
 	float shadowBias;
 	float shadowNormalBias;
@@ -18,6 +14,13 @@ struct DirectionalLightShadow {
 	vec2 shadowMapSize;
 };
 uniform DirectionalLightShadow directionalLightShadow;
+
+uniform sampler2D cloudShapeTex;
+uniform vec3 cloudBoundsMin;
+uniform vec3 cloudBoundsMax;
+uniform vec3 lightDirection;
+uniform float cloudTime;
+uniform float cloudCoverage;
 
 float saturate(float a){
 	return clamp(a, 0.0,1.0);
@@ -48,6 +51,8 @@ float getCloudShadow(vec3 positionWS){
 	if(rayHitInfo.y > 0.0){
 		vec3 hitPosition = positionWS.xyz + (-lightDirection) * rayHitInfo.x;
 		cloudSample = texture2D( cloudShapeTex, hitPosition.xz * 0.025 + cloudTime * vec2(0.02,0.02)).x;
+		cloudSample = InvLerp(cloudCoverage, 1.0, cloudSample);
+		float maskMultiplier = mix(1.0, 2.0, clamp(-cloudCoverage, 0.0,1.0));
 
 		float xMask = 1.0 - abs((clamp(InvLerp(cloudBoundsMin.x, cloudBoundsMax.x, hitPosition.x), 0.0, 1.0) - 0.5)*2.0);
 		xMask = sin(saturate(InvLerp(0.05,0.5,xMask)) * 1.57);
@@ -55,7 +60,7 @@ float getCloudShadow(vec3 positionWS){
 		float zMask = 1.0 - abs((clamp(InvLerp(cloudBoundsMin.z, cloudBoundsMax.z, hitPosition.z), 0.0, 1.0) - 0.5)*2.0);
 		zMask = sin(saturate(InvLerp(0.05,0.5,zMask)) * 1.57);
 
-		cloudSample = clamp(cloudSample* 1.5 - (1.0 - xMask * zMask), 0.0, 1.0);
+		cloudSample = clamp(cloudSample* 1.5 - (1.0 - xMask * zMask * maskMultiplier), 0.0, 1.0);
 	}
 	return cloudSample;
 }
@@ -122,7 +127,22 @@ void main() {
 	vec4 shadowCoord = directionalShadowMatrix * (positionWS + vec4(fNormal.xyz * 0.05, 0.0));
 	float shadow = getShadow( directionalShadowMap, directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, shadowCoord );
 
-	float cloudSample = getCloudShadow(positionWS.xyz);
-	gl_FragColor = vec4(vec3(0.1,0.1,0.35), (1.0 - step(0.3,shadow)) * 0.1 + step(0.3,cloudSample) * 0.1);
-	//gl_FragColor = vec4(cloudSample, 0.0, 0.0, 1.0);
+	vec3 color = vec3(0,0,0);
+	float material = fUV.x * 8.0;
+	if(material < 1.0){
+		color = vec3(0.2,0.30,0.15) * mix(1.0, 1.25, fUV.y);
+	}else if(material > 5.0 && material < 6.0){
+		color = vec3(1.0,0.256,0.09) * mix(0.5, 1.0, sqrt(clamp(material - 5.0, 0.0, 1.0)));
+	}else if(material > 6.0){
+		color = vec3(0.85,0.1,0.1) * mix(0.5, 1.0, (material - 6.0) / 2.0);
+	}
+	float highlight = 1.0 - clamp(movementMag / 0.2, 0.0, 1.0);
+	highlight *= fUV.y;
+	color *= mix(1.0, 1.5, highlight);
+
+	float shadowIntensity = mix(0.6, 1.0, saturate(step(0.5, shadow) - step(0.3, getCloudShadow(positionWS.xyz))));
+	vec3 shadowColor = mix(vec3(0.1,0.1,0.35), vec3(1.0), saturate(shadowIntensity));
+	color *= shadowColor;
+
+	gl_FragColor = vec4(color, 1.0);
 }
