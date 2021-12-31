@@ -45,8 +45,6 @@ export default class Slider{
 		this.barGraphic.clear();
 		const vpos = Num.InverseLerp(this.min,this.max,this.value);
 
-		console.log(vpos);
-
 		this.barGraphic.beginFill(commonStyles.baseButton.bgColorInactive);
 		this.barGraphic.drawRoundedRect(0,0,this.width,5);
 		this.barGraphic.endFill();
@@ -85,6 +83,7 @@ export default class Slider{
 			if(inputStore.mouse.buttons[0]){
 				inputStore.mouse.buttons[0] = false;
 				this.value = Num.Lerp(this.min, this.max, Num.InverseLerp(boundingBox.min.x, boundingBox.max.x, mousePos.x));
+				this.callback(this.value);
 			}
 			this.drawActive();
 		}else{
