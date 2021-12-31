@@ -10,6 +10,7 @@
 	<ul>
 		<li><a href="/PlanetarySystemGenerator">Planetary System Generator</a></li>
 		<li><a href="/PlanetGenerator">Planet Generator</a></li>
+		<li><a href="/TowerBuilder">Tower Builder</a></li>
 	</ul>
 </div>
 <div>
