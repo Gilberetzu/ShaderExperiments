@@ -15,6 +15,10 @@ export default class ThreeSpace{
 		this.lastTime = performance.now();
 	}
 
+	resizeTargets(){
+		this.scene3d.resizeTargets();
+	}
+
 	enter3dScene(){
 		this.scene3d.enter3dScene();
 	}

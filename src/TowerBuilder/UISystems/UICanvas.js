@@ -62,6 +62,12 @@ export default class UICanvas{
 		this.createLogo(startSystem);
 		this.UIElements = [this.logoContainer];
 	}
+
+	resizeTargets(){
+		this.size = window.TowerBuilder.getContainerSize();
+		this.pixiApp.renderer.resize(this.size.width, this.size.height);
+		//UI objects that need to be updated
+	}
 	
 	addUIElement(createElement){
 		this.UIElements.push(createElement(this.pixiApp.stage));

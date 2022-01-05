@@ -458,10 +458,12 @@ export default class PolygonTriangulation {
 					let hit = Ray2D.RayLineIntersect(ray, pEdge, hitInfo);
 
 					if (hit) {
-						possiblePositions.push({
-							distance: hitInfo.t1,
-							newPos: Vec2.Add(vert.pos, Vec2.MultScalar(normal, hitInfo.t1))
-						});
+						if(hitInfo.t1 < this.edgeLenght * 2){
+							possiblePositions.push({
+								distance: hitInfo.t1,
+								newPos: Vec2.Add(vert.pos, Vec2.MultScalar(normal, hitInfo.t1))
+							});
+						}
 					}
 				}
 
@@ -1308,6 +1310,6 @@ export default class PolygonTriangulation {
 		setTimeout(() => {
 			console.log("Relaxation ticker added");
 			this.pixiApp.ticker.add(relaxationTicker);
-		}, 500);
+		}, 500);//500
 	}
 }

@@ -22,6 +22,12 @@ export default class CameraController{
 		scene.add(this.camera);
 	}
 
+	resize(){
+		this.size = window.TowerBuilder.getContainerSize();
+        this.camera.aspect = this.size.width / this.size.height;
+        this.camera.updateProjectionMatrix();
+	}
+
 	cameraMovementAndRotation(inputStore, dt){
 		//Movement State Machine
 		

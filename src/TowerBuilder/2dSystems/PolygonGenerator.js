@@ -127,6 +127,12 @@ export default class PolygonGenerator {
 		this.polygonTriangulator = null;
 	}
 
+	resizeTargets(){
+		let size = window.TowerBuilder.getContainerSize();
+		this.pixiApp.renderer.resize(size.width, size.height);
+		this.pixiApp.stage.position.set(64, size.height - 64);
+	}
+
 	/**
 	 * 
 	 * @param {Vec2} position

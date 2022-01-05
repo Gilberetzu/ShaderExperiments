@@ -570,7 +570,7 @@ export default class GenerationSpace{
 		const currentLayer = Num.Clamp(Math.floor(ray.origin.y), 0, maxVerticalLayers - 1);
 		const dotVertical = Vec3.Dot(ray.direction, new Vec3(0,1,0));
 
-		const plane = new THREE.Plane(new THREE.Vector3(0,1,0));
+		//const plane = new THREE.Plane(new THREE.Vector3(0,1,0));
 		const ray2dDir = new Vec2(ray.direction.z, ray.direction.x);
 		const ray2dOrigin = Vec2.Subtract(new Vec2(ray.origin.z, ray.origin.x), this.centerPosition);
 
@@ -580,14 +580,17 @@ export default class GenerationSpace{
 			for (let layerIndex = currentLayer; layerIndex >= 0; layerIndex--) {
 				//Check top part of the vertex
 				const planeHeight = -layerIndex - 0.5;
-				const vertIndex = this.rayToPolygonPlane(planeHeight, ray, layerIndex, 
-					(state)=>{return state != VERT_STATE.AIR && state != VERT_STATE.WATER;})
-				if(vertIndex != -1){
-					return {
-						layerIndex,
-						vertIndex: vertIndex,
-						adjacentIndex: -1
-					};
+
+				if(ray.origin.y >= -planeHeight){
+					const vertIndex = this.rayToPolygonPlane(planeHeight, ray, layerIndex, 
+						(state)=>{return state != VERT_STATE.AIR && state != VERT_STATE.WATER;})
+					if(vertIndex != -1){
+						return {
+							layerIndex,
+							vertIndex: vertIndex,
+							adjacentIndex: -1
+						};
+					}
 				}
 
 				//Check sides of vertex

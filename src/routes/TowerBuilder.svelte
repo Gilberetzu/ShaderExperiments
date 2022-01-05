@@ -4,6 +4,7 @@
 
 <script>
     import { onMount } from 'svelte';
+import { Color } from 'three';
     import ByMeIcon from '../CommonComponents/ByMeIcon.svelte';
     import SocialLinks from '../CommonComponents/SocialLinks.svelte';
 
@@ -47,6 +48,10 @@
     let fontLoaded = false;
     let systemStarted = false;
     let socialHovered = false;
+
+	let resizeTimeout = null;
+	let waitingForUserToStopResizing = false;
+	let handleResize = false;
 
     const startSystem = () => {
         systemStarted = true;
@@ -95,7 +100,15 @@
                 }
             }
 
-            input.mouse.scrollDelta.x = 0;
+			if(handleResize){
+				uiCanvas.resizeTargets();
+				threeSpace.resizeTargets();
+				pixiSpace.resizeTargets();
+				waitingForUserToStopResizing = false;
+				handleResize = false;
+			}
+            
+			input.mouse.scrollDelta.x = 0;
             input.mouse.scrollDelta.y = 0;
             requestAnimationFrame(systemUpdate);
         };
@@ -155,6 +168,15 @@
 			input.keyboard[key] = false;
 		})
 	}}
+	on:resize={(e)=>{
+		waitingForUserToStopResizing = true;
+		if(resizeTimeout){
+			clearTimeout(resizeTimeout);
+		}
+		resizeTimeout = setTimeout(()=>{
+			handleResize = true;
+		}, 500);
+	}}
 />
 
 <div
@@ -195,6 +217,12 @@
     <canvas bind:this={pixiUICanvas} />
 </div>
 <a style="display: none;" href="./" bind:this={downloadHTMLElement}>download</a>
+
+{#if waitingForUserToStopResizing}
+	<div class="resizeTrigger">
+		<div class="resizeTriggerText">RESIZE TRIGERED</div>
+	</div>
+{/if}
 
 <div
     class="hoverableSocial"
@@ -239,6 +267,23 @@
         left: 75px;
         padding: 10px 0px;
     }
+	.resizeTrigger{
+		width: 100vw;
+        height: 100vh;
+        position: fixed;
+		background-color: rgba(0.0,0.0,0.0,0.4);
+		display: grid;
+		place-content: center;
+		color: white;
+		font-family: Bubblegum Sans;
+		font-size: 4em;
+	}
+	.resizeTriggerText{
+		display: inline-block;
+		background-color: black;
+		border-radius: 0.5em;
+		padding: 0.5em;
+	}
     .personalLogo {
         position: fixed;
         bottom: 0px;

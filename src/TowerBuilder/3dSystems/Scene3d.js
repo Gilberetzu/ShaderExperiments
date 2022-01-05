@@ -166,6 +166,16 @@ export default class Scene3d{
 		this.scene.add(this.bgMesh);
 	}
 
+	resizeTargets(){
+		this.size = window.TowerBuilder.getContainerSize();
+		this.renderer.setSize(this.size.width, this.size.height, false);
+		this.colorTexture.setSize(this.size.width, this.size.height);
+		this.colorCloudMergeTexture.setSize(this.size.width, this.size.height);
+		this.postPRocessMaterial.uniforms.texelSize.value = new THREE.Vector2(1/this.size.width, 1/this.size.height);
+		this.cameraController.resize();
+		this.cloudRenderer.resizeTargets();
+	}
+
 	enter3dScene(){
 		console.log("add called");
 		window.TowerBuilder.addUIElement((container)=>{

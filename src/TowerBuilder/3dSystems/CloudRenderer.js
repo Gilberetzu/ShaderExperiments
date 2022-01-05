@@ -202,7 +202,7 @@ export default class CloudRenderer{
 			}
 		});
 
-		this.kawaseBlurShaderMaterial = new THREE.ShaderMaterial({
+		this.kuwaharaBlurShaderMaterial = new THREE.ShaderMaterial({
 			fragmentShader: KawaseBlurFragmentShader,
 			vertexShader: KawaseBlurVertexShader,
 			uniforms: {
@@ -230,7 +230,20 @@ export default class CloudRenderer{
 		this.cloudBlurRenderMesh = new THREE.Mesh(postProcessGeometry, this.cloudBlurShaderMaterial);
 		this.cloudUpsampleRenderMesh = new THREE.Mesh(postProcessGeometry, this.cloudUpsampleShaderMaterial);
 		this.cloudPassthroughTestMesh = new THREE.Mesh(postProcessGeometry, this.cloudPassthroughTestMaterial);
-		this.kawaseBlurRenderMesh = new THREE.Mesh(postProcessGeometry, this.kawaseBlurShaderMaterial);
+		this.kawaseBlurRenderMesh = new THREE.Mesh(postProcessGeometry, this.kuwaharaBlurShaderMaterial);
+	}
+
+	resizeTargets(){
+		this.size = window.TowerBuilder.getContainerSize();
+		this.cloudTextureBlur1.setSize(this.size.width/2, this.size.height/2);
+		this.cloudTextureBlur2.setSize(this.size.width/4, this.size.height/4);
+		this.cloudTextureBlur3.setSize(this.size.width/8, this.size.height/8);
+		this.cloudTexture.setSize(this.size.width, this.size.height);
+		this.cloudTexture1.setSize(this.size.width/2, this.size.height/2);
+		this.cloudTexture2.setSize(this.size.width/4, this.size.height/4);
+		this.cloudRenderTexture.setSize(this.size.width / 8, this.size.height / 8);
+		this.cloudKawaseTexture.setSize(this.size.width, this.size.height);
+		this.kuwaharaBlurShaderMaterial.uniforms.texelSize.value = new THREE.Vector2(1/this.size.width, 1/this.size.height);
 	}
 
 	update(dt, cameraController, colorTexture, lightController){
@@ -333,8 +346,8 @@ export default class CloudRenderer{
 			spector.setMarker("Kawase Blur");
 		}
 		renderer.setRenderTarget(this.cloudKawaseTexture);
-		this.kawaseBlurShaderMaterial.uniforms.colorTexture.value = this.cloudTexture.texture;
-		this.kawaseBlurShaderMaterial.needsUpdate = true;
+		this.kuwaharaBlurShaderMaterial.uniforms.colorTexture.value = this.cloudTexture.texture;
+		this.kuwaharaBlurShaderMaterial.needsUpdate = true;
 		renderer.render(this.kawaseBlurRenderMesh, postProcessCamera);
 
 		if (window.spector) {
