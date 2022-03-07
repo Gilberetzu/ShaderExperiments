@@ -15,8 +15,8 @@ import BlurUpsampleVertexShader from 	"../Shaders/CloudBlurUpsampleShader/Vertex
 import BlurFragmentShader from 	"../Shaders/CloudBlurUpsampleShader/BlurShader/FragmentShader.glsl?raw";
 import UpsampleFragmentShader from 	"../Shaders/CloudBlurUpsampleShader/BlurShader/FragmentShader.glsl?raw";
 
-import KawaseBlurFragmentShader from 	"../Shaders/KawaseBlur/FragmentShader.glsl?raw";
-import KawaseBlurVertexShader from 	"../Shaders/KawaseBlur/VertexShader.glsl?raw";
+import KuwaharaBlurFragmentShader from 	"../Shaders/KuwaharaBlur/FragmentShader.glsl?raw";
+import KuwaharaBlurVertexShader from 	"../Shaders/KuwaharaBlur/VertexShader.glsl?raw";
 
 export default class CloudRenderer{
 	constructor(postProcessGeometry, colorTexture, cameraController, lightController, renderer, postProcessCamera){
@@ -80,7 +80,7 @@ export default class CloudRenderer{
 			minFilter: THREE.LinearFilter,
 		});
 
-		this.cloudKawaseTexture = new THREE.WebGLRenderTarget(this.size.width, this.size.height, {
+		this.cloudKuwaharaTexture = new THREE.WebGLRenderTarget(this.size.width, this.size.height, {
 			depthBuffer: false,
 			format: THREE.RGBAFormat,
 			type: THREE.FloatType,
@@ -169,7 +169,7 @@ export default class CloudRenderer{
 					value: colorTexture.texture
 				},
 				cloudTexture:{
-					value: this.cloudKawaseTexture.texture
+					value: this.cloudKuwaharaTexture.texture
 				}
 			}
 		});
@@ -203,8 +203,8 @@ export default class CloudRenderer{
 		});
 
 		this.kuwaharaBlurShaderMaterial = new THREE.ShaderMaterial({
-			fragmentShader: KawaseBlurFragmentShader,
-			vertexShader: KawaseBlurVertexShader,
+			fragmentShader: KuwaharaBlurFragmentShader,
+			vertexShader: KuwaharaBlurVertexShader,
 			uniforms: {
 				colorTexture:{
 					value: this.cloudTexture.texture
@@ -230,7 +230,7 @@ export default class CloudRenderer{
 		this.cloudBlurRenderMesh = new THREE.Mesh(postProcessGeometry, this.cloudBlurShaderMaterial);
 		this.cloudUpsampleRenderMesh = new THREE.Mesh(postProcessGeometry, this.cloudUpsampleShaderMaterial);
 		this.cloudPassthroughTestMesh = new THREE.Mesh(postProcessGeometry, this.cloudPassthroughTestMaterial);
-		this.kawaseBlurRenderMesh = new THREE.Mesh(postProcessGeometry, this.kuwaharaBlurShaderMaterial);
+		this.kuwaharaBlurRenderMesh = new THREE.Mesh(postProcessGeometry, this.kuwaharaBlurShaderMaterial);
 	}
 
 	resizeTargets(){
@@ -242,7 +242,7 @@ export default class CloudRenderer{
 		this.cloudTexture1.setSize(this.size.width/2, this.size.height/2);
 		this.cloudTexture2.setSize(this.size.width/4, this.size.height/4);
 		this.cloudRenderTexture.setSize(this.size.width / 8, this.size.height / 8);
-		this.cloudKawaseTexture.setSize(this.size.width, this.size.height);
+		this.cloudKuwaharaTexture.setSize(this.size.width, this.size.height);
 		this.kuwaharaBlurShaderMaterial.uniforms.texelSize.value = new THREE.Vector2(1/this.size.width, 1/this.size.height);
 	}
 
@@ -343,12 +343,12 @@ export default class CloudRenderer{
 		}
 
 		if (window.spector) {
-			spector.setMarker("Kawase Blur");
+			spector.setMarker("Kuwahara Blur");
 		}
-		renderer.setRenderTarget(this.cloudKawaseTexture);
+		renderer.setRenderTarget(this.cloudKuwaharaTexture);
 		this.kuwaharaBlurShaderMaterial.uniforms.colorTexture.value = this.cloudTexture.texture;
 		this.kuwaharaBlurShaderMaterial.needsUpdate = true;
-		renderer.render(this.kawaseBlurRenderMesh, postProcessCamera);
+		renderer.render(this.kuwaharaBlurRenderMesh, postProcessCamera);
 
 		if (window.spector) {
 			spector.clearMarker();
